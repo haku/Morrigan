@@ -5,13 +5,10 @@ import java.util.Date;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaPicture;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaItem;
 
-public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
+public class MixedMediaItem extends MediaItem implements IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors - protected so only siblings can create instances.
 
@@ -174,7 +171,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 		this.setHeight(0);
 	}
 
-	private boolean _setFromMediaTrack (final IMediaTrack mt) {
+	private boolean _setFromMediaTrack (final IMediaItem mt) {
 		boolean b =
 				this.setDuration(mt.getDuration())
 						| this.setStartCount(mt.getStartCount())
@@ -184,14 +181,14 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaTrack (final IMediaTrack mt) {
+	public boolean setFromMediaTrack (final IMediaItem mt) {
 		boolean b =
 				this.setFromMediaItem(mt)
 						| _setFromMediaTrack(mt);
 		return b;
 	}
 
-	private boolean _setFromMediaPicture (final IMediaPicture mp) {
+	private boolean _setFromMediaPicture (final IMediaItem mp) {
 		boolean b =
 				this.setWidth(mp.getWidth())
 						| this.setHeight(mp.getHeight());
@@ -199,7 +196,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaPicture (final IMediaPicture mp) {
+	public boolean setFromMediaPicture (final IMediaItem mp) {
 		boolean b =
 				this.setFromMediaItem(mp)
 						| _setFromMediaPicture(mp);
@@ -207,7 +204,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaMixedItem (final IMixedMediaItem mmi) {
+	public boolean setFromMediaMixedItem (final IMediaItem mmi) {
 		boolean b =
 				this.setFromMediaItem(mmi)
 						| _setFromMediaTrack(mmi)
@@ -220,8 +217,8 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	public boolean setFromMediaItem (final IMediaItem mi) {
 		boolean ret = super.setFromMediaItem(mi);
 
-		if (mi instanceof IMixedMediaItem) {
-			IMixedMediaItem mmi = (IMixedMediaItem) mi;
+		if (mi instanceof IMediaItem) {
+			IMediaItem mmi = mi;
 
 			boolean b =
 					this.setMediaType(mmi.getMediaType());
@@ -229,8 +226,8 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 			ret = b | ret;
 		}
 
-		if (mi instanceof IMediaTrack) {
-			IMediaTrack mt = (IMediaTrack) mi;
+		if (mi instanceof IMediaItem) {
+			IMediaItem mt = mi;
 
 			boolean b = this.setDuration(mt.getDuration())
 					| this.setStartCount(mt.getStartCount())
@@ -240,8 +237,8 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 			ret = b | ret;
 		}
 
-		if (mi instanceof IMediaPicture) {
-			IMediaPicture mli = (IMediaPicture) mi;
+		if (mi instanceof IMediaItem) {
+			IMediaItem mli = mi;
 
 			boolean b = this.setWidth(mli.getWidth())
 					| this.setHeight(mli.getHeight());

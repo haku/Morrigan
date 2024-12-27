@@ -3,8 +3,8 @@ package com.vaguehope.morrigan.player;
 import java.util.List;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.transcode.Transcode;
 
 public interface Player {
@@ -25,12 +25,12 @@ public interface Player {
 	/**
 	 * May be async.
 	 */
-	void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list);
+	void loadAndStartPlaying(IMediaItemList list);
 
 	/**
 	 * May be async.
 	 */
-	void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track);
+	void loadAndStartPlaying(IMediaItemList list, IMediaItem track);
 
 	/**
 	 * May be async.
@@ -50,7 +50,7 @@ public interface Player {
 
 	void setCurrentItem(PlayItem item);
 	PlayItem getCurrentItem();
-	IMediaTrackList<? extends IMediaTrack> getCurrentList();
+	IMediaItemList getCurrentList();
 
 	/**
 	 * Return -1 if not playing.

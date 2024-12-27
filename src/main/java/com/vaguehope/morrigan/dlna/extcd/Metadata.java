@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.dlna.extcd;
 
 import java.util.Date;
 
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 
 public class Metadata {
 
@@ -18,7 +18,7 @@ public class Metadata {
 		this.endCount = endCount;
 	}
 
-	public Metadata (final IMixedMediaItem item) {
+	public Metadata (final IMediaItem item) {
 		this.dateLastPlayed = item.getDateLastPlayed();
 		this.startCount = item.getStartCount();
 		this.endCount = item.getEndCount();

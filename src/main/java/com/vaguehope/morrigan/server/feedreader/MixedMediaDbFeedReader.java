@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;

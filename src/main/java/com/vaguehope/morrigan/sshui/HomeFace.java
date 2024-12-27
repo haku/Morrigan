@@ -15,8 +15,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.config.SavedView;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -228,7 +227,7 @@ public class HomeFace extends MenuFace {
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
-			final IMediaTrackList<? extends IMediaTrack> list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
+			final IMediaItemList list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
 			if (list instanceof IMixedMediaDb) {
 				this.dbHelper.askSearch(gui, (IMixedMediaDb) list);
 			}

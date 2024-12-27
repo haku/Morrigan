@@ -18,8 +18,7 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayer;
@@ -27,7 +26,7 @@ import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.GeneratedString;
 
-public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
+public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implements IMixedMediaItemStorageLayer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayerInner.class);
 
@@ -295,8 +294,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Album readers.
 
-	protected Collection<IMixedMediaItem> local_getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws SQLException, ClassNotFoundException {
-		List<IMixedMediaItem> ret;
+	protected Collection<IMediaItem> local_getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws SQLException, ClassNotFoundException {
+		List<IMediaItem> ret;
 
 		StringBuilder sql = new StringBuilder();
 		sql.append(_SQL_MEDIAFILESALBUMS_SELECT);
@@ -359,10 +358,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 	}
 
-	protected IMixedMediaItem local_getByFile (final String filePath) throws SQLException, ClassNotFoundException {
+	protected IMediaItem local_getByFile (final String filePath) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<IMixedMediaItem> res;
+		List<IMediaItem> res;
 
 		String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHEREFILEEQ;
 		ps = getDbCon().prepareStatement(sql);
@@ -384,10 +383,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		throw new IllegalArgumentException("File not found '"+filePath+"' (results count = "+res.size()+").");
 	}
 
-	protected IMixedMediaItem local_getByMd5 (final BigInteger md5) throws SQLException, ClassNotFoundException {
+	protected IMediaItem local_getByMd5 (final BigInteger md5) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<IMixedMediaItem> res;
+		List<IMediaItem> res;
 
 		String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHERE_MD5_EQ;
 		ps = getDbCon().prepareStatement(sql);
@@ -888,8 +887,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 	}
 
-	protected static List<IMixedMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
-		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+	protected static List<IMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
+		final List<IMediaItem> ret = new ArrayList<>();
 		if (rs.next()) {
 			final ColumnIndexes indexes = new ColumnIndexes(rs);
 			do {
@@ -900,9 +899,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return ret;
 	}
 
-	protected static IMixedMediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final MixedMediaItemFactory itemFactory) throws SQLException {
+	protected static IMediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final MixedMediaItemFactory itemFactory) throws SQLException {
 		String filePath = rs.getString(indexes.colFile);
-		IMixedMediaItem mi = itemFactory.getNewMediaItem(filePath);
+		IMediaItem mi = itemFactory.getNewMediaItem(filePath);
 
 		/* The object returned by the itemFactory may not be fresh.
 		 * It is important that this method call every possible setter.

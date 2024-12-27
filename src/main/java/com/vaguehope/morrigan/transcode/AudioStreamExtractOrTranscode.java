@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.MnLogger;
@@ -140,14 +139,14 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		return codec;
 	}
 
-	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaItem item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final MimeType... otherTypes) throws IOException {
 		this(context, item, tags, transcode, fallbackType, otherTypes.length > 0
 		? EnumSet.copyOf(Arrays.asList(otherTypes))
 		: EnumSet.noneOf(MimeType.class));
 	}
 
-	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaItem item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
 		super(context, item, tags, transcode, findAudioStreamType(context, item, tags, transcode, fallbackType, otherTypes));
 

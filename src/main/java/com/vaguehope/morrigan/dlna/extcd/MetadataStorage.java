@@ -4,9 +4,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -25,11 +24,11 @@ public class MetadataStorage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Writes.
 
-	public void incTrackStartCnt (final IMediaTrack item) throws MorriganException {
+	public void incTrackStartCnt (final IMediaItem item) throws MorriganException {
 		try {
 			try {
 				this.storage.addFile(MediaType.TRACK, item.getRemoteId(), 0);
-				this.storage.incTrackPlayed(new ItemWithFilepath((IMixedMediaItem) item, item.getRemoteId()));
+				this.storage.incTrackPlayed(new ItemWithFilepath(item, item.getRemoteId()));
 			}
 			finally {
 				this.storage.commitOrRollBack();
@@ -41,10 +40,10 @@ public class MetadataStorage {
 		}
 	}
 
-	public void incTrackEndCnt (final IMediaTrack item) throws MorriganException {
+	public void incTrackEndCnt (final IMediaItem item) throws MorriganException {
 		try {
 			try {
-				this.storage.incTrackFinished(new ItemWithFilepath((IMixedMediaItem) item, item.getRemoteId()));
+				this.storage.incTrackFinished(new ItemWithFilepath(item, item.getRemoteId()));
 			}
 			finally {
 				this.storage.commitOrRollBack();
@@ -59,9 +58,9 @@ public class MetadataStorage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Reads.
 
-	private final ConcurrentMap<String, Metadata> cache = new ConcurrentHashMap<String, Metadata>();
+	private final ConcurrentMap<String, Metadata> cache = new ConcurrentHashMap<>();
 
-	private void uncache (final IMediaTrack track) {
+	private void uncache (final IMediaItem track) {
 		this.cache.remove(track.getRemoteId());
 	}
 

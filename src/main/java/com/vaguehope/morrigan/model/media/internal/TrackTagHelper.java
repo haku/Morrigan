@@ -15,9 +15,10 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -61,7 +62,7 @@ public final class TrackTagHelper {
 
 	private TrackTagHelper () {}
 
-	public static void readTrackTags (final IMediaItemDb<?, ?> itemDb, final IMediaTrack mlt, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
+	public static void readTrackTags (final IMediaItemDb<?> itemDb, final IMediaItem mlt, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		final AudioFile af;
 		try {
 			af = AudioFileIO.read(file);

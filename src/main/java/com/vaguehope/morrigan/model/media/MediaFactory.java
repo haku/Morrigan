@@ -58,7 +58,7 @@ public interface MediaFactory {
 	 */
 	ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException;
 
-	IMediaItemDb<?,?> getMediaItemDbTransactional (IMediaItemDb<?,?> db) throws DbException;
+	IMediaItemDb<?> getMediaItemDbTransactional (IMediaItemDb<?> db) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -87,13 +87,13 @@ public interface MediaFactory {
 	 */
 	MorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
 	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
-	<T extends IMediaItem> MorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
-	<T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
+	MorriganTask getMediaFileCopyTask (IMediaItemList mediaItemList, List<IMediaItem> mediaSelection, File targetDirectory);
+	MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList fromList, Collection<IMediaItem> itemsToCopy, ILocalMixedMediaDb toDb);
 	MorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	void readTrackTags (IMediaItemDb<?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
+	void readTrackTags (IMediaItemDb<?> itemDb, IMediaItem mlt, File file) throws IOException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

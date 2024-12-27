@@ -18,11 +18,9 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMediaPicture;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
@@ -56,17 +54,17 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 // Content.
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
+	public List<IMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
 		return simpleSearchMedia(getDefaultMediaType(), term, maxResults);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return simpleSearchMedia(getDefaultMediaType(), term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
+	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
 		return simpleSearchMedia(mediaType, term, maxResults, null, null, false);
 	}
 
@@ -127,12 +125,12 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMediaItems () {
+	public List<IMediaItem> getMediaItems () {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public List<IMixedMediaItem> getAllDbEntries () throws DbException {
+	public List<IMediaItem> getAllDbEntries () throws DbException {
 		return Collections.emptyList();
 	}
 
@@ -170,12 +168,12 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public void copyItemFile (final IMixedMediaItem item, final OutputStream os) throws MorriganException {
+	public void copyItemFile (final IMediaItem item, final OutputStream os) throws MorriganException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public File copyItemFile (final IMixedMediaItem item, final File targetDirectory) throws MorriganException {
+	public File copyItemFile (final IMediaItem item, final File targetDirectory) throws MorriganException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
@@ -275,22 +273,22 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	public void unregisterSortChangeListener (final IMediaItemDb.SortChangeListener scl) {}
 
 	@Override
-	public void incTrackStartCnt (final IMediaTrack item, final long n) throws MorriganException {}
+	public void incTrackStartCnt (final IMediaItem item, final long n) throws MorriganException {}
 
 	@Override
-	public void incTrackStartCnt (final IMediaTrack item) throws MorriganException {}
+	public void incTrackStartCnt (final IMediaItem item) throws MorriganException {}
 
 	@Override
-	public void incTrackEndCnt (final IMediaTrack item, final long n) throws MorriganException {}
+	public void incTrackEndCnt (final IMediaItem item, final long n) throws MorriganException {}
 
 	@Override
-	public void incTrackEndCnt (final IMediaTrack item) throws MorriganException {}
+	public void incTrackEndCnt (final IMediaItem item) throws MorriganException {}
 
 	@Override
-	public void setTrackDuration (final IMediaTrack item, final int duration) throws MorriganException {}
+	public void setTrackDuration (final IMediaItem item, final int duration) throws MorriganException {}
 
 	@Override
-	public void setTrackDateLastPlayed (final IMediaTrack item, final Date date) throws MorriganException {}
+	public void setTrackDateLastPlayed (final IMediaItem item, final Date date) throws MorriganException {}
 
 	@Override
 	public void read () throws MorriganException {}
@@ -307,97 +305,97 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public void addItem (final IMixedMediaItem item) {
+	public void addItem (final IMediaItem item) {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public IMixedMediaItem addFile (final File file) throws MorriganException, DbException {
+	public IMediaItem addFile (final File file) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public List<IMixedMediaItem> addFiles (final List<File> files) throws MorriganException, DbException {
+	public List<IMediaItem> addFiles (final List<File> files) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void removeItem (final IMixedMediaItem item) throws MorriganException {
+	public void removeItem (final IMediaItem item) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public IMixedMediaItem getByFile (final File file) throws DbException {
+	public IMediaItem getByFile (final File file) throws DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public IMixedMediaItem getByMd5 (final BigInteger md5) throws DbException {
+	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMediaType (final IMixedMediaItem item, final MediaType newType) throws MorriganException {
+	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setTrackStartCnt (final IMediaTrack item, final long n) throws MorriganException {
+	public void setTrackStartCnt (final IMediaItem item, final long n) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setTrackEndCnt (final IMediaTrack item, final long n) throws MorriganException {
+	public void setTrackEndCnt (final IMediaItem item, final long n) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemDateAdded (final IMixedMediaItem item, final Date date) throws MorriganException {
+	public void setItemDateAdded (final IMediaItem item, final Date date) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMd5 (final IMixedMediaItem item, final BigInteger md5) throws MorriganException {
+	public void setItemMd5 (final IMediaItem item, final BigInteger md5) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemSha1(final IMixedMediaItem item, final BigInteger sha1) throws MorriganException {
+	public void setItemSha1(final IMediaItem item, final BigInteger sha1) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemDateLastModified (final IMixedMediaItem item, final Date date) throws MorriganException {
+	public void setItemDateLastModified (final IMediaItem item, final Date date) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemEnabled (final IMixedMediaItem item, final boolean value) throws MorriganException {
+	public void setItemEnabled (final IMediaItem item, final boolean value) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemEnabled (final IMixedMediaItem item, final boolean value, final Date lastModified) throws MorriganException {
+	public void setItemEnabled (final IMediaItem item, final boolean value, final Date lastModified) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMissing (final IMixedMediaItem item, final boolean value) throws MorriganException {
+	public void setItemMissing (final IMediaItem item, final boolean value) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setRemoteLocation (final IMixedMediaItem track, final String remoteLocation) throws MorriganException {
+	public void setRemoteLocation (final IMediaItem track, final String remoteLocation) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void persistTrackData (final IMixedMediaItem track) throws MorriganException {
+	public void persistTrackData (final IMediaItem track) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public IMixedMediaItem updateItem (final IMixedMediaItem item) throws MorriganException, DbException {
+	public IMediaItem updateItem (final IMediaItem item) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -422,7 +420,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (final MediaAlbum album) throws MorriganException {
+	public Collection<IMediaItem> getAlbumItems (final MediaAlbum album) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -442,7 +440,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public void setPictureWidthAndHeight (final IMediaPicture item, final int width, final int height) throws MorriganException {
+	public void setPictureWidthAndHeight (final IMediaItem item, final int width, final int height) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -502,12 +500,12 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public boolean isMarkedAsUnreadable (final IMixedMediaItem mi) throws MorriganException {
+	public boolean isMarkedAsUnreadable (final IMediaItem mi) throws MorriganException {
 		return false;
 	}
 
 	@Override
-	public void markAsUnreadabled (final IMixedMediaItem mi) throws MorriganException {
+	public void markAsUnreadabled (final IMediaItem mi) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -522,7 +520,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
+	public Collection<IMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
 		return Collections.emptyList();
 	}
 

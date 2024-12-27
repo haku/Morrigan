@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
-public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
+public interface IMediaItemDb<S extends IMediaItemStorageLayer> extends IMediaItemList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	interface SortChangeListener {
@@ -34,20 +34,20 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	URI getRemote(String name) throws DbException;
 	Map<String, URI> getRemotes() throws DbException;
 
-	List<T> simpleSearch (String term, int maxResults) throws DbException;
-	List<T> simpleSearch (String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
-	List<T> getAllDbEntries () throws DbException;
-	T getByFile (File file) throws DbException;
-	T getByFile (String filepath) throws DbException;
-	T getByMd5 (BigInteger md5) throws DbException;
+	List<IMediaItem> simpleSearch (String term, int maxResults) throws DbException;
+	List<IMediaItem> simpleSearch (String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	List<IMediaItem> getAllDbEntries () throws DbException;
+	IMediaItem getByFile (File file) throws DbException;
+	IMediaItem getByFile (String filepath) throws DbException;
+	IMediaItem getByMd5 (BigInteger md5) throws DbException;
 
 	/**
 	 * Note: returned item will be missing DB rowId.
 	 */
-	T addFile (File file) throws MorriganException, DbException;
+	IMediaItem addFile (File file) throws MorriganException, DbException;
 	FileExistance hasFile (String filepath) throws MorriganException, DbException;
 	FileExistance hasFile (File file) throws MorriganException, DbException;
-	List<T> addFiles (List<File> files) throws MorriganException, DbException;
+	List<IMediaItem> addFiles (List<File> files) throws MorriganException, DbException;
 
 	void setHideMissing(final boolean v) throws MorriganException;
 
@@ -57,12 +57,12 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	void registerSortChangeListener (SortChangeListener scl);
 	void unregisterSortChangeListener (SortChangeListener scl);
 
-	boolean isMarkedAsUnreadable (T mi) throws MorriganException;
-	void markAsUnreadabled (T mi) throws MorriganException;
+	boolean isMarkedAsUnreadable (IMediaItem mi) throws MorriganException;
+	void markAsUnreadabled (IMediaItem mi) throws MorriganException;
 
 	void beginBulkUpdate ();
 	void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException;
-	T updateItem (T item) throws MorriganException, DbException;
+	IMediaItem updateItem (IMediaItem item) throws MorriganException, DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

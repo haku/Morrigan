@@ -14,8 +14,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
@@ -105,14 +105,14 @@ public class MlistsServletTest {
 	public void itServesSha1Tags() throws Exception {
 		this.testDb.setDefaultMediaType(MediaType.TRACK, true);
 
-		final IMixedMediaItem t0 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567890abcdefL));
+		final IMediaItem t0 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567890abcdefL));
 		this.testDb.addTag(t0, "foo", MediaTagType.MANUAL, null, new Date(123456789000L), false);
 		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, null, new Date(987654321000L), false);
 		this.testDb.addTag(t0, "no-mod-date", MediaTagType.MANUAL, null, null, false);  // Because apparently this is still a thing.
 		this.testDb.addTag(t0, "gone", MediaTagType.MANUAL, null, new Date(155666777000L), true);
 		this.testDb.addTag(t0, "bat", MediaTagType.AUTOMATIC, "some class", new Date(155666888000L), false);
 
-		final IMixedMediaItem t1 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1114567890abcdefL));
+		final IMediaItem t1 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1114567890abcdefL));
 		this.testDb.setItemMediaType(t1, MediaType.PICTURE);
 		this.testDb.addTag(t1, "pic", MediaTagType.MANUAL, null, new Date(155666888000L), false);
 

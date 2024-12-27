@@ -10,10 +10,9 @@ import org.jupnp.model.meta.RemoteService;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -70,14 +69,14 @@ public class ContentDirectoryDb extends EphemeralMixedMediaDb {
 	}
 
 	@Override
-	public IMixedMediaItem getByFile (final String remoteId) throws DbException {
-		final IMixedMediaItem item = this.contentDirectory.fetchItemByIdWithRetry(remoteId, MAX_TRIES);
+	public IMediaItem getByFile (final String remoteId) throws DbException {
+		final IMediaItem item = this.contentDirectory.fetchItemByIdWithRetry(remoteId, MAX_TRIES);
 		if (item == null) throw new IllegalArgumentException("File with ID '" + remoteId + "' not found.");
 		return item;
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return this.contentDirectory.searchWithRetry(term, maxResults, MAX_TRIES);
 	}
 
@@ -85,12 +84,12 @@ public class ContentDirectoryDb extends EphemeralMixedMediaDb {
 //	Metadata.
 
 	@Override
-	public void incTrackStartCnt (final IMediaTrack item) throws MorriganException {
+	public void incTrackStartCnt (final IMediaItem item) throws MorriganException {
 		this.metadataStorage.incTrackStartCnt(item);
 	}
 
 	@Override
-	public void incTrackEndCnt (final IMediaTrack item) throws MorriganException {
+	public void incTrackEndCnt (final IMediaItem item) throws MorriganException {
 		this.metadataStorage.incTrackEndCnt(item);
 	}
 

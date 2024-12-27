@@ -28,7 +28,7 @@ import org.mockito.stubbing.Answer;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -161,7 +161,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		runUpdateTask();
 		verify(this.taskEventListener).subTask("Found 1 albums");
 
-		final IMixedMediaItem i1 = this.testDb.getByFile(f1);
+		final IMediaItem i1 = this.testDb.getByFile(f1);
 		this.testDb.addTag(i1, "my tag", MediaTagType.MANUAL, (MediaTagClassification) null);
 		this.testDb.addTag(i1, "auto tag", MediaTagType.AUTOMATIC, "bar");
 		this.testDb.addTag(i1, "auto tag2", MediaTagType.AUTOMATIC, "foo");
@@ -188,7 +188,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		runUpdateTask();
 		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
 		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
-		final IMixedMediaItem i2 = this.testDb.getByFile(f2);
+		final IMediaItem i2 = this.testDb.getByFile(f2);
 		assertEquals("my tag", this.testDb.getTags(i2).get(0).getTag());
 		assertEquals("auto tag", this.testDb.getTags(i2).get(1).getTag());
 		assertEquals(BigInteger.valueOf(2), i2.getMd5());
@@ -203,7 +203,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		final File f1 = mockFileInDir(sourceDir, "foo.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
 		runUpdateTask();
 
-		final IMixedMediaItem i1 = this.testDb.getByFile(f1);
+		final IMediaItem i1 = this.testDb.getByFile(f1);
 		this.testDb.addTag(i1, "deleted tag 1", MediaTagType.MANUAL, (MediaTagClassification) null);
 		final List<MediaTag> tags = this.testDb.getTags(i1);
 		int rmCount = 0;
@@ -231,7 +231,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 	}
 
 	private void assertHasFile(final File f1, final boolean missing, final boolean enabled) throws DbException {
-		final IMixedMediaItem a = this.testDb.getByFile(f1);
+		final IMediaItem a = this.testDb.getByFile(f1);
 		assertNotNull("Not found: " + f1.getAbsolutePath(), a);
 		assertEquals(f1.length(), a.getFileSize());
 		assertEquals(missing, a.isMissing());

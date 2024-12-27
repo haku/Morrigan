@@ -24,8 +24,8 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -35,13 +35,13 @@ public class TagEditor extends DialogWindow {
 
 	private static final int MAX_AUTOCOMPLETE_RESULTS = 20;
 
-	protected final IMediaTrackList<?> list;
-	protected final IMediaTrack item;
+	protected final IMediaItemList list;
+	protected final IMediaItem item;
 
 	protected final TextBox txtNewTag;
 	protected final TagListBox lstTags;
 
-	public TagEditor (final IMediaTrackList<?> list, final IMediaTrack item) throws MorriganException {
+	public TagEditor (final IMediaItemList list, final IMediaItem item) throws MorriganException {
 		super(maxLength(item.getTitle(), 50)); // FIXME magic number.
 
 		this.list = list;
@@ -246,7 +246,7 @@ public class TagEditor extends DialogWindow {
 
 		@Override
 		protected ListItemRenderer<MediaTag, TagListBox> createDefaultListItemRenderer () {
-			return new ListItemRenderer<MediaTag, TagListBox>() {
+			return new ListItemRenderer<>() {
 				@Override
 				public int getHotSpotPositionOnLine (final int selectedIndex) {
 					return -1;
@@ -265,7 +265,7 @@ public class TagEditor extends DialogWindow {
 		return s.substring(0, maxLength);
 	}
 
-	public static void show (final WindowBasedTextGUI owner, final IMediaTrackList<?> list, final IMediaTrack item) throws MorriganException {
+	public static void show (final WindowBasedTextGUI owner, final IMediaItemList list, final IMediaItem item) throws MorriganException {
 		new TagEditor(list, item).showDialog(owner);
 	}
 

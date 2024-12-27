@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItem;
 
 public class CoverArtHelperTest {
 
@@ -125,7 +126,7 @@ public class CoverArtHelperTest {
 
 	@Test
 	public void itFindsCoverForAlbum () throws Exception {
-		Collection<IMediaItem> albumPics = new LinkedHashSet<IMediaItem>();
+		Collection<IMediaItem> albumPics = new LinkedHashSet<>();
 		albumPics.add(new TestItem(givenNoise().getAbsolutePath()));
 
 		final File cover = this.tmp.newFile("cover.jpg");
@@ -136,7 +137,7 @@ public class CoverArtHelperTest {
 
 	@Test
 	public void itFindsCoverForAlbumByFallingBackToFirstPic () throws Exception {
-		Collection<IMediaItem> albumPics = new LinkedHashSet<IMediaItem>();
+		Collection<IMediaItem> albumPics = new LinkedHashSet<>();
 
 		final File cover = this.tmp.newFile("somethinG.jPg");
 		albumPics.add(new TestItem(cover.getAbsolutePath()));
@@ -157,7 +158,7 @@ public class CoverArtHelperTest {
 		return this.tmp.newFile("something.jpg");
 	}
 
-	private static class TestItem extends MediaItem {
+	private static class TestItem extends MixedMediaItem {
 
 		public TestItem (final String filePath) {
 			super(filePath);

@@ -6,11 +6,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
-public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer<IMixedMediaItem> {
+public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 
@@ -20,12 +20,12 @@ public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer<IMixedMe
 	void setDefaultMediaType (MediaType mediaType);
 	MediaType getDefaultMediaType();
 
-	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
-	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumn, SortDirection[] sortDirection, boolean includeDisabled) throws DbException;
+	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
+	List<IMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
+	List<IMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumn, SortDirection[] sortDirection, boolean includeDisabled) throws DbException;
 
-	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
+	Collection<IMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for generic MediaItem.

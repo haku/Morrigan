@@ -1,7 +1,7 @@
 package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 
 /**
  * This object will be responsible for all caching of item instances
@@ -22,7 +22,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 public class MixedMediaItemFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<MixedMediaItem, String, RuntimeException>(true) {
+	private final RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<>(true) {
 
 		@Override
 		protected boolean isValidProduct (final MixedMediaItem product) {
@@ -44,7 +44,7 @@ public class MixedMediaItemFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public IMixedMediaItem getNewMediaItem (final String filePath) {
+	public IMediaItem getNewMediaItem (final String filePath) {
 		if (filePath == null) return newItem(null); // We can not cache these. :(
 		return this.factory.manufacture(filePath);
 	}

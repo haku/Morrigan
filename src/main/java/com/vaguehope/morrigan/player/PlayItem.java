@@ -2,8 +2,8 @@ package com.vaguehope.morrigan.player;
 
 import java.io.File;
 
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.util.Objs;
 
 /**
@@ -12,15 +12,15 @@ import com.vaguehope.morrigan.util.Objs;
 public class PlayItem {
 
 	private final PlayItemType type;
-	private final IMediaTrackList<? extends IMediaTrack> list;
-	private final IMediaTrack track;
+	private final IMediaItemList list;
+	private final IMediaItem track;
 	private final File altFile;
 	private int id = Integer.MIN_VALUE;
 
 	/**
 	 * Either list or track may be null.
 	 */
-	public PlayItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
+	public PlayItem (final IMediaItemList list, final IMediaItem track) {
 		if (list == null && track == null) throw new IllegalArgumentException("At least one of list and track must be specified.");
 		this.type = PlayItemType.PLAYABLE;
 		this.list = list;
@@ -36,7 +36,7 @@ public class PlayItem {
 		this.altFile = null;
 	}
 
-	private PlayItem (final PlayItemType type, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track, final File altFile) {
+	private PlayItem (final PlayItemType type, final IMediaItemList list, final IMediaItem track, final File altFile) {
 		this.type = type;
 		this.list = list;
 		this.track = track;
@@ -66,11 +66,11 @@ public class PlayItem {
 		return this.altFile != null;
 	}
 
-	public IMediaTrackList<? extends IMediaTrack> getList () {
+	public IMediaItemList getList () {
 		return this.list;
 	}
 
-	public IMediaTrack getTrack () {
+	public IMediaItem getTrack () {
 		return this.track;
 	}
 
@@ -102,7 +102,7 @@ public class PlayItem {
 		return new PlayItem(this.type, this.list, this.track, this.altFile);
 	}
 
-	public PlayItem withTrack(final IMediaTrack newTrack) {
+	public PlayItem withTrack(final IMediaItem newTrack) {
 		if (this.type.isPseudo()) throw new IllegalArgumentException("Can not add track to pseudo item.");
 
 		final PlayItem pi = new PlayItem(this.list, newTrack);
@@ -116,7 +116,7 @@ public class PlayItem {
 		return new PlayItem(this.type, this.list, this.track, newAltFile);
 	}
 
-	public String resolveTitle(IMediaTrackList<? extends IMediaTrack> relativeTo) {
+	public String resolveTitle(IMediaItemList relativeTo) {
 		if (this.type.isPseudo()) return this.type.toString();
 		if (this.track == null) return this.list.getListName();
 		if (this.list.equals(relativeTo)) return this.track.getTitle();

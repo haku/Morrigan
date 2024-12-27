@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -17,11 +17,11 @@ public class TranscodeTask implements MorriganTask {
 
 	private final Transcoder transcoder;
 	private final Transcode transcode;
-	private final IMediaTrackList<? extends IMediaTrack> db;
+	private final IMediaItemList db;
 	private final Integer maxNumber;
 	private final TranscodeContext context;
 
-	public TranscodeTask (final Transcoder transcoder, final Transcode transcode, final IMediaTrackList<? extends IMediaTrack> db, final Integer maxNumber, final TranscodeContext context) {
+	public TranscodeTask (final Transcoder transcoder, final Transcode transcode, final IMediaItemList db, final Integer maxNumber, final TranscodeContext context) {
 		this.transcoder = transcoder;
 		this.transcode = transcode;
 		this.db = db;
@@ -42,7 +42,7 @@ public class TranscodeTask implements MorriganTask {
 		try {
 			final List<TranscodeProfile> profiles = new ArrayList<>();
 			this.db.read();
-			for (final IMediaTrack item : this.db.getMediaItems()) {
+			for (final IMediaItem item : this.db.getMediaItems()) {
 				if (taskEventListener.isCanceled()) break;
 				if (profiles.size() >= this.maxNumber) break;
 				if (!item.isEnabled()) continue;

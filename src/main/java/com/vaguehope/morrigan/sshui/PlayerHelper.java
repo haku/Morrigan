@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerQueue;
@@ -21,15 +21,15 @@ public final class PlayerHelper {
 		throw new AssertionError();
 	}
 
-	public static void shuffleAndEnqueue (final IMediaTrackList<? extends IMediaTrack> db, final List<? extends IMediaTrack> tracks, final Player player) {
-		final List<IMediaTrack> shuffeledList = new ArrayList<>(tracks);
+	public static void shuffleAndEnqueue (final IMediaItemList db, final List<IMediaItem> tracks, final Player player) {
+		final List<IMediaItem> shuffeledList = new ArrayList<>(tracks);
 		Collections.shuffle(shuffeledList);
 		enqueueAll(db, shuffeledList, player);
 	}
 
-	public static void playAll (final IMediaTrackList<? extends IMediaTrack> db, final List<? extends IMediaTrack> tracks, final Player player) {
+	public static void playAll (final IMediaItemList db, final List<IMediaItem> tracks, final Player player) {
 		final List<PlayItem> items = new ArrayList<>();
-		for (final IMediaTrack track : tracks) {
+		for (final IMediaItem track : tracks) {
 			items.add(new PlayItem(db, track));
 		}
 		player.getQueue().addToQueue(items);
@@ -37,9 +37,9 @@ public final class PlayerHelper {
 		player.nextTrack();
 	}
 
-	public static void enqueueAll (final IMediaTrackList<? extends IMediaTrack> db, final List<? extends IMediaTrack> tracks, final Player player) {
+	public static void enqueueAll (final IMediaItemList db, final List<IMediaItem> tracks, final Player player) {
 		final PlayerQueue queue = player.getQueue();
-		for (final IMediaTrack track : tracks) {
+		for (final IMediaItem track : tracks) {
 			queue.addToQueue(new PlayItem(db, track));
 		}
 	}

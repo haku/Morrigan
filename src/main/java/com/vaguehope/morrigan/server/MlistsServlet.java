@@ -37,13 +37,10 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMediaPicture;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
@@ -287,7 +284,7 @@ public class MlistsServlet extends HttpServlet {
 		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
 			final String filepath = URLDecoder.decode(afterPath, "UTF-8");
 			if (mmdb.hasFile(filepath).isKnown()) {
-				final IMixedMediaItem item = mmdb.getByFile(filepath);
+				final IMediaItem item = mmdb.getByFile(filepath);
 				if (item != null) {
 					postToMmdbItem(req, resp, action, mmdb, item);
 				}
@@ -360,7 +357,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final IMixedMediaItem item) throws IOException, MorriganException {
+	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final IMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -450,9 +447,9 @@ public class MlistsServlet extends HttpServlet {
 			if (player != null) { // parsePlayer() will write the error msg.
 				mmdb.read();
 				resp.setContentType("text/plain");
-				final Collection<IMixedMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
+				final Collection<IMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
 				final List<PlayItem> trackPlayItems = new ArrayList<>();
-				for (final IMixedMediaItem track : tracks) {
+				for (final IMediaItem track : tracks) {
 					trackPlayItems.add(new PlayItem(mmdb, track));
 				}
 				if (action.equals(CMD_PLAY)) {
@@ -538,7 +535,7 @@ public class MlistsServlet extends HttpServlet {
 				// Request to fetch media file.
 				final String filepath = URLDecoder.decode(afterPath, "UTF-8");
 				if (mmdb.hasFile(filepath).isKnown()) {
-					final IMixedMediaItem item = mmdb.getByFile(filepath);
+					final IMediaItem item = mmdb.getByFile(filepath);
 					final File file = item.getFile();
 					if (file != null && file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
@@ -634,7 +631,7 @@ public class MlistsServlet extends HttpServlet {
 			// TODO it would be nice to make the gson instance static and reusable, but ATM the type converted wraps the DB.
 			// TODO do not output entries that do not have any tags.
 			final Gson gson = new GsonBuilder()
-					.registerTypeHierarchyAdapter(IMixedMediaItem.class, new Sha1TagsJsonSerializer(mmdb, includeAutoTags))
+					.registerTypeHierarchyAdapter(IMediaItem.class, new Sha1TagsJsonSerializer(mmdb, includeAutoTags))
 					.create();
 			final Object[] items = mmdb.getAllDbEntries().stream().filter(i -> i.getSha1() != null).toArray();
 			resp.setContentType(CONTENT_TYPE_JSON);
@@ -645,7 +642,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static class Sha1TagsJsonSerializer implements JsonSerializer<IMixedMediaItem> {
+	private static class Sha1TagsJsonSerializer implements JsonSerializer<IMediaItem> {
 		private final IMixedMediaDb db;
 		private final boolean includeAutoTags;
 
@@ -655,7 +652,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		@Override
-		public JsonElement serialize(final IMixedMediaItem i, final Type typeOfSrc, final JsonSerializationContext context) {
+		public JsonElement serialize(final IMediaItem i, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject o = new JsonObject();
 			o.addProperty("sha1", i.getSha1().toString(16));
 			final JsonArray a = new JsonArray();
@@ -760,7 +757,7 @@ public class MlistsServlet extends HttpServlet {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
 
-		List<IMixedMediaItem> items;
+		List<IMediaItem> items;
 		if (queryString != null) {
 			items = ml.simpleSearch(queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
 		}
@@ -809,7 +806,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		if (includeItems == IncludeItems.YES) {
-			for (final IMixedMediaItem mi : items) {
+			for (final IMediaItem mi : items) {
 				dw.startElement("entry");
 				fillInMediaItem(dw, ml, mi, includeTags, transcode, this.config);
 				dw.endElement("entry");
@@ -819,7 +816,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "mlist");
 	}
 
-	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi,
+	static void fillInMediaItem (final DataWriter dw, final IMediaItemList ml, final IMediaItem mi,
 			final IncludeTags includeTags, final String transcodeStr, final Config config) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
@@ -831,9 +828,9 @@ public class MlistsServlet extends HttpServlet {
 
 		final Transcode transcode = Transcode.parse(transcodeStr);
 		if (transcode != Transcode.NONE) {
-			if (mi instanceof IMediaTrack) {
+			if (mi instanceof IMediaItem) {
 				if (tags == null) tags = ml.readTags(mi);
-				final TranscodeProfile tProfile = transcode.profileForItem(new TranscodeContext(config), (IMediaTrack) mi, tags);
+				final TranscodeProfile tProfile = transcode.profileForItem(new TranscodeContext(config), mi, tags);
 				if (tProfile != null) {
 					title = tProfile.getTranscodedTitle();
 
@@ -860,8 +857,8 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
 		}
 
-		if (mi instanceof IMixedMediaItem) {
-			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
+		if (mi instanceof IMediaItem) {
+			FeedHelper.addElement(dw, "type", mi.getMediaType().getN());
 		}
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
 		if (originalFileMd5 != null && !BigInteger.ZERO.equals(originalFileMd5)) FeedHelper.addElement(dw, "originalhash", originalFileMd5.toString(16));
@@ -872,8 +869,8 @@ public class MlistsServlet extends HttpServlet {
 		});
 		FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
 
-		if (mi instanceof IMediaTrack) {
-			final IMediaTrack track = (IMediaTrack) mi;
+		if (mi instanceof IMediaItem) {
+			final IMediaItem track = mi;
 			FeedHelper.addElement(dw, "duration", track.getDuration());
 			FeedHelper.addElement(dw, "startcount", track.getStartCount());
 			FeedHelper.addElement(dw, "endcount", track.getEndCount());
@@ -881,8 +878,8 @@ public class MlistsServlet extends HttpServlet {
 				FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(track.getDateLastPlayed()));
 			}
 		}
-		else if (mi instanceof IMediaPicture) {
-			final IMediaPicture pic = (IMediaPicture) mi;
+		else if (mi instanceof IMediaItem) {
+			final IMediaItem pic = mi;
 			FeedHelper.addElement(dw, "width", pic.getWidth());
 			FeedHelper.addElement(dw, "height", pic.getHeight());
 		}

@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
@@ -57,7 +57,7 @@ public abstract class AbstractPlayer implements Player {
 		this.register = register;
 		this.playerStateStorage = playerStateStorage;
 		this.config = config;
-		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("pld"));
+		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new DaemonThreadFactory("pld"));
 		this.transcoder = new Transcoder(id);
 	}
 
@@ -165,7 +165,7 @@ public abstract class AbstractPlayer implements Player {
 		if (asMeasured > 0) return asMeasured;
 
 		final PlayItem item = getCurrentItem();
-		final IMediaTrack track = item != null && item.hasTrack() ? item.getTrack() : null;
+		final IMediaItem track = item != null && item.hasTrack() ? item.getTrack() : null;
 		final int trackDuration = track != null ? track.getDuration() : -1;
 		if (trackDuration > 0) return trackDuration;
 
@@ -223,12 +223,12 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
+	public final void loadAndStartPlaying (final IMediaItemList list) {
 		loadAndStartPlaying(list, null);
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
+	public final void loadAndStartPlaying (final IMediaItemList list, final IMediaItem track) {
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
 
@@ -255,7 +255,7 @@ public abstract class AbstractPlayer implements Player {
 				order = PlaybackOrder.RANDOM;
 			}
 
-			final IMediaTrack track = this.orderHelper.getNextTrack(pi.getList(), null, order);
+			final IMediaItem track = this.orderHelper.getNextTrack(pi.getList(), null, order);
 			if (track == null) {
 				System.err.println("Failed to fill in track: " + pi);
 				return;
@@ -351,7 +351,7 @@ public abstract class AbstractPlayer implements Player {
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
 		if (currentItem != null && currentItem.isComplete()) {
-			final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentItem.getList(), currentItem.getTrack(), pbOrder);
+			final IMediaItem nextTrack = getOrderResolver().getNextTrack(currentItem.getList(), currentItem.getTrack(), pbOrder);
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
@@ -359,8 +359,8 @@ public abstract class AbstractPlayer implements Player {
 					currentItem.getList(), currentItem.getTrack(), pbOrder);
 		}
 
-		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
-		final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentList, null, pbOrder);
+		final IMediaItemList currentList = getCurrentList();
+		final IMediaItem nextTrack = getOrderResolver().getNextTrack(currentList, null, pbOrder);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}

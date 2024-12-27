@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.player.LocalPlayer;
@@ -90,7 +90,7 @@ public final class PrintingThingsHelper {
 		return String.valueOf(p.getPlaybackOrder());
 	}
 
-	public static String summariseItemWithPlayCounts (final IMediaTrackList<?> list, final IMediaTrack item, final DateFormat dateFormat) throws MorriganException {
+	public static String summariseItemWithPlayCounts (final IMediaItemList list, final IMediaItem item, final DateFormat dateFormat) throws MorriganException {
 		if (item.getStartCount() > 0 || item.getEndCount() > 0) {
 			return String.format("%s/%s %s %s",
 					item.getStartCount(), item.getEndCount(),
@@ -100,14 +100,14 @@ public final class PrintingThingsHelper {
 		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
 	}
 
-	public static String summariseItemTags (final IMediaTrackList<?> list, final IMediaTrack item) throws MorriganException {
+	public static String summariseItemTags (final IMediaItemList list, final IMediaItem item) throws MorriganException {
 		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
 	}
 
 	public static String summariseTags (final Player player) {
 		final PlayItem playItem = player.getCurrentItem();
 		if (playItem != null && playItem.hasTrack()) {
-			final IMediaTrackList<? extends IMediaTrack> list = player.getCurrentList();
+			final IMediaItemList list = player.getCurrentList();
 			if (list != null) {
 				try {
 					final List<MediaTag> tags = list.getTags(playItem.getTrack()); // TODO cache this?

@@ -34,8 +34,8 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -59,10 +59,10 @@ public class ContentAdaptor {
 
 	private final Map<String, ContentNode> cache = Collections.synchronizedMap(new LruMap<String, ContentNode>(100, 100));
 
-	private final Map<String, MediaListReference> objectIdToMediaListReference = new ConcurrentHashMap<String, MediaListReference>();
-	private final Map<String, MlrAnd<DbSubNodeType>> objectIdToDbSubNodeType = new ConcurrentHashMap<String, MlrAnd<DbSubNodeType>>();
-	private final Map<String, MlrAnd<MediaTag>> objectIdToTag = new ConcurrentHashMap<String, MlrAnd<MediaTag>>();
-	private final Map<String, MlrAnd<MediaAlbum>> objectIdToAlbum = new ConcurrentHashMap<String, MlrAnd<MediaAlbum>>();
+	private final Map<String, MediaListReference> objectIdToMediaListReference = new ConcurrentHashMap<>();
+	private final Map<String, MlrAnd<DbSubNodeType>> objectIdToDbSubNodeType = new ConcurrentHashMap<>();
+	private final Map<String, MlrAnd<MediaTag>> objectIdToTag = new ConcurrentHashMap<>();
+	private final Map<String, MlrAnd<MediaAlbum>> objectIdToAlbum = new ConcurrentHashMap<>();
 
 	public ContentAdaptor (final MediaFactory mediaFactory, final MediaServer mediaServer, final MediaFileLocator mediaFileLocator) {
 		this.mediaFactory = mediaFactory;
@@ -281,8 +281,8 @@ public class ContentAdaptor {
 		return new ContentNode(c);
 	}
 
-	private void addItemsToContainer (final MediaListReference mlr, final Container c, final IMixedMediaDb db, final Collection<IMixedMediaItem> items) throws MorriganException {
-		for (final IMixedMediaItem item : items) {
+	private void addItemsToContainer (final MediaListReference mlr, final Container c, final IMixedMediaDb db, final Collection<IMediaItem> items) throws MorriganException {
+		for (final IMediaItem item : items) {
 			final Item i = makeItem(c, mlr, item);
 			if (i != null) {
 				tagsToDescription(db, item, i);
@@ -292,18 +292,18 @@ public class ContentAdaptor {
 		updateContainer(c);
 	}
 
-	private final Cache<String, List<IMixedMediaItem>> queryCache = new Cache<String, List<IMixedMediaItem>>(50);
+	private final Cache<String, List<IMediaItem>> queryCache = new Cache<>(50);
 
 	public List<Item> queryToItems(final MediaListReference mlr, final IMixedMediaDb db, final String term, final Container parentContainer, final int maxResults) throws DbException, MorriganException {
 		final String cacheKey = String.format("%s|%s|%s", term, maxResults, mlr.getIdentifier());
-		List<IMixedMediaItem> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
+		List<IMediaItem> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
 		if (results == null) {
 			results = db.simpleSearchMedia(MediaType.TRACK, term, maxResults);
 			this.queryCache.put(cacheKey, results);
 		}
 
-		final List<Item> ret = new ArrayList<Item>();
-		for (final IMixedMediaItem item : results) {
+		final List<Item> ret = new ArrayList<>();
+		for (final IMediaItem item : results) {
 			final Item i = makeItem(parentContainer, mlr, item);
 			if (i != null) {
 				tagsToDescription(db, item, i);
@@ -313,7 +313,7 @@ public class ContentAdaptor {
 		return ret;
 	}
 
-	private Item makeItem (final Container parentContainer, final MediaListReference mlr, final IMixedMediaItem mediaItem) {
+	private Item makeItem (final Container parentContainer, final MediaListReference mlr, final IMediaItem mediaItem) {
 		final File file = new File(mediaItem.getFilepath());
 		final MediaFormat format = MediaFormat.identify(file);
 		if (format == null) {
@@ -357,7 +357,7 @@ public class ContentAdaptor {
 		return item;
 	}
 
-	private static void tagsToDescription (final IMixedMediaDb db, final IMixedMediaItem mediaItem, final Item item) throws MorriganException {
+	private static void tagsToDescription (final IMixedMediaDb db, final IMediaItem mediaItem, final Item item) throws MorriganException {
 		final List<MediaTag> tags = db.getTags(mediaItem);
 		if (tags != null && tags.size() > 0) {
 			StringBuilder s = null;
@@ -397,19 +397,19 @@ public class ContentAdaptor {
 
 	private String dbSubNodeObjectId (final MediaListReference mlr, final DbSubNodeType t) {
 		final String id = makeDbSubNodeObjectId(mlr, t);
-		this.objectIdToDbSubNodeType.put(id, new MlrAnd<DbSubNodeType>(mlr, t));
+		this.objectIdToDbSubNodeType.put(id, new MlrAnd<>(mlr, t));
 		return id;
 	}
 
 	private String tagObjectId (final MediaListReference mlr, final MediaTag tag) {
 		final String id = makeTagObjectId(mlr, tag);
-		this.objectIdToTag.put(id, new MlrAnd<MediaTag>(mlr, tag));
+		this.objectIdToTag.put(id, new MlrAnd<>(mlr, tag));
 		return id;
 	}
 
 	private String albumObjectId (final MediaListReference mlr, final MediaAlbum album) {
 		final String id = makeAlbumObjectId(mlr, album);
-		this.objectIdToAlbum.put(id, new MlrAnd<MediaAlbum>(mlr, album));
+		this.objectIdToAlbum.put(id, new MlrAnd<>(mlr, album));
 		return id;
 	}
 

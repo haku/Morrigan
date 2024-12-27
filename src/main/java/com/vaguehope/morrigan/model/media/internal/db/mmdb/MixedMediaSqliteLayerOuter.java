@@ -12,8 +12,8 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.internal.Defaults;
@@ -63,32 +63,32 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getAllMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<IMediaItem> getAllMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		return getMedia(MediaType.UNKNOWN, sorts, directions, hideMissing);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<IMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		return getMedia(getDefaultMediaType(), sorts, directions, hideMissing);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
+	public List<IMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
 		return getMedia(getDefaultMediaType(), sorts, directions, hideMissing, search);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
+	public List<IMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
 		return simpleSearchMedia(getDefaultMediaType(), term, maxResults);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions, final boolean includeDisabled) throws DbException {
 		return simpleSearchMedia(getDefaultMediaType(), term, maxResults, sorts, directions, includeDisabled);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<IMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false).execute(getDbCon(), this.itemFactory);
 		}
@@ -98,7 +98,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
+	public List<IMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false, search).execute(getDbCon(), this.itemFactory);
 		}
@@ -111,7 +111,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
 	 */
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
+	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, term).execute(getDbCon(), this.itemFactory, maxResults);
 		}
@@ -121,7 +121,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sortColumn, sortDirection, true, !includeDisabled, term).execute(getDbCon(), this.itemFactory, maxResults);
 		}
@@ -134,12 +134,12 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	Album readers.
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (final MediaAlbum album) throws DbException {
+	public Collection<IMediaItem> getAlbumItems (final MediaAlbum album) throws DbException {
 		return getAlbumItems(MediaType.UNKNOWN, album);
 	}
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws DbException {
+	public Collection<IMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws DbException {
 		try {
 			return local_getAlbumItems(mediaType, album);
 		}
@@ -172,7 +172,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public IMixedMediaItem getByFile (final File file) throws DbException {
+	public IMediaItem getByFile (final File file) throws DbException {
 		try {
 			return local_getByFile(file.getAbsolutePath());
 		}
@@ -182,7 +182,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public IMixedMediaItem getByFile (final String filePath) throws DbException {
+	public IMediaItem getByFile (final String filePath) throws DbException {
 		try {
 			return local_getByFile(filePath);
 		}
@@ -192,7 +192,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public IMixedMediaItem getByMd5 (final BigInteger md5) throws DbException {
+	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		try {
 			return local_getByMd5(md5);
 		}
@@ -461,7 +461,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IMixedMediaItem getNewT (final String filePath) {
+	public IMediaItem getNewT (final String filePath) {
 		return this.itemFactory.getNewMediaItem(filePath);
 	}
 

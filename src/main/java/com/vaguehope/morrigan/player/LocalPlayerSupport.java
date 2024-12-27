@@ -1,12 +1,11 @@
 package com.vaguehope.morrigan.player;
 
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 
 public interface LocalPlayerSupport {
 
 	void historyChanged();
 
-	IMediaTrackList<IMediaTrack> getCurrentList();
+	IMediaItemList getCurrentList();
 
 }

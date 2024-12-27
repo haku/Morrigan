@@ -23,7 +23,6 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
@@ -151,7 +150,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 
 	@Override
-	public IMediaItemDb<?, ?> getMediaItemDbTransactional (final IMediaItemDb<?, ?> db) throws DbException {
+	public IMediaItemDb<?> getMediaItemDbTransactional (final IMediaItemDb<?> db) throws DbException {
 		if (MediaListType.LOCALMMDB.toString().equals(db.getType())) {
 			return LocalMixedMediaDbFactory.getTransactional(db.getDbPath());
 		}
@@ -235,13 +234,13 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public <T extends IMediaItem> MorriganTask getMediaFileCopyTask (final IMediaItemList<T> mediaItemList, final List<T> mediaSelection, final File targetDirectory) {
-		return new MediaFileCopyTask<>(mediaItemList, mediaSelection, targetDirectory);
+	public MorriganTask getMediaFileCopyTask (final IMediaItemList mediaItemList, final List<IMediaItem> mediaSelection, final File targetDirectory) {
+		return new MediaFileCopyTask(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
-	public <T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb) {
-		return new CopyToLocalMmdbTask<>(fromList, itemsToCopy, toDb, this.config);
+	public MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final ILocalMixedMediaDb toDb) {
+		return new CopyToLocalMmdbTask(fromList, itemsToCopy, toDb, this.config);
 	}
 
 	@Override
@@ -253,7 +252,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void readTrackTags (final IMediaItemDb<?, ?> itemDb, final IMediaTrack mt, final File file) throws IOException, MorriganException {
+	public void readTrackTags (final IMediaItemDb<?> itemDb, final IMediaItem mt, final File file) throws IOException, MorriganException {
 		try {
 			TrackTagHelper.readTrackTags(itemDb, mt, file);
 		}

@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.dlna.util.Cache;
 import com.vaguehope.morrigan.dlna.util.Quietly;
 import com.vaguehope.morrigan.dlna.util.StringHelper;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class ContentDirectory {
@@ -41,7 +41,7 @@ public class ContentDirectory {
 	private final RemoteService contentDirectory;
 	private final MetadataStorage metadataStorage;
 
-	private final Cache<String, IMixedMediaItem> itemCache = new Cache<String, IMixedMediaItem>(100);
+	private final Cache<String, IMediaItem> itemCache = new Cache<>(100);
 
 	public ContentDirectory (final ControlPoint controlPoint, final RemoteService contentDirectory, final MetadataStorage metadataStorage) {
 		this.controlPoint = controlPoint;
@@ -49,7 +49,7 @@ public class ContentDirectory {
 		this.metadataStorage = metadataStorage;
 	}
 
-	public IMixedMediaItem fetchItemByIdWithRetry (final String remoteId, final int maxTries) throws DbException {
+	public IMediaItem fetchItemByIdWithRetry (final String remoteId, final int maxTries) throws DbException {
 		int attempt = 0;
 		while (true) {
 			attempt += 1;
@@ -66,7 +66,7 @@ public class ContentDirectory {
 		}
 	}
 
-	public List<IMixedMediaItem> searchWithRetry (final String term, final int maxResults, final int maxTries) throws DbException {
+	public List<IMediaItem> searchWithRetry (final String term, final int maxResults, final int maxTries) throws DbException {
 		int attempt = 0;
 		while (true) {
 			attempt += 1;
@@ -83,8 +83,8 @@ public class ContentDirectory {
 		}
 	}
 
-	public IMixedMediaItem fetchItemById (final String remoteId) throws DbException {
-		final IMixedMediaItem cached = this.itemCache.getFresh(remoteId, 1, TimeUnit.MINUTES);
+	public IMediaItem fetchItemById (final String remoteId) throws DbException {
+		final IMediaItem cached = this.itemCache.getFresh(remoteId, 1, TimeUnit.MINUTES);
 		if (cached != null) return cached;
 
 		final CountDownLatch cdl = new CountDownLatch(1);
@@ -117,12 +117,12 @@ public class ContentDirectory {
 		final List<Item> items = ref.get().getItems();
 		if (items.size() < 1) return null;
 		if (items.size() > 1) LOG.warn("Fetching item {} returned more than 1 result.", remoteId);
-		final IMixedMediaItem item = didlItemToMnItem(items.get(0));
+		final IMediaItem item = didlItemToMnItem(items.get(0));
 		this.itemCache.put(remoteId, item);
 		return item;
 	}
 
-	public List<IMixedMediaItem> search (final String term, final int maxResults) throws DbException {
+	public List<IMediaItem> search (final String term, final int maxResults) throws DbException {
 		if (StringHelper.blank(term) || "*".equals(term)) {
 			return dlnaBrowse(maxResults);
 		}
@@ -132,11 +132,11 @@ public class ContentDirectory {
 		return dlnaSearch(term, maxResults);
 	}
 
-	private List<IMixedMediaItem> dlnaBrowse (final int maxResults) throws DbException {
+	private List<IMediaItem> dlnaBrowse (final int maxResults) throws DbException {
 		return dlnaBrowse(ROOT_CONTENT_ID, maxResults);
 	}
 
-	private List<IMixedMediaItem> dlnaBrowse (final String containerId, final int maxResults) throws DbException {
+	private List<IMediaItem> dlnaBrowse (final String containerId, final int maxResults) throws DbException {
 		final CountDownLatch cdl = new CountDownLatch(2);
 		final AtomicReference<DIDLContent> refMetadata = new AtomicReference<DIDLContent>();
 		final AtomicReference<DIDLContent> refChildren = new AtomicReference<DIDLContent>();
@@ -189,7 +189,7 @@ public class ContentDirectory {
 		if (refMetadata.get() == null) throw new DbException(errMetadata.get());
 		if (refChildren.get() == null) throw new DbException(errChildren.get());
 
-		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+		final List<IMediaItem> ret = new ArrayList<>();
 		if (refMetadata.get().getContainers().size() > 0) {
 			final String parentId = refMetadata.get().getContainers().get(0).getParentID();
 			if (!"-1".equals(parentId)) ret.add(new DidlContainer(parentId, ".."));
@@ -199,7 +199,7 @@ public class ContentDirectory {
 		return ret;
 	}
 
-	private List<IMixedMediaItem> dlnaSearch (final String term, final int maxResults) throws DbException {
+	private List<IMediaItem> dlnaSearch (final String term, final int maxResults) throws DbException {
 		final String searchCriteria = String.format("(%s and dc:title contains \"%s\")", TYPE_CRITERIA, term);
 
 		final CountDownLatch cdl = new CountDownLatch(1);
@@ -232,23 +232,23 @@ public class ContentDirectory {
 		return didlItemsToMnItems(ref.get().getItems());
 	}
 
-	private static List<IMixedMediaItem> didlContainersToMnItems (final List<Container> containers) {
-		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+	private static List<IMediaItem> didlContainersToMnItems (final List<Container> containers) {
+		final List<IMediaItem> ret = new ArrayList<>();
 		for (final Container container : containers) {
 			ret.add(new DidlContainer(container));
 		}
 		return ret;
 	}
 
-	private List<IMixedMediaItem> didlItemsToMnItems (final List<Item> items) throws DbException {
-		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+	private List<IMediaItem> didlItemsToMnItems (final List<Item> items) throws DbException {
+		final List<IMediaItem> ret = new ArrayList<>();
 		for (final Item item : items) {
 			ret.add(didlItemToMnItem(item));
 		}
 		return ret;
 	}
 
-	private IMixedMediaItem didlItemToMnItem (final Item item) throws DbException {
+	private IMediaItem didlItemToMnItem (final Item item) throws DbException {
 		Res primaryRes = null;
 		MediaType mediaType = MediaType.UNKNOWN;
 		Res artRes = null;

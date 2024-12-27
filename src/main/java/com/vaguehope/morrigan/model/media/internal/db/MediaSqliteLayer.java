@@ -14,11 +14,10 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.helper.EqualHelper;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.MatchMode;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -29,7 +28,7 @@ import com.vaguehope.morrigan.model.media.internal.MediaTagImpl;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sqlitewrapper.GenericSqliteLayer;
 
-public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqliteLayer implements IMediaItemStorageLayer<T> {
+public abstract class MediaSqliteLayer extends GenericSqliteLayer implements IMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 
@@ -39,23 +38,23 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Collection<IMediaItemStorageLayerChangeListener<T>> changeListeners = Collections.synchronizedList(new ArrayList<IMediaItemStorageLayerChangeListener<T>>());
-	private final IMediaItemStorageLayerChangeListener<T> changeCaller = new IMediaItemStorageLayerChangeListenerAdaptor<>(this.changeListeners);
+	private final Collection<IMediaItemStorageLayerChangeListener> changeListeners = Collections.synchronizedList(new ArrayList<IMediaItemStorageLayerChangeListener>());
+	private final IMediaItemStorageLayerChangeListener changeCaller = new IMediaItemStorageLayerChangeListenerAdaptor(this.changeListeners);
 
 	@Override
-	public void addChangeListener(final IMediaItemStorageLayerChangeListener<T> listener) {
+	public void addChangeListener(final IMediaItemStorageLayerChangeListener listener) {
 		// TODO rewrite this to use a map instead?
 		if (!this.changeListeners.contains(listener)) this.changeListeners.add(listener);
 	}
 
 	@Override
-	public void removeChangeListener(final IMediaItemStorageLayerChangeListener<T> listener) {
+	public void removeChangeListener(final IMediaItemStorageLayerChangeListener listener) {
 		this.changeListeners.remove(listener);
 	}
 
 
 	@Override
-	public IMediaItemStorageLayerChangeListener<T> getChangeEventCaller () {
+	public IMediaItemStorageLayerChangeListener getChangeEventCaller () {
 		return this.changeCaller;
 	}
 

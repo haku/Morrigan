@@ -23,11 +23,12 @@ public class ItemTagsImpl implements ItemTags {
 	/**
 	 * Will not return null.
 	 */
-	public static ItemTags forItem (final IMediaItemList<?> list, final IDbItem item) throws MorriganException {
+	public static ItemTags forItem (final IMediaItemList list, final IDbItem item) throws MorriganException {
 		if (list == null || item == null) return EMPTY;
 		return new ItemTagsImpl(list.getTagsIncludingDeleted(item));
 	}
 
+	@Override
 	public List<MediaTag> tagsIncludingDeleted () {
 		return this.tags;
 	}
@@ -37,7 +38,7 @@ public class ItemTagsImpl implements ItemTags {
 	 */
 	@Override
 	public List<MediaTag> startingWith (final String startsWith) {
-		final List<MediaTag> ret = new ArrayList<MediaTag>();
+		final List<MediaTag> ret = new ArrayList<>();
 		for (final MediaTag tag : this.tags) {
 			if (tag.getType() == MediaTagType.MANUAL && StringHelper.startsWithIgnoreCase(tag.getTag(), startsWith)) {
 				ret.add(tag);

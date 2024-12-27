@@ -39,9 +39,9 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.Objs;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
-		extends MediaItemList<T>
-		implements IMediaItemDb<S, T> {
+public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
+		extends MediaItemList
+		implements IMediaItemDb<S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -106,7 +106,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof MediaItemDb)) return false;
-		final MediaItemDb<?, ?> that = (MediaItemDb<?, ?>) obj;
+		final MediaItemDb<?> that = (MediaItemDb<?>) obj;
 
 		return Objs.equals(this.config, that.config);
 	}
@@ -178,7 +178,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public List<T> getMediaItems () {
+	public List<IMediaItem> getMediaItems () {
 		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
 		return super.getMediaItems();
 	}
@@ -235,7 +235,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	protected void doRead () throws MorriganException, DbException {
 //		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 
-		List<T> allMedia;
+		List<IMediaItem> allMedia;
 		long t0 = System.currentTimeMillis();
 		if (this.searchTerm != null) {
 			allMedia = this.dbLayer.getMedia(
@@ -308,10 +308,10 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 * Returns a copy of the main list updated with all items from the DB.
 	 */
 	@Override
-	public List<T> getAllDbEntries () throws DbException {
+	public List<IMediaItem> getAllDbEntries () throws DbException {
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.
-		List<T> copyOfMainList = new ArrayList<>(getMediaItems());
-		List<T> allList = this.dbLayer.getAllMedia(
+		List<IMediaItem> copyOfMainList = new ArrayList<>(getMediaItems());
+		List<IMediaItem> allList = this.dbLayer.getAllMedia(
 				new IDbColumn[] { this.dbLayer.getDefaultSortColumn() },
 				new SortDirection[] { SortDirection.ASC },
 				false);
@@ -426,34 +426,34 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public T getByFile (final File file) throws DbException {
+	public IMediaItem getByFile (final File file) throws DbException {
 		return this.dbLayer.getByFile(file);
 	}
 
 	@Override
-	public T getByFile (final String filepath) throws DbException {
+	public IMediaItem getByFile (final String filepath) throws DbException {
 		return this.dbLayer.getByFile(filepath);
 	}
 
 	@Override
-	public T getByMd5 (final BigInteger md5) throws DbException {
+	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		return this.dbLayer.getByMd5(md5);
 	}
 
 	@Override
-	public List<T> simpleSearch (final String term, final int maxResults) throws DbException {
+	public List<IMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(term, maxResults);
 	}
 
 	@Override
-	public List<T> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return this.dbLayer.simpleSearch(term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB events.
 
-	private final IMediaItemStorageLayerChangeListener<T> storageChangeListener = new IMediaItemStorageLayerChangeListener<T>() {
+	private final IMediaItemStorageLayerChangeListener storageChangeListener = new IMediaItemStorageLayerChangeListener() {
 
 		@Override
 		public void eventMessage (final String msg) {
@@ -519,7 +519,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 //	Updating tracks.
 
 	@Override
-	public void setItemDateAdded (final T track, final Date date) throws MorriganException {
+	public void setItemDateAdded (final IMediaItem track, final Date date) throws MorriganException {
 		super.setItemDateAdded(track, date);
 		try {
 			this.dbLayer.setDateAdded(track, date);
@@ -530,7 +530,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void removeItem (final T track) throws MorriganException {
+	public void removeItem (final IMediaItem track) throws MorriganException {
 		try {
 			_removeMediaTrack(track);
 		}
@@ -544,7 +544,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 * class is sub-classed and removeMediaTrack() overridden.
 	 * @throws DbException
 	 */
-	private void _removeMediaTrack (final T track) throws MorriganException, DbException {
+	private void _removeMediaTrack (final IMediaItem track) throws MorriganException, DbException {
 		super.removeItem(track);
 
 		// Remove track.
@@ -562,7 +562,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemMd5 (final T track, final BigInteger md5) throws MorriganException {
+	public void setItemMd5 (final IMediaItem track, final BigInteger md5) throws MorriganException {
 		super.setItemMd5(track, md5);
 		try {
 			this.dbLayer.setMd5(track, md5);
@@ -573,7 +573,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemSha1 (final T track, final BigInteger sha1) throws MorriganException {
+	public void setItemSha1 (final IMediaItem track, final BigInteger sha1) throws MorriganException {
 		super.setItemSha1(track, sha1);
 		try {
 			this.dbLayer.setSha1(track, sha1);
@@ -584,7 +584,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemDateLastModified (final T track, final Date date) throws MorriganException {
+	public void setItemDateLastModified (final IMediaItem track, final Date date) throws MorriganException {
 		super.setItemDateLastModified(track, date);
 		try {
 			this.dbLayer.setDateLastModified(track, date);
@@ -595,7 +595,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemEnabled (final T track, final boolean value) throws MorriganException {
+	public void setItemEnabled (final IMediaItem track, final boolean value) throws MorriganException {
 		super.setItemEnabled(track, value);
 		try {
 			this.dbLayer.setEnabled(track, value);
@@ -606,7 +606,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemEnabled (final T track, final boolean value, final Date lastModified) throws MorriganException {
+	public void setItemEnabled (final IMediaItem track, final boolean value, final Date lastModified) throws MorriganException {
 		super.setItemEnabled(track, value, lastModified);
 		try {
 			this.dbLayer.setEnabled(track, value, lastModified);
@@ -617,7 +617,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemMissing (final T track, final boolean value) throws MorriganException {
+	public void setItemMissing (final IMediaItem track, final boolean value) throws MorriganException {
 		super.setItemMissing(track, value);
 		try {
 			this.dbLayer.setMissing(track, value);
@@ -628,7 +628,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setRemoteLocation (final T track, final String remoteLocation) throws MorriganException {
+	public void setRemoteLocation (final IMediaItem track, final String remoteLocation) throws MorriganException {
 		track.setRemoteLocation(remoteLocation);
 		try {
 			this.dbLayer.setRemoteLocation(track, remoteLocation);
@@ -639,7 +639,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void persistTrackData (final T track) throws MorriganException {
+	public void persistTrackData (final IMediaItem track) throws MorriganException {
 		try {
 			this.dbLayer.setMd5(track, track.getMd5());
 			this.dbLayer.setSha1(track, track.getSha1());
@@ -933,7 +933,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public Collection<T> getAlbumItems (final MediaAlbum album) throws MorriganException {
+	public Collection<IMediaItem> getAlbumItems (final MediaAlbum album) throws MorriganException {
 		try {
 			return this.dbLayer.getAlbumItems(album);
 		}
@@ -978,12 +978,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	private static final String TAG_UNREADABLE = "UNREADABLE";
 
 	@Override
-	public boolean isMarkedAsUnreadable (final T mi) throws MorriganException {
+	public boolean isMarkedAsUnreadable (final IMediaItem mi) throws MorriganException {
 		return hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
 	}
 
 	@Override
-	public void markAsUnreadabled (final T mi) throws MorriganException {
+	public void markAsUnreadabled (final IMediaItem mi) throws MorriganException {
 		setItemEnabled(mi, false);
 		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassificationImpl) null);
 	}
@@ -997,8 +997,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 * @throws DbException
 	 */
 	@Override
-	public T addFile (final File file) throws MorriganException, DbException {
-		T track = null;
+	public IMediaItem addFile (final File file) throws MorriganException, DbException {
+		IMediaItem track = null;
 		boolean added = this.dbLayer.addFile(file);
 		if (added) {
 			track = getDbLayer().getNewT(file.getAbsolutePath());
@@ -1013,12 +1013,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 * are ignored.
 	 */
 	@Override
-	public List<T> addFiles (final List<File> files) throws MorriganException, DbException {
-		List<T> ret = new ArrayList<>();
+	public List<IMediaItem> addFiles (final List<File> files) throws MorriganException, DbException {
+		List<IMediaItem> ret = new ArrayList<>();
 		boolean[] res = this.dbLayer.addFiles(files);
 		for (int i = 0; i < files.size(); i++) {
 			if (res[i]) {
-				T t = getDbLayer().getNewT(files.get(i).getAbsolutePath());
+				IMediaItem t = getDbLayer().getNewT(files.get(i).getAbsolutePath());
 				t.reset();
 				addItem(t);
 				ret.add(t);
@@ -1027,7 +1027,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		return ret;
 	}
 
-	private List<T> _changedItems = null;
+	private List<IMediaItem> _changedItems = null;
 
 	@Override
 	public void beginBulkUpdate () {
@@ -1046,10 +1046,10 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public void completeBulkUpdate (final boolean thereWereErrors) throws MorriganException, DbException {
 		try {
-			List<T> removed = replaceListWithoutSetDirty(this._changedItems);
+			List<IMediaItem> removed = replaceListWithoutSetDirty(this._changedItems);
 			if (!thereWereErrors) {
 				this.logger.fine("completeBulkUpdate() : About to clean " + removed.size() + " items...");
-				for (T i : removed) {
+				for (final IMediaItem i : removed) {
 					_removeMediaTrack(i);
 				}
 			}
@@ -1063,12 +1063,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public T updateItem (final T mi) throws MorriganException, DbException {
+	public IMediaItem updateItem (final IMediaItem mi) throws MorriganException, DbException {
 		if (this._changedItems == null) {
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
 		}
 
-		T ret;
+		IMediaItem ret;
 		boolean added = this.dbLayer.addFile(mi.getFilepath(), -1);
 		if (added) {
 			addItem(mi);
@@ -1077,8 +1077,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		}
 		else {
 			// Update item.
-			T track = null;
-			List<T> mediaTracks = getMediaItems();
+			IMediaItem track = null;
+			List<IMediaItem> mediaTracks = getMediaItems();
 			int index = mediaTracks.indexOf(mi); // TODO FIXME This REALLY should be a HashMap lookup.
 			if (index >= 0) {
 				track = mediaTracks.get(index);

@@ -6,7 +6,6 @@ import java.util.Date;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.MimeType;
@@ -14,12 +13,12 @@ import com.vaguehope.morrigan.util.MimeType;
 public abstract class TranscodeProfile {
 
 	protected final TranscodeContext context;
-	private final IMediaTrack item;
+	private final IMediaItem item;
 	private final ItemTags tags;
 	private final Transcode transcode;
 	private final MimeType mimeType;
 
-	protected TranscodeProfile (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode, final MimeType mimeType) {
+	protected TranscodeProfile (final TranscodeContext context, final IMediaItem item, final ItemTags tags, final Transcode transcode, final MimeType mimeType) {
 		this.context = context;
 		if (item == null) throw new IllegalArgumentException("Item required.");
 		if (transcode == null) throw new IllegalArgumentException("Transcode required.");
@@ -30,7 +29,7 @@ public abstract class TranscodeProfile {
 		this.mimeType = mimeType;
 	}
 
-	public IMediaTrack getItem () {
+	public IMediaItem getItem () {
 		return this.item;
 	}
 

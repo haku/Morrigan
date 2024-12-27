@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.model.media;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.basicimpl.DbColumn;
 
-public interface IMediaItemStorageLayer2<T extends IMediaItem> extends IMediaItemStorageLayer<T> {
+public interface IMediaItemStorageLayer2<T extends IMediaItem> extends IMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/*

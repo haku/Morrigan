@@ -11,9 +11,10 @@ import java.util.UUID;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 
 
-public interface IMediaItemList<T extends IMediaItem> {
+public interface IMediaItemList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void dispose ();
@@ -40,7 +41,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 * May returns -1 if no data is available.
 	 */
 	int getCount ();
-	List<T> getMediaItems();
+	List<IMediaItem> getMediaItems();
 
 	/**
 	 * This is the signal to read any source data needed.
@@ -53,25 +54,25 @@ public interface IMediaItemList<T extends IMediaItem> {
 	void forceRead () throws MorriganException;
 	long getDurationOfLastRead();
 
-	void addItem (T item);
-	void removeItem (T item) throws MorriganException;
+	void addItem (IMediaItem item);
+	void removeItem (IMediaItem item) throws MorriganException;
 
-	void setItemDateAdded (T item, Date date) throws MorriganException;
-	void setItemMd5 (T item, BigInteger md5) throws MorriganException;
-	void setItemSha1 (T item, BigInteger sha1) throws MorriganException;
-	void setItemDateLastModified (T item, Date date) throws MorriganException;
-	void setItemEnabled (T item, boolean value) throws MorriganException;
-	void setItemEnabled (T item, boolean value, Date lastModified) throws MorriganException;
-	void setItemMissing (T item, boolean value) throws MorriganException;
-	void setRemoteLocation (T track, String remoteLocation) throws MorriganException;
-	void persistTrackData (T track) throws MorriganException;
+	void setItemDateAdded (IMediaItem item, Date date) throws MorriganException;
+	void setItemMd5 (IMediaItem item, BigInteger md5) throws MorriganException;
+	void setItemSha1 (IMediaItem item, BigInteger sha1) throws MorriganException;
+	void setItemDateLastModified (IMediaItem item, Date date) throws MorriganException;
+	void setItemEnabled (IMediaItem item, boolean value) throws MorriganException;
+	void setItemEnabled (IMediaItem item, boolean value, Date lastModified) throws MorriganException;
+	void setItemMissing (IMediaItem item, boolean value) throws MorriganException;
+	void setRemoteLocation (IMediaItem track, String remoteLocation) throws MorriganException;
+	void persistTrackData (IMediaItem track) throws MorriganException;
 
 	/**
 	 * This will flush the OutputStream.
 	 * This will not close the output stream.
 	 */
-	void copyItemFile (T item, OutputStream os) throws MorriganException;
-	File copyItemFile (T item, File targetDirectory) throws MorriganException;
+	void copyItemFile (IMediaItem item, OutputStream os) throws MorriganException;
+	File copyItemFile (IMediaItem item, File targetDirectory) throws MorriganException;
 
 	List<MediaTagClassification> getTagClassifications () throws MorriganException;
 	void addTagClassification (String classificationName) throws MorriganException;
@@ -107,7 +108,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	MediaAlbum getAlbum (String name) throws MorriganException;
 	void removeAlbum (MediaAlbum album) throws MorriganException;
 	Collection<MediaAlbum> getAlbums () throws MorriganException;
-	Collection<T> getAlbumItems (MediaAlbum album) throws MorriganException;
+	Collection<IMediaItem> getAlbumItems (MediaAlbum album) throws MorriganException;
 	/**
 	 * Will have no effect if already in album.
 	 */
@@ -117,6 +118,44 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 * Returns number of items removed.
 	 */
 	int removeFromAllAlbums (IDbItem item) throws MorriganException;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// track
+
+	/**
+	 * Adds n.
+	 */
+	void incTrackStartCnt (IMediaItem item, long n) throws MorriganException;
+	/**
+	 * Adds 1 and sets last played date.
+	 */
+	void incTrackStartCnt (IMediaItem item) throws MorriganException;
+	void setTrackStartCnt (IMediaItem item, long n) throws MorriganException;
+
+	/**
+	 * Adds n.
+	 */
+	void incTrackEndCnt (IMediaItem item, long n) throws MorriganException;
+	/**
+	 * Adds 1.
+	 */
+	void incTrackEndCnt (IMediaItem item) throws MorriganException;
+	void setTrackEndCnt (IMediaItem item, long n) throws MorriganException;
+
+	void setTrackDuration (IMediaItem item, int duration) throws MorriganException;
+	void setTrackDateLastPlayed (IMediaItem item, Date date) throws MorriganException;
+
+	DurationData getTotalDuration ();
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// picture
+
+	void setPictureWidthAndHeight (IMediaItem item, int width, int height) throws MorriganException;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// mixed
+
+	void setItemMediaType (IMediaItem item, MediaType newType) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

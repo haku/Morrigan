@@ -42,7 +42,7 @@ import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -229,7 +229,7 @@ public class GoalSeekingDlnaPlayerTest {
 	}
 
 	private PlayItem makeItem () throws MorriganException, DbException {
-		final IMixedMediaItem track = this.testDb.addTestTrack();
+		final IMediaItem track = this.testDb.addTestTrack();
 		return new PlayItem(this.testDb, track);
 	}
 

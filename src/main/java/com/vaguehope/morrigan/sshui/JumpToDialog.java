@@ -33,7 +33,7 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -60,7 +60,7 @@ public class JumpToDialog extends DialogWindow {
 	private final Label lblTags;
 
 	private volatile boolean alive = true;
-	private List<? extends IMediaTrack> searchResults;
+	private List<IMediaItem> searchResults;
 	private JumpResult result;
 
 	public JumpToDialog (final IMixedMediaDb db, final AtomicReference<String> savedSearchTerm) {
@@ -165,7 +165,7 @@ public class JumpToDialog extends DialogWindow {
 	/**
 	 * Only call on UI thread.
 	 */
-	protected void requestTags (final IMediaTrack item) {
+	protected void requestTags (final IMediaItem item) {
 		if (this.searchRunner == null) return;
 		this.searchRunner.requestTags(item);
 	}
@@ -184,7 +184,7 @@ public class JumpToDialog extends DialogWindow {
 			this.queue.offer(partialQuery);
 		}
 
-		public void requestTags (final IMediaTrack item) {
+		public void requestTags (final IMediaItem item) {
 			if (item == null) return;
 			this.queue.offer(item);
 		}
@@ -229,11 +229,11 @@ public class JumpToDialog extends DialogWindow {
 							this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowAutocomplete(this.dlg, partialQuery, tags));
 						}
 
-						final List<? extends IMediaTrack> results = this.dlg.db.simpleSearch(partialQuery.fullText, MAX_RESULTS);
+						final List<IMediaItem> results = this.dlg.db.simpleSearch(partialQuery.fullText, MAX_RESULTS);
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new SetSearchResults(this.dlg, results));
 					}
-					else if (item instanceof IMediaTrack) {
-						final List<MediaTag> tags = this.dlg.db.getTags((IMediaTrack) item);
+					else if (item instanceof IMediaItem) {
+						final List<MediaTag> tags = this.dlg.db.getTags((IMediaItem) item);
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowTags(this.dlg, tags));
 					}
 					else {
@@ -268,9 +268,9 @@ public class JumpToDialog extends DialogWindow {
 	private static class SetSearchResults implements Runnable {
 
 		private final JumpToDialog dlg;
-		private final List<? extends IMediaTrack> results;
+		private final List<IMediaItem> results;
 
-		public SetSearchResults (final JumpToDialog dlg, final List<? extends IMediaTrack> results) {
+		public SetSearchResults (final JumpToDialog dlg, final List<IMediaItem> results) {
 			this.dlg = dlg;
 			this.results = results;
 		}
@@ -331,7 +331,7 @@ public class JumpToDialog extends DialogWindow {
 	/**
 	 * Call on UI thread.
 	 */
-	protected final void setSearchResults (final List<? extends IMediaTrack> results) {
+	protected final void setSearchResults (final List<IMediaItem> results) {
 		this.searchResults = results;
 		this.lstResults.setItems(results);
 		if (results != null && results.size() > 0) {
@@ -350,7 +350,7 @@ public class JumpToDialog extends DialogWindow {
 	}
 
 	protected void acceptEnqueueResult () {
-		final IMediaTrack track = this.lstResults.getSelectedTrack();
+		final IMediaItem track = this.lstResults.getSelectedTrack();
 		if (track != null) setResult(new JumpResult(JumpType.ENQUEUE, this.txtSearch.getText(), track));
 	}
 
@@ -374,7 +374,7 @@ public class JumpToDialog extends DialogWindow {
 	}
 
 	protected void acceptRevealResult () {
-		final IMediaTrack track = this.lstResults.getSelectedTrack();
+		final IMediaItem track = this.lstResults.getSelectedTrack();
 		if (track != null) setResult(new JumpResult(JumpType.REVEAL, this.txtSearch.getText(), track));
 	}
 
@@ -454,7 +454,7 @@ public class JumpToDialog extends DialogWindow {
 
 	}
 
-	private static class MediaItemListBox extends AbstractListBox<IMediaTrack, MediaItemListBox> {
+	private static class MediaItemListBox extends AbstractListBox<IMediaItem, MediaItemListBox> {
 
 		private final JumpToDialog dialog;
 
@@ -463,30 +463,30 @@ public class JumpToDialog extends DialogWindow {
 			this.dialog = dialog;
 		}
 
-		public void setItems (final List<? extends IMediaTrack> items) {
+		public void setItems (final List<IMediaItem> items) {
 			clearItems();
 			if (items != null) {
-				for (final IMediaTrack track : items) {
+				for (final IMediaItem track : items) {
 					addItem(track);
 				}
 				setSelectedIndex(0);
 			}
 		}
 
-		public IMediaTrack getSelectedTrack () {
+		public IMediaItem getSelectedTrack () {
 			if (getItemCount() < 1) return null;
 			return getSelectedItem();
 		}
 
 		@Override
-		protected ListItemRenderer<IMediaTrack, MediaItemListBox> createDefaultListItemRenderer() {
-			return new ListItemRenderer<IMediaTrack, MediaItemListBox>() {
+		protected ListItemRenderer<IMediaItem, MediaItemListBox> createDefaultListItemRenderer() {
+			return new ListItemRenderer<>() {
 				@Override
 				public int getHotSpotPositionOnLine(final int selectedIndex) {
 					return -1;
 				}
 				@Override
-				public void drawItem(final TextGUIGraphics graphics, final MediaItemListBox listBox, final int index, final IMediaTrack item, final boolean selected, final boolean focused) {
+				public void drawItem(final TextGUIGraphics graphics, final MediaItemListBox listBox, final int index, final IMediaItem item, final boolean selected, final boolean focused) {
 					super.drawItem(graphics, listBox, index, item, selected, true);
 				}
 			};
@@ -555,22 +555,22 @@ public class JumpToDialog extends DialogWindow {
 
 		private final JumpType type;
 		private final String text;
-		private final IMediaTrack track;
-		private final List<? extends IMediaTrack> tracks;
+		private final IMediaItem track;
+		private final List<IMediaItem> tracks;
 
 		public JumpResult (final JumpType type, final String text) {
 			this(type, text, null, null);
 		}
 
-		public JumpResult (final JumpType type, final String text, final IMediaTrack track) {
+		public JumpResult (final JumpType type, final String text, final IMediaItem track) {
 			this(type, text, track, null);
 		}
 
-		public JumpResult (final JumpType type, final String text, final List<? extends IMediaTrack> tracks) {
+		public JumpResult (final JumpType type, final String text, final List<IMediaItem> tracks) {
 			this(type, text, null, tracks);
 		}
 
-		private JumpResult (final JumpType type, final String text, final IMediaTrack track, final List<? extends IMediaTrack> tracks) {
+		private JumpResult (final JumpType type, final String text, final IMediaItem track, final List<IMediaItem> tracks) {
 			if (type == null) throw new IllegalArgumentException("type not specified");
 			this.type = type;
 			this.track = track;
@@ -587,12 +587,12 @@ public class JumpToDialog extends DialogWindow {
 			return this.text;
 		}
 
-		public IMediaTrack getTrack () {
+		public IMediaItem getTrack () {
 			if (this.track == null) throw new IllegalStateException("track not set.");
 			return this.track;
 		}
 
-		public List<? extends IMediaTrack> getTracks () {
+		public List<IMediaItem> getTracks () {
 			if (this.tracks == null) {
 				if (this.track != null) return Collections.singletonList(this.track);
 				throw new IllegalStateException("tracks not set.");

@@ -13,8 +13,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.server.util.XmlHelper;
@@ -54,7 +54,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	private long entriesProcessed = 0;
 	private int progress = 0;
 
-	private IMixedMediaItem currentItem;
+	private IMediaItem currentItem;
 	private StringBuilder currentText;
 
 	private Date enabledLastModified;
@@ -120,7 +120,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		else if (this.stack.size() == 2 && localName.equals("entry")) {
 			try {
 				// Returned item should have DB row ID filed in.
-				final IMixedMediaItem realItem = this.rmmdb.updateItem(this.currentItem);
+				final IMediaItem realItem = this.rmmdb.updateItem(this.currentItem);
 				if (realItem.getDbRowId() < 0) throw new IllegalStateException("Can not add tags without DB row id for '"+realItem+"'.");
 
 				if (this.tagValues.size() > 0 || this.tagAttrs.size() > 0) {

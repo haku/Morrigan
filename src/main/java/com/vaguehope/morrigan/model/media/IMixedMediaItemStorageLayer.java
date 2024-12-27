@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.model.media;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.basicimpl.DbColumn;
 
-public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer<IMixedMediaItem> {
+public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	IDbColumn SQL_TBL_MEDIAFILES_COL_ID        = new DbColumn("id",        "id",            "INTEGER PRIMARY KEY AUTOINCREMENT", null);

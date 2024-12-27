@@ -25,9 +25,8 @@ import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -72,15 +71,15 @@ public class DbFace extends DefaultFace {
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final Set<IMixedMediaItem> selectedItems = new HashSet<>();
+	private final Set<IMediaItem> selectedItems = new HashSet<>();
 
-	private List<IMixedMediaItem> mediaItems;
+	private List<IMediaItem> mediaItems;
 	private int selectedItemIndex = -1;
 	private int scrollTop = 0;
 	private int pageSize = 1;
 	private VDirection lastMoveDirection = VDirection.DOWN;
 	private String itemDetailsBar = "";
-	private IMixedMediaItem itemDetailsBarItem;
+	private IMediaItem itemDetailsBarItem;
 	private boolean saveScrollOnClose = false;
 
 
@@ -139,7 +138,7 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	public void revealItem (final IMediaTrack track) throws MorriganException {
+	public void revealItem (final IMediaItem track) throws MorriganException {
 		final int i = this.mediaItems.indexOf(track);
 		if (i >= 0) {
 			setSelectedItem(i);
@@ -161,7 +160,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void updateItemDetailsBar () {
-		final IMixedMediaItem item = getSelectedItem();
+		final IMediaItem item = getSelectedItem();
 		if (this.itemDetailsBarItem != null && this.itemDetailsBarItem.equals(item)) return;
 
 		this.mnContext.getUnreliableEs().submit(new Callable<Void>() {
@@ -293,16 +292,16 @@ public class DbFace extends DefaultFace {
 		updateItemDetailsBar();
 	}
 
-	private IMixedMediaItem getSelectedItem () {
+	private IMediaItem getSelectedItem () {
 		if (this.selectedItemIndex < 0) return null;
 		if (this.selectedItemIndex >= this.mediaItems.size()) return null;
 		return this.mediaItems.get(this.selectedItemIndex);
 	}
 
-	private List<IMixedMediaItem> getSelectedItems () {
+	private List<IMediaItem> getSelectedItems () {
 		if (this.selectedItems.size() > 0) {
-			final List<IMixedMediaItem> ret = new ArrayList<>();
-			for (final IMixedMediaItem item : this.mediaItems) {
+			final List<IMediaItem> ret = new ArrayList<>();
+			for (final IMediaItem item : this.mediaItems) {
 				if (this.selectedItems.contains(item)) ret.add(item);
 			}
 			return ret;
@@ -327,14 +326,14 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void enqueueSelection (final WindowBasedTextGUI gui) {
-		final List<IMixedMediaItem> items = getSelectedItems();
+		final List<IMediaItem> items = getSelectedItems();
 		enqueueItems(gui, items);
 		if (items.size() == 1 && items.contains(getSelectedItem())) {
 			menuMove(this.lastMoveDirection, 1);
 		}
 	}
 
-	private void enqueueItems (final WindowBasedTextGUI gui, final List<? extends IMediaTrack> tracks) {
+	private void enqueueItems (final WindowBasedTextGUI gui, final List<IMediaItem> tracks) {
 		if (tracks.size() < 1) return;
 		final Player player = getPlayer(gui, String.format("Enqueue %s items", tracks.size()));
 		if (player == null) return;
@@ -346,7 +345,7 @@ public class DbFace extends DefaultFace {
 		playItems(gui, getSelectedItems());
 	}
 
-	private void playItems (final WindowBasedTextGUI gui, final List<IMixedMediaItem> tracks) {
+	private void playItems (final WindowBasedTextGUI gui, final List<IMediaItem> tracks) {
 		if (tracks.size() < 1) return;
 		final Player player = getPlayer(gui, String.format("Play %s items", tracks.size()));
 		if (player == null) return;
@@ -355,13 +354,13 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void showEditTagsForSelectedItem (final WindowBasedTextGUI gui) throws MorriganException {
-		final IMixedMediaItem item = getSelectedItem();
+		final IMediaItem item = getSelectedItem();
 		if (item == null) return;
 		TagEditor.show(gui, this.db, item);
 	}
 
 	private void toggleSelection () throws MorriganException {
-		final IMixedMediaItem item = getSelectedItem();
+		final IMediaItem item = getSelectedItem();
 		if (item == null) return;
 		if (!this.selectedItems.remove(item)) this.selectedItems.add(item);
 		updateItemDetailsBar();
@@ -376,7 +375,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askExportSelection (final WindowBasedTextGUI gui) {
-		final List<IMixedMediaItem> items = getSelectedItems();
+		final List<IMediaItem> items = getSelectedItems();
 		if (items.size() < 1) return;
 		final File dir = DirDialog.show(gui, String.format("Export %s tracks", items.size()), "Export", this.sessionState.initialDir);
 		if (dir == null) return;
@@ -386,8 +385,8 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void toggleEnabledSelection () throws MorriganException {
-		final List<IMixedMediaItem> items = getSelectedItems();
-		for (final IMixedMediaItem item : items) {
+		final List<IMediaItem> items = getSelectedItems();
+		for (final IMediaItem item : items) {
 			this.db.setItemEnabled(item, !item.isEnabled());
 		}
 		this.lastActionMessage.setLastActionMessage(String.format("Toggled enabled on %s items.", items.size()));
@@ -446,7 +445,7 @@ public class DbFace extends DefaultFace {
 			if (i >= this.scrollTop + this.pageSize) break;
 			if (i >= this.mediaItems.size()) break;
 
-			final IMixedMediaItem item = this.mediaItems.get(i);
+			final IMediaItem item = this.mediaItems.get(i);
 			final String name = String.valueOf(item);
 
 			final boolean selectedItem = this.selectedItems.contains(item);

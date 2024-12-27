@@ -17,8 +17,8 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
@@ -117,7 +117,7 @@ public class PlayerFace extends DefaultFace {
 		this.itemDetailsBarItem = this.selectedItem;
 		if (this.selectedItem instanceof PlayItem) {
 			final PlayItem playItem = (PlayItem) this.selectedItem;
-			final IMediaTrack item = playItem.getTrack();
+			final IMediaItem item = playItem.getTrack();
 			if (item != null) {
 				this.itemDetailsBar = PrintingThingsHelper.summariseItemWithPlayCounts(playItem.getList(), item, this.dateFormat);
 			}
@@ -289,7 +289,7 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		final IMediaTrackList<? extends IMediaTrack> list = this.player.getCurrentList();
+		final IMediaItemList list = this.player.getCurrentList();
 		if (list != null) {
 			if (list instanceof IMixedMediaDb) {
 				askJumpTo(gui, (IMixedMediaDb) list);

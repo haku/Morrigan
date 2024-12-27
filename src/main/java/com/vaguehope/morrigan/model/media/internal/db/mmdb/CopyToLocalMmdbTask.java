@@ -8,7 +8,6 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -20,15 +19,15 @@ import com.vaguehope.morrigan.util.ChecksumHelper;
  * @param <T>
  *            the type of the source list.
  */
-public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
+public class CopyToLocalMmdbTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final IMediaItemList<T> fromList;
-	private final Collection<T> itemsToCopy;
+	private final IMediaItemList fromList;
+	private final Collection<IMediaItem> itemsToCopy;
 	private final ILocalMixedMediaDb toDb;
 	private final Config config;
 
-	public CopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb, final Config config) {
+	public CopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final ILocalMixedMediaDb toDb, final Config config) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
@@ -56,7 +55,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 			 * TODO rewrite this using a trans-clone?
 			 */
 
-			for (final T item : this.itemsToCopy) {
+			for (final IMediaItem item : this.itemsToCopy) {
 				taskEventListener.subTask(item.getTitle());
 
 				final File coItemDir = getCheckoutItemDirectory(coDir, item);
@@ -69,7 +68,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 				if (this.toDb.getDbLayer().hasFile(coFile).isKnown()) {
 					this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
 				}
-				final IMixedMediaItem addedItem = this.toDb.addFile(coFile);
+				final IMediaItem addedItem = this.toDb.addFile(coFile);
 				addedItem.setFromMediaItem(item);
 				this.toDb.persistTrackData(addedItem);
 

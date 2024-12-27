@@ -20,9 +20,9 @@ import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -274,8 +274,8 @@ public class PlayersServlet extends HttpServlet {
 			final String tag = req.getParameter("tag");
 			if (tag != null && tag.length() > 0) {
 				final PlayItem currentItem = player.getCurrentItem();
-				final IMediaTrack item = currentItem != null ? currentItem.getTrack() : null;
-				final IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.getList() : null;
+				final IMediaItem item = currentItem != null ? currentItem.getTrack() : null;
+				final IMediaItemList list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
 					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 					writeResponse(req, resp, player);
@@ -427,7 +427,7 @@ public class PlayersServlet extends HttpServlet {
 		final String listId;
 		final String listUrl;
 		final String listView;
-		final IMediaTrackList<? extends IMediaTrack> currentList = p.getCurrentList();
+		final IMediaItemList currentList = p.getCurrentList();
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
@@ -496,7 +496,7 @@ public class PlayersServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 
 			if (currentItem != null && currentItem.hasTrack()) {
-				final IMediaTrack track = currentItem.getTrack();
+				final IMediaItem track = currentItem.getTrack();
 				FeedHelper.addElement(dw, "trackfilesize", track.getFileSize());
 				if (track.getMd5() != null) FeedHelper.addElement(dw, "trackhash", track.getMd5().toString(16));
 				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(track.isEnabled()));
@@ -546,7 +546,7 @@ public class PlayersServlet extends HttpServlet {
 			}
 
 			if (playItem.hasTrack()) {
-				final IMediaTrack mi = playItem.getTrack();
+				final IMediaItem mi = playItem.getTrack();
 				FeedHelper.addLink(dw, MlistsServlet.fileLink(mi), "item");
 
 				if (mi.getDateAdded() != null) {

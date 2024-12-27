@@ -16,8 +16,7 @@ import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
@@ -122,8 +121,8 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	}
 
 	@Override
-	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
-		IMediaTrackList<? extends IMediaTrack> ret = null;
+	public IMediaItemList getCurrentList () {
+		IMediaItemList ret = null;
 
 		final PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.hasList()) {

@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.model.media.internal;
 
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 
 public interface Defaults {
 
