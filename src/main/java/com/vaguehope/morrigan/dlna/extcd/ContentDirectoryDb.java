@@ -12,8 +12,8 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -28,7 +28,7 @@ public class ContentDirectoryDb extends EphemeralMixedMediaDb {
 
 	public ContentDirectoryDb (final String listId, final ControlPoint controlPoint,
 			final RemoteDevice device, final RemoteService contentDirectory,
-			final IMixedMediaStorageLayer storage) {
+			final IMediaItemStorageLayer storage) {
 		this.listId = listId;
 		this.device = device;
 		this.metadataStorage = new MetadataStorage(storage);

@@ -22,22 +22,22 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.TrackTagHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalDbUpdateTask;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.transcode.Ffprobe;
 import com.vaguehope.morrigan.transcode.FfprobeCache;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMediaDb> {
+public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<IMediaItemDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 
-	public static class Factory extends RecyclingFactory2<LocalMixedMediaDbUpdateTask, ILocalMixedMediaDb, RuntimeException> {
+	public static class Factory extends RecyclingFactory2<LocalMixedMediaDbUpdateTask, IMediaItemDb, RuntimeException> {
 
 		private final PlaybackEngineFactory playbackEngineFactory;
 		private final MediaFactory mediaFactory;
@@ -54,7 +54,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		}
 
 		@Override
-		protected LocalMixedMediaDbUpdateTask makeNewProduct (final ILocalMixedMediaDb material) {
+		protected LocalMixedMediaDbUpdateTask makeNewProduct (final IMediaItemDb material) {
 			return new LocalMixedMediaDbUpdateTask(material, this.playbackEngineFactory, this.mediaFactory);
 		}
 
@@ -65,14 +65,14 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
 
-	protected LocalMixedMediaDbUpdateTask (final ILocalMixedMediaDb library, final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
+	protected LocalMixedMediaDbUpdateTask (final IMediaItemDb library, final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
 		super(library);
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.mediaFactory = mediaFactory;
 	}
 
 	@Override
-	protected ILocalMixedMediaDb getTransactional (final ILocalMixedMediaDb itemList) throws DbException {
+	protected IMediaItemDb getTransactional (final IMediaItemDb itemList) throws DbException {
 		return this.mediaFactory.getLocalMixedMediaDbTransactional(itemList);
 	}
 
@@ -100,7 +100,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected void mergeItems (final ILocalMixedMediaDb list, final IMediaItem itemToKeep, final IMediaItem itemToBeRemove) throws MorriganException {
+	protected void mergeItems (final IMediaItemDb list, final IMediaItem itemToKeep, final IMediaItem itemToBeRemove) throws MorriganException {
 		list.incTrackStartCnt(itemToKeep, itemToBeRemove.getStartCount());
 		list.incTrackEndCnt(itemToKeep, itemToBeRemove.getEndCount());
 
@@ -149,7 +149,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	private IPlaybackEngine playbackEngine = null;
 
 	@Override
-	protected boolean shouldTrackMetaData1 (final TaskEventListener taskEventListener, final ILocalMixedMediaDb library, final IMediaItem item) throws MorriganException {
+	protected boolean shouldTrackMetaData1 (final TaskEventListener taskEventListener, final IMediaItemDb library, final IMediaItem item) throws MorriganException {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (item.getDuration() <= 0) {
 				if (!library.isMarkedAsUnreadable(item)) {
@@ -181,7 +181,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected OpResult readTrackMetaData1 (final ILocalMixedMediaDb list, final IMediaItem item, final File file) {
+	protected OpResult readTrackMetaData1 (final IMediaItemDb list, final IMediaItem item, final File file) {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
@@ -242,7 +242,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void readTrackMetaData2 (final ILocalMixedMediaDb list, final IMediaItem item, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
+	protected void readTrackMetaData2 (final IMediaItemDb list, final IMediaItem item, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		if (item.getMediaType() == MediaType.TRACK) {
 			TrackTagHelper.readTrackTags(list, item, file);
 		}

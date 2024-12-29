@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -24,10 +24,10 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 
 	private final IMediaItemList fromList;
 	private final Collection<IMediaItem> itemsToCopy;
-	private final ILocalMixedMediaDb toDb;
+	private final IMediaItemDb toDb;
 	private final Config config;
 
-	public CopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final ILocalMixedMediaDb toDb, final Config config) {
+	public CopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final IMediaItemDb toDb, final Config config) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
@@ -68,7 +68,7 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 				if (this.toDb.getDbLayer().hasFile(coFile).isKnown()) {
 					this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
 				}
-				final IMediaItem addedItem = this.toDb.addFile(coFile);
+				final IMediaItem addedItem = this.toDb.addFile(item.getMediaType(), coFile);
 				addedItem.setFromMediaItem(item);
 				this.toDb.persistTrackData(addedItem);
 
@@ -94,7 +94,7 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO extract this to Config class?
-	private File getCheckoutDirectory (final ILocalMixedMediaDb db) {
+	private File getCheckoutDirectory (final IMediaItemDb db) {
 		final File coDir = new File(this.config.getConfigDir(), "checkout");
 		if (!coDir.exists()) {
 			if (!coDir.mkdir()) {

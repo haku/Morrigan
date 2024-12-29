@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.ErrorHelper;
@@ -53,7 +53,7 @@ public class ContentDirectoryHolder {
 		final String id = idForDevice(device);
 		this.contentDirectories.put(id, contentDirectory);
 		try {
-			final IMixedMediaStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
+			final IMediaItemStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
 			this.mediaFactory.addExternalDb(new ContentDirectoryDb(id, this.upnpService.getControlPoint(), device, contentDirectory, storage));
 		}
 		catch (final DbException e) {
@@ -72,7 +72,7 @@ public class ContentDirectoryHolder {
 		return device.getIdentity().getUdn().getIdentifierString();
 	}
 
-	private static void dispose (final IMixedMediaDb db) {
+	private static void dispose (final IMediaItemDb db) {
 		if (db == null) return;
 		db.dispose();
 	}

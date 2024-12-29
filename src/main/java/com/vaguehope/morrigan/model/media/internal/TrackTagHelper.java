@@ -62,7 +62,7 @@ public final class TrackTagHelper {
 
 	private TrackTagHelper () {}
 
-	public static void readTrackTags (final IMediaItemDb<?> itemDb, final IMediaItem mlt, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
+	public static void readTrackTags (final IMediaItemDb itemDb, final IMediaItem mlt, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		final AudioFile af;
 		try {
 			af = AudioFileIO.read(file);

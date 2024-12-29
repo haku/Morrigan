@@ -6,14 +6,14 @@ import java.util.concurrent.ConcurrentMap;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MetadataStorage {
 
-	private final IMixedMediaStorageLayer storage;
+	private final IMediaItemStorageLayer storage;
 
-	public MetadataStorage (final IMixedMediaStorageLayer storage) {
+	public MetadataStorage (final IMediaItemStorageLayer storage) {
 		this.storage = storage;
 	}
 

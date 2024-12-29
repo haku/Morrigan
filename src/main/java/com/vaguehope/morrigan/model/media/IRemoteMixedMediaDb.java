@@ -6,7 +6,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public interface IRemoteMixedMediaDb extends IMixedMediaDb {
+public interface IRemoteMixedMediaDb extends IMediaItemDb {
 
 	URI getUri() throws DbException;
 	void setUri(URI uri) throws DbException;

@@ -40,9 +40,7 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.Objs;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
-		extends MediaItemList
-		implements IMediaItemDb<S> {
+public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -50,7 +48,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	private final MediaItemDbConfig config;
 	private final String searchTerm;
 
-	private final S dbLayer;
+	private final IMediaItemStorageLayer dbLayer;
 	private IDbColumn librarySort;
 	private SortDirection librarySortDirection;
 	private boolean hideMissing;
@@ -61,7 +59,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	 * TODO FIXME merge libraryName and searchTerm to match return value of
 	 * getSerial().
 	 */
-	protected MediaItemDb (final String listName, final MediaItemDbConfig config, final S dbLayer) {
+	protected MediaItemDb (final String listName, final MediaItemDbConfig config, final IMediaItemStorageLayer dbLayer) {
 		super(dbLayer.getDbFilePath(), listName);
 
 		if (config == null) throw new IllegalArgumentException("Must not be null: config");
@@ -107,7 +105,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof MediaItemDb)) return false;
-		final MediaItemDb<?> that = (MediaItemDb<?>) obj;
+		final MediaItemDb that = (MediaItemDb) obj;
 
 		return Objs.equals(this.config, that.config);
 	}
@@ -149,7 +147,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	}
 
 	@Override
-	public S getDbLayer () {
+	public IMediaItemStorageLayer getDbLayer() {
 		return this.dbLayer;
 	}
 
@@ -990,9 +988,9 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	 * @throws DbException
 	 */
 	@Override
-	public IMediaItem addFile (final File file) throws MorriganException, DbException {
+	public IMediaItem addFile (final MediaType mediaType, final File file) throws MorriganException, DbException {
 		IMediaItem track = null;
-		boolean added = this.dbLayer.addFile(file);
+		boolean added = this.dbLayer.addFile(mediaType, file);
 		if (added) {
 			track = getDbLayer().getNewT(file.getAbsolutePath());
 			track.reset();
@@ -1006,9 +1004,9 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	 * are ignored.
 	 */
 	@Override
-	public List<IMediaItem> addFiles (final List<File> files) throws MorriganException, DbException {
+	public List<IMediaItem> addFiles (final MediaType mediaType, final List<File> files) throws MorriganException, DbException {
 		List<IMediaItem> ret = new ArrayList<>();
-		boolean[] res = this.dbLayer.addFiles(files);
+		boolean[] res = this.dbLayer.addFiles(mediaType, files);
 		for (int i = 0; i < files.size(); i++) {
 			if (res[i]) {
 				IMediaItem t = getDbLayer().getNewT(files.get(i).getAbsolutePath());
@@ -1062,7 +1060,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 		}
 
 		IMediaItem ret;
-		boolean added = this.dbLayer.addFile(mi.getFilepath(), -1);
+		boolean added = this.dbLayer.addFile(mi.getMediaType(), mi.getFilepath(), -1);
 		if (added) {
 			addItem(mi);
 			persistTrackData(mi);

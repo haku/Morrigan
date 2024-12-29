@@ -5,8 +5,8 @@ import java.util.List;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -32,13 +32,13 @@ public class DbHelper {
 		this.defaultDbFace = defaultDbFace;
 	}
 
-	public IMixedMediaDb resolveReference (final MediaListReference ref) throws DbException, MorriganException {
-		final IMixedMediaDb db = this.mnContext.getMediaFactory().getMixedMediaDbByRef(ref);
+	public IMediaItemDb resolveReference (final MediaListReference ref) throws DbException, MorriganException {
+		final IMediaItemDb db = this.mnContext.getMediaFactory().getMixedMediaDbByRef(ref);
 		db.read();
 		return db;
 	}
 
-	public void askSearch (final WindowBasedTextGUI gui, final IMixedMediaDb db) throws DbException, MorriganException {
+	public void askSearch (final WindowBasedTextGUI gui, final IMediaItemDb db) throws DbException, MorriganException {
 		final JumpResult res = JumpToDialog.show(gui, db, this.sessionState);
 		if (res == null) return;
 		switch (res.getType()) {
@@ -65,7 +65,7 @@ public class DbHelper {
 		if (this.lastActionMessage != null) this.lastActionMessage.setLastActionMessage(String.format("Enqueued %s items in %s.", tracks.size(), player.getName()));
 	}
 
-	private void revealItem (final IMixedMediaDb db, final IMediaItem track) throws MorriganException {
+	private void revealItem (final IMediaItemDb db, final IMediaItem track) throws MorriganException {
 		if (this.defaultDbFace != null) {
 			this.defaultDbFace.revealItem(track);
 		}
@@ -81,7 +81,7 @@ public class DbHelper {
 		if (player != null) PlayerHelper.shuffleAndEnqueue(db, tracks, player);
 	}
 
-	private void openFilter (final IMixedMediaDb db, final String searchTerm) throws MorriganException, DbException {
+	private void openFilter (final IMediaItemDb db, final String searchTerm) throws MorriganException, DbException {
 		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState,
 				this.mnContext.getMediaFactory().getLocalMixedMediaDb(db.getDbPath(), searchTerm),
 				this.defaultPlayer));

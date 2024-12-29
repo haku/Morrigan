@@ -67,9 +67,8 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
-		addFile(file);
+		addFile(MediaType.TRACK, file);
 		final IMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
-		setItemMediaType(track, MediaType.TRACK);
 		setItemMd5(track, md5);
 		setItemSha1(track, sha1);
 

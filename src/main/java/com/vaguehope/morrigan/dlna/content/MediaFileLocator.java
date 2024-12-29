@@ -14,7 +14,7 @@ import com.vaguehope.morrigan.dlna.httpserver.FileLocator;
 import com.vaguehope.morrigan.dlna.util.Cache;
 import com.vaguehope.morrigan.dlna.util.HashHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -81,7 +81,7 @@ public class MediaFileLocator implements FileLocator {
 
 		final MediaListReference mlr = derefMlr(parts[0]);
 		if (mlr == null) throw new IllegalArgumentException("Invalid ref in ID: " + id);
-		final IMixedMediaDb db = this.dbHelper.mediaListReferenceToDb(mlr);
+		final IMediaItemDb db = this.dbHelper.mediaListReferenceToDb(mlr);
 
 		if ("item".equals(parts[1])) {
 			if (parts.length < 4) throw new IllegalArgumentException("Need at least 4 parts: " + id);
@@ -121,7 +121,7 @@ public class MediaFileLocator implements FileLocator {
 		}
 	}
 
-	private final Cache<String, MediaListReference> mlrCache = new Cache<String, MediaListReference>(10);
+	private final Cache<String, MediaListReference> mlrCache = new Cache<>(10);
 
 	private MediaListReference derefMlr (final String encodedMlrIdentifier) {
 		final MediaListReference cached = this.mlrCache.getFresh(encodedMlrIdentifier, 60, TimeUnit.SECONDS);

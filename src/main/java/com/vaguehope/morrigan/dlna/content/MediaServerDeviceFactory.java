@@ -55,7 +55,7 @@ public class MediaServerDeviceFactory {
 		final Icon icon = UpnpHelper.createDeviceIcon();
 
 		final LocalService<ContentDirectoryService> contDirSrv = new AnnotationLocalServiceBinder().read(ContentDirectoryService.class);
-		contDirSrv.setManager(new DefaultServiceManager<ContentDirectoryService>(contDirSrv, ContentDirectoryService.class) {
+		contDirSrv.setManager(new DefaultServiceManager<>(contDirSrv, ContentDirectoryService.class) {
 			@Override
 			protected ContentDirectoryService createServiceInstance () {
 				final ContentAdaptor contentAdaptor = new ContentAdaptor(mediaFactory, mediaServer, mediaFileLocator);
@@ -75,7 +75,7 @@ public class MediaServerDeviceFactory {
 		});
 
 		final LocalService<ConnectionManagerService> connManSrv = new AnnotationLocalServiceBinder().read(ConnectionManagerService.class);
-		connManSrv.setManager(new DefaultServiceManager<ConnectionManagerService>(connManSrv, ConnectionManagerService.class) {
+		connManSrv.setManager(new DefaultServiceManager<>(connManSrv, ConnectionManagerService.class) {
 			@Override
 			public void execute (final Command<ConnectionManagerService> cmd) throws Exception {
 				try {

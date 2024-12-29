@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
-public interface IMediaItemDb<S extends IMediaItemStorageLayer> extends IMediaItemList {
+public interface IMediaItemDb extends IMediaItemList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	interface SortChangeListener {
@@ -24,7 +24,7 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer> extends IMediaIt
 	void rollback () throws DbException;
 
 	String getDbPath ();
-	S getDbLayer();
+	IMediaItemStorageLayer getDbLayer();
 
 	List<String> getSources () throws MorriganException;
 	void addSource (String source) throws MorriganException;
@@ -45,10 +45,10 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer> extends IMediaIt
 	/**
 	 * Note: returned item will be missing DB rowId.
 	 */
-	IMediaItem addFile (File file) throws MorriganException, DbException;
+	IMediaItem addFile (MediaType mediaType, File file) throws MorriganException, DbException;
 	FileExistance hasFile (String filepath) throws MorriganException, DbException;
 	FileExistance hasFile (File file) throws MorriganException, DbException;
-	List<IMediaItem> addFiles (List<File> files) throws MorriganException, DbException;
+	List<IMediaItem> addFiles (MediaType mediaType, List<File> files) throws MorriganException, DbException;
 
 	void setHideMissing(final boolean v) throws MorriganException;
 

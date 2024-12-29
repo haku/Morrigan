@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -15,12 +15,12 @@ import com.vaguehope.morrigan.tasks.TaskResult;
 
 public class PullRemoteToLocal implements MorriganTask {
 
-	private final ILocalMixedMediaDb ldb;
+	private final IMediaItemDb ldb;
 	private final URI remoteUri;
 	private final MediaFactory mediaFactory;
 	private final Config config;
 
-	public PullRemoteToLocal (final ILocalMixedMediaDb localDb, final URI remoteUri, final MediaFactory mediaFactory, final Config config) {
+	public PullRemoteToLocal (final IMediaItemDb localDb, final URI remoteUri, final MediaFactory mediaFactory, final Config config) {
 		this.ldb = localDb;
 		this.remoteUri = remoteUri;
 		this.mediaFactory = mediaFactory;

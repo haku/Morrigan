@@ -27,7 +27,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -58,9 +58,9 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		this.testDb.setHideMissing(false);
 
 		this.mediaFactory = mock(MediaFactory.class);
-		when(this.mediaFactory.getLocalMixedMediaDbTransactional(this.testDb)).thenAnswer(new Answer<ILocalMixedMediaDb>() {
+		when(this.mediaFactory.getLocalMixedMediaDbTransactional(this.testDb)).thenAnswer(new Answer<IMediaItemDb>() {
 			@Override
-			public ILocalMixedMediaDb answer(final InvocationOnMock invocation) throws Throwable {
+			public IMediaItemDb answer(final InvocationOnMock invocation) throws Throwable {
 				return new TestMixedMediaDb(LocalMixedMediaDbUpdateTaskTest.this.testDb.getListName(), false);
 			}
 		});

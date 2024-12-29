@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.dlna.util.Cache;
 import com.vaguehope.morrigan.dlna.util.Objects;
 import com.vaguehope.morrigan.dlna.util.StringHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -46,7 +46,7 @@ public class SearchEngine {
 		this.mediaFactory = mediaFactory;
 	}
 
-	private final Cache<String, List<Item>> queryCache = new Cache<String, List<Item>>(50);
+	private final Cache<String, List<Item>> queryCache = new Cache<>(50);
 
 	public List<Item> search (final ContentNode contentNode, final String searchCriteria) throws ContentDirectoryException, DbException, MorriganException {
 		if (searchCriteria == null) throw new ContentDirectoryException(ContentDirectoryErrorCodes.UNSUPPORTED_SEARCH_CRITERIA, "Do not know how to parse: " + searchCriteria);
@@ -54,9 +54,9 @@ public class SearchEngine {
 		final String term = criteriaToMnTerm(searchCriteria);
 		if (term == null) throw new ContentDirectoryException(ContentDirectoryErrorCodes.UNSUPPORTED_SEARCH_CRITERIA, "Do not know how to parse: " + searchCriteria);
 
-		final List<Item> ret = new ArrayList<Item>();
+		final List<Item> ret = new ArrayList<>();
 		for (final MediaListReference mlr : this.mediaFactory.getAllLocalMixedMediaDbs()) {
-			final IMixedMediaDb db = this.mediaFactory.getLocalMixedMediaDb(mlr.getIdentifier());
+			final IMediaItemDb db = this.mediaFactory.getLocalMixedMediaDb(mlr.getIdentifier());
 			if (db.getCount() > 0) { // Only search loaded DBs.
 				final String cacheKey = String.format("%s|%s|%s", term, contentNode.getContainer().getId(), mlr.getIdentifier());
 				List<Item> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
@@ -82,13 +82,13 @@ public class SearchEngine {
 
 	private static class CriteriaListener extends CDSCBaseListener {
 
-		private static final Set<String> TITLE_FIELDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+		private static final Set<String> TITLE_FIELDS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
 				"dc:title")));
 
-		private static final Set<String> ARTIST_FIELDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+		private static final Set<String> ARTIST_FIELDS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
 				"dc:creator", "upnp:artist")));
 
-		private final Set<Predicate> allPredicates = new LinkedHashSet<Predicate>();
+		private final Set<Predicate> allPredicates = new LinkedHashSet<>();
 
 		public CriteriaListener () {}
 

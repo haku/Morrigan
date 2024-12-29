@@ -12,8 +12,8 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -132,7 +132,7 @@ public final class PrintingThingsHelper {
 				TimeHelper.formatTimeSeconds(d.getDuration()));
 	}
 
-	public static String dbSummary (final IMixedMediaDb db) {
+	public static String dbSummary (final IMediaItemDb db) {
 		final StringBuilder msg = new StringBuilder();
 		msg.append(db.getCount());
 		msg.append(" items totaling ");
@@ -145,7 +145,7 @@ public final class PrintingThingsHelper {
 		return msg.toString();
 	}
 
-	public static String sortSummary (final IMixedMediaDb db) {
+	public static String sortSummary (final IMediaItemDb db) {
 		final IDbColumn col = db.getSort();
 		return String.format("%s %s.",
 				col != null ? col.getHumanName() : "(unknown)",

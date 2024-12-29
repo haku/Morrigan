@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.server.model;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
@@ -88,7 +88,7 @@ public final class RemoteMixedMediaDbFactory {
 	public static IRemoteMixedMediaDb getTransactionalClone (final IRemoteMixedMediaDb rmmdb) throws DbException {
 		String title = RemoteMixedMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
 		MediaItemDbConfig config = new MediaItemDbConfig(rmmdb.getDbPath(), null);
-		IMixedMediaStorageLayer storage = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath());
+		IMediaItemStorageLayer storage = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath());
 		RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUri(), rmmdb.getPass());
 		return new RemoteMixedMediaDb(title, config, details, storage);
 	}

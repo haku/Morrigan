@@ -25,40 +25,40 @@ public interface MediaFactory {
 	/**
 	 * Create a new one.
 	 */
-	ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException;
+	IMediaItemDb createLocalMixedMediaDb (String name) throws MorriganException;
 
 	/**
 	 * Main instance.
 	 */
-	ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
+	IMediaItemDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
 
 	/**
 	 * With a filter set: a view.
 	 */
-	ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
+	IMediaItemDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
 
 	/**
 	 * Same as getLocalMixedMediaDb().
 	 */
-	ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
+	IMediaItemDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
 
 	/**
 	 * MID is like:
 	 * LOCALMMDB/test.local.db3
 	 */
-	IMixedMediaDb getMixedMediaDbByMid(String mid, String filter) throws DbException, MorriganException;
+	IMediaItemDb getMixedMediaDbByMid(String mid, String filter) throws DbException, MorriganException;
 
-	IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException;
-	IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
+	IMediaItemDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException;
+	IMediaItemDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
 	 * Create an new instance with transactional behaviour.
 	 */
-	ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException;
+	IMediaItemDb getLocalMixedMediaDbTransactional (IMediaItemDb lmmdb) throws DbException;
 
-	IMediaItemDb<?> getMediaItemDbTransactional (IMediaItemDb<?> db) throws DbException;
+	IMediaItemDb getMediaItemDbTransactional (IMediaItemDb db) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -69,14 +69,14 @@ public interface MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	IMixedMediaStorageLayer getStorageLayer (String filepath) throws DbException;
+	IMediaItemStorageLayer getStorageLayer (String filepath) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	Collection<MediaListReference> getExternalDbs();
-	IMixedMediaDb getExternalDb(String id);
-	void addExternalDb(IMixedMediaDb db);
-	IMixedMediaDb removeExternalDb(String id);
+	IMediaItemDb getExternalDb(String id);
+	void addExternalDb(IMediaItemDb db);
+	IMediaItemDb removeExternalDb(String id);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -85,15 +85,15 @@ public interface MediaFactory {
 	/*
 	 * TODO merge these next two methods?
 	 */
-	MorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
+	MorriganTask getLocalMixedMediaDbUpdateTask (IMediaItemDb library);
 	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
 	MorriganTask getMediaFileCopyTask (IMediaItemList mediaItemList, List<IMediaItem> mediaSelection, File targetDirectory);
-	MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList fromList, Collection<IMediaItem> itemsToCopy, ILocalMixedMediaDb toDb);
-	MorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
+	MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList fromList, Collection<IMediaItem> itemsToCopy, IMediaItemDb toDb);
+	MorriganTask getSyncMetadataRemoteToLocalTask (IMediaItemDb local, IRemoteMixedMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	void readTrackTags (IMediaItemDb<?> itemDb, IMediaItem mlt, File file) throws IOException, MorriganException;
+	void readTrackTags (IMediaItemDb itemDb, IMediaItem mlt, File file) throws IOException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

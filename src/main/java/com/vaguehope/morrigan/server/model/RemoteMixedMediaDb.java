@@ -16,17 +16,17 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.engines.playback.NotImplementedException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedReader;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,7 +49,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	/**
 	 * Connect to existing DB.
 	 */
-	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final IMixedMediaStorageLayer localDbLayer) throws DbException {
+	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final IMediaItemStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 		readCacheDate();
 	}
@@ -57,7 +57,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	/**
 	 * Create a fresh DB.
 	 */
-	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details, final IMixedMediaStorageLayer localDbLayer) throws DbException {
+	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details, final IMediaItemStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 
 		setUri(details.getUri());

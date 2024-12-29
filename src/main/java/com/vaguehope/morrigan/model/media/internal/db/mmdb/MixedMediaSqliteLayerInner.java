@@ -438,9 +438,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		return false;
 	}
 
-	protected boolean[] local_addFiles (final List<File> filesToAdd) throws SQLException, ClassNotFoundException, DbException {
+	protected boolean[] local_addFiles (final MediaType mediaType, final List<File> filesToAdd) throws SQLException, ClassNotFoundException, DbException {
 		final boolean[] ret = new boolean[filesToAdd.size()];
-		final List<File> unknownFiles = new ArrayList<File>(filesToAdd.size());
+		final List<File> unknownFiles = new ArrayList<>(filesToAdd.size());
 
 		for (int i = 0; i < filesToAdd.size(); i++) {
 			final File file = filesToAdd.get(i);
@@ -477,7 +477,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 				if (file == null) continue; // Ignore placeholders.
 				// WARNING: this assumes the order of parameters in the above SQL.
 				ps.setString(1, file.getAbsolutePath());
-				ps.setInt(2, MediaType.UNKNOWN.getN());
+				ps.setInt(2, mediaType.getN());
 				ps.setDate(3, new java.sql.Date(new Date().getTime()));
 				ps.setDate(4, new java.sql.Date(file.lastModified()));
 				ps.addBatch();
@@ -485,7 +485,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 
 			final int[] batchRes = ps.executeBatch();
 
-			final List<File> addedFiles = new ArrayList<File>();
+			final List<File> addedFiles = new ArrayList<>();
 			int ri = 0;
 
 			for (int fi = 0; fi < unknownFiles.size(); fi++) {

@@ -21,7 +21,6 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -32,7 +31,7 @@ import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
 import com.vaguehope.morrigan.util.FileSystem;
 
-public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaItemStorageLayer>> implements MorriganTask {
+public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected enum ScanOption {
@@ -261,7 +260,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 			final Q transClone = getTransactional(this.itemList);
 			try {
-				transClone.addFiles(filesToAdd);
+				transClone.addFiles(MediaType.UNKNOWN, filesToAdd);
 				filesAdded = filesAdded + filesToAdd.size();
 			}
 			finally {

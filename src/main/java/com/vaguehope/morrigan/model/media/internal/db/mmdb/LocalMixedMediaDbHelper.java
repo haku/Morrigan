@@ -4,9 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
@@ -29,7 +30,7 @@ public final class LocalMixedMediaDbHelper {
 		return file;
 	}
 
-	public static ILocalMixedMediaDb createMmdb (final Config config, final String name) throws MorriganException {
+	public static IMediaItemDb createMmdb (final Config config, final String name) throws MorriganException {
 		final String file = getFullPathToMmdb(config, name);
 		try {
 			return LocalMixedMediaDbFactory.getMain(file);
@@ -50,7 +51,7 @@ public final class LocalMixedMediaDbHelper {
 	}
 
 	public static List<MediaListReference> getAllMmdb (final Config config) {
-		final List<MediaListReference> ret = new ArrayList<MediaListReference>();
+		final List<MediaListReference> ret = new ArrayList<>();
 
 		final File dir = config.getMmdbDir();
 		final File[] files = dir.listFiles();

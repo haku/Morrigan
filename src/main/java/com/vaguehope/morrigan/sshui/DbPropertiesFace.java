@@ -16,8 +16,8 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
@@ -43,7 +43,7 @@ public class DbPropertiesFace extends MenuFace {
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
 	private final SessionState sessionState;
-	private final IMixedMediaDb db;
+	private final IMediaItemDb db;
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
 
@@ -54,7 +54,7 @@ public class DbPropertiesFace extends MenuFace {
 			final FaceNavigation navigation,
 			final MnContext mnContext,
 			final SessionState sessionState,
-			final IMixedMediaDb db) throws MorriganException, DbException {
+			final IMediaItemDb db) throws MorriganException, DbException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
@@ -211,8 +211,8 @@ public class DbPropertiesFace extends MenuFace {
 
 	// TODO replace with AsyncActions() ?
 	private void rescanSources () {
-		if (this.db instanceof ILocalMixedMediaDb) {
-			final MorriganTask task = this.mnContext.getMediaFactory().getLocalMixedMediaDbUpdateTask((ILocalMixedMediaDb) this.db);
+		if (this.db.getType().equals(MediaListType.LOCALMMDB.toString())) {
+			final MorriganTask task = this.mnContext.getMediaFactory().getLocalMixedMediaDbUpdateTask(this.db);
 			if (task != null) {
 				this.mnContext.getAsyncTasksRegister().scheduleTask(task);
 				this.lastActionMessage.setLastActionMessage("Update started.");
@@ -246,7 +246,7 @@ public class DbPropertiesFace extends MenuFace {
 		}
 		if (filter == null) return;
 
-		IMixedMediaDb d = this.db;
+		IMediaItemDb d = this.db;
 		if (!"*".equals(filter)) {
 			d = this.mnContext.getMediaFactory().getLocalMixedMediaDb(this.db.getDbPath(), filter);
 		}

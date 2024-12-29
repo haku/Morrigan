@@ -23,7 +23,7 @@ public interface IMediaItemList {
 	String getListName ();
 	UUID getUuid ();
 
-	String getType ();
+	String getType (); // TODO make something better than string!
 	String getSerial (); // TODO rename to something more helpful?
 	String getSearchTerm ();
 

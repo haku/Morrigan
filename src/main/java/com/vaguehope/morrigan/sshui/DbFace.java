@@ -26,7 +26,7 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -63,7 +63,7 @@ public class DbFace extends DefaultFace {
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
 	private final SessionState sessionState;
-	private final IMixedMediaDb db;
+	private final IMediaItemDb db;
 	private final Player defaultPlayer;
 	private final DbHelper dbHelper;
 
@@ -87,7 +87,7 @@ public class DbFace extends DefaultFace {
 			final FaceNavigation navigation,
 			final MnContext mnContext,
 			final SessionState sessionState,
-			final IMixedMediaDb db,
+			final IMediaItemDb db,
 			final Player defaultPlayer) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
@@ -534,11 +534,11 @@ public class DbFace extends DefaultFace {
 
 	private static class SortColumnAction implements Runnable {
 
-		private final IMixedMediaDb db;
+		private final IMediaItemDb db;
 		private final IDbColumn col;
 		private final SortDirection direction;
 
-		public SortColumnAction (final IMixedMediaDb db, final IDbColumn col, final SortDirection direction) {
+		public SortColumnAction (final IMediaItemDb db, final IDbColumn col, final SortDirection direction) {
 			this.db = db;
 			this.col = col;
 			this.direction = direction;

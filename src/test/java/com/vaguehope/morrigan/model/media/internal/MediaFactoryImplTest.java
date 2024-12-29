@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.model.media.internal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,8 +12,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 
 public class MediaFactoryImplTest {
@@ -30,20 +29,20 @@ public class MediaFactoryImplTest {
 
 	@Test
 	public void itGetsLocalByMid() throws Exception {
-		final ILocalMixedMediaDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
+		final IMediaItemDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
 		final MediaListReference ref = this.undertest.getAllLocalMixedMediaDbs().iterator().next();
 		assertEquals(db, this.undertest.getMixedMediaDbByMid(ref.getMid(), null));
 		assertEquals(db, this.undertest.getMixedMediaDbByRef(ref));
 
 		final String filter = "some-filter" + RND.nextLong();
-		final ILocalMixedMediaDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
+		final IMediaItemDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
 		assertEquals(dbWithFilter, this.undertest.getMixedMediaDbByMid(ref.getMid(), filter));
 		assertEquals(dbWithFilter, this.undertest.getMixedMediaDbByRef(ref, filter));
 	}
 
 	@Test
 	public void itGetsRemoteByMid() throws Exception {
-		final IMixedMediaDb external = mock(IMixedMediaDb.class);
+		final IMediaItemDb external = mock(IMediaItemDb.class);
 		final String id = "id" + RND.nextLong();
 		when(external.getListId()).thenReturn(id);
 		when(external.getListName()).thenReturn("name for " + id);

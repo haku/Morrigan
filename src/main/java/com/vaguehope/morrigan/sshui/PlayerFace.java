@@ -18,8 +18,8 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -291,8 +291,8 @@ public class PlayerFace extends DefaultFace {
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		final IMediaItemList list = this.player.getCurrentList();
 		if (list != null) {
-			if (list instanceof IMixedMediaDb) {
-				askJumpTo(gui, (IMixedMediaDb) list);
+			if (list instanceof IMediaItemDb) {
+				askJumpTo(gui, (IMediaItemDb) list);
 			}
 			else {
 				MessageDialog.showMessageDialog(gui, "TODO", "Search: " + list);
@@ -303,7 +303,7 @@ public class PlayerFace extends DefaultFace {
 		}
 	}
 
-	private void askJumpTo (final WindowBasedTextGUI gui, final IMixedMediaDb db) throws DbException, MorriganException {
+	private void askJumpTo (final WindowBasedTextGUI gui, final IMediaItemDb db) throws DbException, MorriganException {
 		this.dbHelper.askSearch(gui, db);
 	}
 

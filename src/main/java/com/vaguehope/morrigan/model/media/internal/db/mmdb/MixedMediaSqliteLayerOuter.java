@@ -13,12 +13,11 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner implements IMixedMediaStorageLayer {
+public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -166,16 +165,6 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	Media adders and removers.
 
 	@Override
-	public boolean addFile (final File file) throws DbException {
-		return addFile(MediaType.UNKNOWN, file);
-	}
-
-	@Override
-	public boolean addFile (final String filepath, final long lastModified) throws DbException {
-		return addFile(MediaType.UNKNOWN, filepath, lastModified);
-	}
-
-	@Override
 	public boolean addFile (final MediaType mediaType, final File file) throws DbException {
 		try {
 			return local_addTrack(mediaType, file.getAbsolutePath(), file.lastModified());
@@ -198,9 +187,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public boolean[] addFiles (final List<File> files) throws DbException {
+	public boolean[] addFiles (final MediaType mediaType,final List<File> files) throws DbException {
 		try {
-			return local_addFiles(files);
+			return local_addFiles(mediaType, files);
 		}
 		catch (Exception e) {
 			this.logger.log(Level.SEVERE, "Exception while adding files: \n" + StringHelper.joinCollection(files, "\n"), e);

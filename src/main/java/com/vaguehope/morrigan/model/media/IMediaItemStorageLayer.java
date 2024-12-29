@@ -118,7 +118,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	List<IMediaItem> simpleSearch(MediaType mediaType, String term, int maxResults) throws DbException;
 	List<IMediaItem> simpleSearch(MediaType mediaType, String term, int maxResults, IDbColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
-	boolean[] addFiles (List<File> files) throws DbException;
+	boolean[] addFiles (MediaType mediaType, List<File> files) throws DbException;
 
 	/**
 	 *
@@ -126,7 +126,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	 * @return true if the file needed to be added.
 	 * @throws DbException
 	 */
-	boolean addFile(File file) throws DbException;
+	boolean addFile (MediaType mediaType, File file) throws DbException;
 
 	/**
 	 *
@@ -135,11 +135,12 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	 * @return true if the file needed to be added.
 	 * @throws DbException
 	 */
-	boolean addFile(String filepath, long lastModified) throws DbException;
+	boolean addFile (MediaType mediaType, String filepath, long lastModified) throws DbException;
 
 	int removeFile(String sfile) throws DbException;
 	int removeFile (IDbItem dbItem) throws DbException;
 
+	void setItemMediaType(IMediaItem item, MediaType newType) throws DbException;
 	void setDateAdded(IMediaItem item, Date date) throws DbException;
 	void setMd5(IMediaItem item, BigInteger md5) throws DbException;
 	void setSha1(IMediaItem item, BigInteger sha1) throws DbException;
@@ -148,6 +149,22 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	void setEnabled(IMediaItem item, boolean value, Date lastModified) throws DbException;
 	void setMissing(IMediaItem item, boolean value) throws DbException;
 	void setRemoteLocation(IMediaItem item, String remoteLocation) throws DbException;
+	void setDimensions (IMediaItem item, int width, int height) throws DbException;
+
+	/**
+	 * Inc start count by one and set last played date.
+	 * @param sfile
+	 * @throws DbException
+	 */
+	void incTrackPlayed (IMediaItem item) throws DbException;
+
+	void incTrackFinished (IMediaItem item) throws DbException;
+	void incTrackStartCnt (IMediaItem item, long n) throws DbException;
+	void setTrackStartCnt (IMediaItem item, long n) throws DbException;
+	void incTrackEndCnt (IMediaItem item, long n) throws DbException;
+	void setTrackEndCnt (IMediaItem item, long n) throws DbException;
+	void setDateLastPlayed (IMediaItem item, Date date) throws DbException;
+	void setTrackDuration (IMediaItem item, int duration) throws DbException;
 
 	IMediaItem getNewT(String filePath);
 

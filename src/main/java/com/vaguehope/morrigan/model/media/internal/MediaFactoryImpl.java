@@ -19,12 +19,10 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -54,7 +52,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<String, ILocalMixedMediaDb> addedLocals = new ConcurrentHashMap<>();
+	private final Map<String, IMediaItemDb> addedLocals = new ConcurrentHashMap<>();
 
 	@Override
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs () {
@@ -63,32 +61,32 @@ public class MediaFactoryImpl implements MediaFactory {
 
 		final Collection<MediaListReference> ret = new ArrayList<>();
 		ret.addAll(real);
-		for (final ILocalMixedMediaDb db : this.addedLocals.values()) {
+		for (final IMediaItemDb db : this.addedLocals.values()) {
 			ret.add(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName()));
 		}
 		return ret;
 	}
 
 	@Override
-	public ILocalMixedMediaDb createLocalMixedMediaDb (final String name) throws MorriganException {
+	public IMediaItemDb createLocalMixedMediaDb (final String name) throws MorriganException {
 		return LocalMixedMediaDbHelper.createMmdb(this.config, name);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDb (final String fullFilePath) throws DbException {
+	public IMediaItemDb getLocalMixedMediaDb (final String fullFilePath) throws DbException {
 		if (!new File(fullFilePath).isFile()) throw new DbException("File not found: " + fullFilePath);
 		return LocalMixedMediaDbFactory.getMain(fullFilePath);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDb (final String fullFilePath, final String filter) throws DbException {
+	public IMediaItemDb getLocalMixedMediaDb (final String fullFilePath, final String filter) throws DbException {
 		if (!new File(fullFilePath).isFile()) throw new DbException("File not found: " + fullFilePath);
 		if (filter == null || filter.length() < 1) return getLocalMixedMediaDb(fullFilePath);
 		return LocalMixedMediaDbFactory.getView(fullFilePath, filter);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
+	public IMediaItemDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
 		return LocalMixedMediaDbFactory.getMainBySerial(serial);
 	}
 
@@ -100,7 +98,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/id%3D1fcee07abcdefghiujklmnopqrstuvwxyz810c6e-foo_bar
 	 */
 	@Override
-	public IMixedMediaDb getMixedMediaDbByMid(final String mid, final String filter) throws DbException, MorriganException {
+	public IMediaItemDb getMixedMediaDbByMid(final String mid, final String filter) throws DbException, MorriganException {
 		final String[] parts = mid.split("/");
 		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
 
@@ -108,7 +106,7 @@ public class MediaFactoryImpl implements MediaFactory {
 		final String name = parts[1];
 
 		if (type.equals(MediaListType.LOCALMMDB.toString())) {
-			final ILocalMixedMediaDb local = this.addedLocals.get(StringUtils.removeEndIgnoreCase(name, Config.MMDB_LOCAL_FILE_EXT));
+			final IMediaItemDb local = this.addedLocals.get(StringUtils.removeEndIgnoreCase(name, Config.MMDB_LOCAL_FILE_EXT));
 			if (local != null) return local;
 
 			final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(this.config, name);
@@ -125,32 +123,32 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException {
+	public IMediaItemDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException {
 		return getMixedMediaDbByMid(ref.getMid(), null);
 	}
 
 	@Override
-	public IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException {
+	public IMediaItemDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException {
 		return getMixedMediaDbByMid(ref.getMid(), filter);
 	}
 
 	/**
 	 * For testing use only.  Can use to add in mock implementations.
 	 */
-	public void addLocalMixedMediaDb (final ILocalMixedMediaDb db) {
+	public void addLocalMixedMediaDb (final IMediaItemDb db) {
 		this.addedLocals.put(db.getListName(), db);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (final ILocalMixedMediaDb lmmdb) throws DbException {
+	public IMediaItemDb getLocalMixedMediaDbTransactional (final IMediaItemDb lmmdb) throws DbException {
 		return LocalMixedMediaDbFactory.getTransactional(lmmdb.getDbPath());
 	}
 
 
 	@Override
-	public IMediaItemDb<?> getMediaItemDbTransactional (final IMediaItemDb<?> db) throws DbException {
+	public IMediaItemDb getMediaItemDbTransactional (final IMediaItemDb db) throws DbException {
 		if (MediaListType.LOCALMMDB.toString().equals(db.getType())) {
 			return LocalMixedMediaDbFactory.getTransactional(db.getDbPath());
 		}
@@ -182,35 +180,35 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IMixedMediaStorageLayer getStorageLayer (final String filepath) throws DbException {
+	public IMediaItemStorageLayer getStorageLayer (final String filepath) throws DbException {
 		return MixedMediaSqliteLayerFactory.getTransactional(filepath);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<String, IMixedMediaDb> externalDbs = new ConcurrentSkipListMap<>();
+	private final Map<String, IMediaItemDb> externalDbs = new ConcurrentSkipListMap<>();
 
 	@Override
 	public Collection<MediaListReference> getExternalDbs () {
 		final List<MediaListReference> ret = new ArrayList<>();
-		for (IMixedMediaDb db : this.externalDbs.values()) {
+		for (IMediaItemDb db : this.externalDbs.values()) {
 			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, db.getListId(), db.getListName()));
 		}
 		return ret;
 	}
 
 	@Override
-	public IMixedMediaDb getExternalDb (final String id) {
+	public IMediaItemDb getExternalDb (final String id) {
 		return this.externalDbs.get(id);
 	}
 
 	@Override
-	public void addExternalDb (final IMixedMediaDb db) {
+	public void addExternalDb (final IMediaItemDb db) {
 		this.externalDbs.put(db.getListId(), db);
 	}
 
 	@Override
-	public IMixedMediaDb removeExternalDb (final String id) {
+	public IMediaItemDb removeExternalDb (final String id) {
 		return this.externalDbs.remove(id);
 	}
 
@@ -224,7 +222,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public MorriganTask getLocalMixedMediaDbUpdateTask (final ILocalMixedMediaDb library) {
+	public MorriganTask getLocalMixedMediaDbUpdateTask (final IMediaItemDb library) {
 		return this.localMixedMediaDbUpdateTaskFactory.manufacture(library);
 	}
 
@@ -239,12 +237,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final ILocalMixedMediaDb toDb) {
+	public MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final IMediaItemDb toDb) {
 		return new CopyToLocalMmdbTask(fromList, itemsToCopy, toDb, this.config);
 	}
 
 	@Override
-	public MorriganTask getSyncMetadataRemoteToLocalTask (final ILocalMixedMediaDb local, final IRemoteMixedMediaDb remote) {
+	public MorriganTask getSyncMetadataRemoteToLocalTask (final IMediaItemDb local, final IRemoteMixedMediaDb remote) {
 		// TODO FIXME use a factory to prevent duplicates.
 		return new SyncMetadataRemoteToLocalTask(local, remote, this);
 	}
@@ -252,7 +250,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void readTrackTags (final IMediaItemDb<?> itemDb, final IMediaItem mt, final File file) throws IOException, MorriganException {
+	public void readTrackTags (final IMediaItemDb itemDb, final IMediaItem mt, final File file) throws IOException, MorriganException {
 		try {
 			TrackTagHelper.readTrackTags(itemDb, mt, file);
 		}

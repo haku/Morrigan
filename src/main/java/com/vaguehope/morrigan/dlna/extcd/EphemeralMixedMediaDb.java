@@ -16,13 +16,12 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.FileExistance;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -32,7 +31,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
+public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 
 	@Override
 	public void dispose () {}
@@ -284,12 +283,12 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public IMediaItem addFile (final File file) throws MorriganException, DbException {
+	public IMediaItem addFile(final MediaType mediaType, final File file) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public List<IMediaItem> addFiles (final List<File> files) throws MorriganException, DbException {
+	public List<IMediaItem> addFiles(final MediaType mediaType, final List<File> files) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -434,7 +433,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public IMixedMediaStorageLayer getDbLayer () {
+	public IMediaItemStorageLayer getDbLayer () {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

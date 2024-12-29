@@ -15,7 +15,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -249,8 +249,8 @@ public class OrderResolver {
 		// Can not follow tags if no current item.
 		if (current == null) return getNextTrackByLastPlayedDate(list, current);
 
-		if (!(list instanceof IMixedMediaDb)) throw new IllegalArgumentException("Only DB lists supported.");
-		final IMixedMediaDb db = (IMixedMediaDb) list;
+		if (!(list instanceof IMediaItemDb)) throw new IllegalArgumentException("Only DB lists supported.");
+		final IMediaItemDb db = (IMediaItemDb) list;
 
 		final Random rnd = new Random();
 

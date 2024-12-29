@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -22,13 +22,13 @@ import com.vaguehope.morrigan.util.Objs;
 public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final ILocalMixedMediaDb local;
+	private final IMediaItemDb local;
 	private final IRemoteMixedMediaDb remote;
 	private final MediaFactory mediaFactory;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public SyncMetadataRemoteToLocalTask (final ILocalMixedMediaDb local, final IRemoteMixedMediaDb remote, final MediaFactory mediaFactory) {
+	public SyncMetadataRemoteToLocalTask (final IMediaItemDb local, final IRemoteMixedMediaDb remote, final MediaFactory mediaFactory) {
 		this.local = local;
 		this.remote = remote;
 		this.mediaFactory = mediaFactory;
@@ -47,7 +47,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		taskEventListener.onStart();
 		TaskResult ret;
 		try {
-			final ILocalMixedMediaDb trans = this.mediaFactory.getLocalMixedMediaDbTransactional(this.local);
+			final IMediaItemDb trans = this.mediaFactory.getLocalMixedMediaDbTransactional(this.local);
 			try {
 				trans.read();
 				// FIXME add getByMd5() to local DB.
@@ -103,7 +103,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		return ret;
 	}
 
-	private static void syncMediaItems (final ILocalMixedMediaDb ldb, final IRemoteMixedMediaDb rdb, final IMediaItem remoteItem, final IMediaItem localItem) throws MorriganException {
+	private static void syncMediaItems (final IMediaItemDb ldb, final IRemoteMixedMediaDb rdb, final IMediaItem remoteItem, final IMediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
 			ldb.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}
@@ -167,7 +167,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		}
 	}
 
-	private static void addTag (final ILocalMixedMediaDb db, final IMediaItem item, final MediaTag tag) throws MorriganException {
+	private static void addTag (final IMediaItemDb db, final IMediaItem item, final MediaTag tag) throws MorriganException {
 		final MediaTagClassification cls = tag.getClassification();
 		final String clsString = cls == null ? null : cls.getClassification();
 		db.addTag(item, tag.getTag(), tag.getType(), clsString, tag.getModified(), tag.isDeleted());

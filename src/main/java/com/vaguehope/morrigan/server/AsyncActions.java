@@ -3,15 +3,15 @@ package com.vaguehope.morrigan.server;
 import java.net.URI;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.MorriganTask;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 /**
  * Set of helper functions for interacting
@@ -32,10 +32,9 @@ public class AsyncActions {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public AsyncTask scheduleMmdbScan (final IMixedMediaDb mmdb) {
-		if (mmdb instanceof ILocalMixedMediaDb) {
-			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) mmdb;
-			return scheduleMmdbScan(lmmdb);
+	public AsyncTask scheduleMmdbScan (final IMediaItemDb mmdb) {
+		if (mmdb.getType().equals(MediaListType.LOCALMMDB.toString())) {
+			return scheduleLocalMmdbScan(mmdb);
 		}
 		else if (mmdb instanceof IRemoteMixedMediaDb) {
 			IRemoteMixedMediaDb rmmdb = (IRemoteMixedMediaDb) mmdb;
@@ -46,7 +45,7 @@ public class AsyncActions {
 		}
 	}
 
-	public AsyncTask scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
+	public AsyncTask scheduleLocalMmdbScan (final IMediaItemDb mmdb) {
 		final MorriganTask task = this.mediaFactory.getLocalMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			return this.asyncTasksRegister.scheduleTask(task);
@@ -66,7 +65,7 @@ public class AsyncActions {
 		}
 	}
 
-	public void syncMetaData (final ILocalMixedMediaDb ldb, final IRemoteMixedMediaDb rdb) {
+	public void syncMetaData (final IMediaItemDb ldb, final IRemoteMixedMediaDb rdb) {
 		MorriganTask task = this.mediaFactory.getSyncMetadataRemoteToLocalTask(ldb, rdb);
 		if (task != null) {
 			this.asyncTasksRegister.scheduleTask(task);
@@ -76,7 +75,7 @@ public class AsyncActions {
 		}
 	}
 
-	public AsyncTask scheduleMmdbPull (final ILocalMixedMediaDb db, final String remote) throws DbException {
+	public AsyncTask scheduleMmdbPull (final IMediaItemDb db, final String remote) throws DbException {
 		final URI remoteUri = db.getRemote(remote);
 		if (remoteUri == null) throw new IllegalArgumentException("Invalid remote name: " + remote);
 		return this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(db, remoteUri, this.mediaFactory, this.config));
