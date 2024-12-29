@@ -76,7 +76,7 @@ public class ContentDirectoryDb extends EphemeralMixedMediaDb {
 	}
 
 	@Override
-	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return this.contentDirectory.searchWithRetry(term, maxResults, MAX_TRIES);
 	}
 

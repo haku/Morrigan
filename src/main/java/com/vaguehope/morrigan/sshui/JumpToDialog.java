@@ -230,7 +230,7 @@ public class JumpToDialog extends DialogWindow {
 							this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowAutocomplete(this.dlg, partialQuery, tags));
 						}
 
-						final List<IMediaItem> results = this.dlg.db.simpleSearch(MediaType.TRACK, partialQuery.fullText, MAX_RESULTS);
+						final List<IMediaItem> results = this.dlg.db.search(MediaType.TRACK, partialQuery.fullText, MAX_RESULTS);
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new SetSearchResults(this.dlg, results));
 					}
 					else if (item instanceof IMediaItem) {

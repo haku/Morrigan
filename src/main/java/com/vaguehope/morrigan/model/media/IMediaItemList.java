@@ -133,8 +133,8 @@ public interface IMediaItemList {
 	 */
 	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
-	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	List<IMediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException;
+	List<IMediaItem> search (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 
 	/**
 	 * filepath is anything the list identifies entries by, eg could also be an ID.

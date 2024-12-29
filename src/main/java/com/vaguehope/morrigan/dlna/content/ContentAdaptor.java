@@ -277,7 +277,7 @@ public class ContentAdaptor {
 	private ContentNode queryToContentNode (final String parentObjectId, final String objectId, final MediaListReference mlr,
 			final IMediaItemDb db, final String term, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException, MorriganException {
 		final Container c = makeContainer(parentObjectId, objectId, mlr.getTitle());
-		addItemsToContainer(mlr, c, db, db.simpleSearch(MediaType.TRACK, term, MAX_ITEMS, sortColumns, sortDirections, false));
+		addItemsToContainer(mlr, c, db, db.search(MediaType.TRACK, term, MAX_ITEMS, sortColumns, sortDirections, false));
 		return new ContentNode(c);
 	}
 
@@ -298,7 +298,7 @@ public class ContentAdaptor {
 		final String cacheKey = String.format("%s|%s|%s", term, maxResults, mlr.getIdentifier());
 		List<IMediaItem> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
 		if (results == null) {
-			results = db.simpleSearch(MediaType.TRACK, term, maxResults);
+			results = db.search(MediaType.TRACK, term, maxResults);
 			this.queryCache.put(cacheKey, results);
 		}
 

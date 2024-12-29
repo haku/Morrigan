@@ -47,8 +47,8 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemList {
 // Content.
 
 	@Override
-	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults) throws DbException {
-		return simpleSearch(mediaType, term, maxResults, null, null, false);
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults) throws DbException {
+		return search(mediaType, term, maxResults, null, null, false);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

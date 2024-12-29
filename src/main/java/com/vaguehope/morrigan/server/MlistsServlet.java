@@ -774,7 +774,7 @@ public class MlistsServlet extends HttpServlet {
 
 		List<IMediaItem> items;
 		if (queryString != null) {
-			items = ml.simpleSearch(MediaType.TRACK, queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
+			items = ml.search(MediaType.TRACK, queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			items = ml.getMediaItems();

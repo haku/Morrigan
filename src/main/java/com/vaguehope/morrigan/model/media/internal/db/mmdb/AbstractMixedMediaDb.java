@@ -31,13 +31,13 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults) throws DbException {
-		return getDbLayer().simpleSearch(mediaType, term, maxResults);
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults) throws DbException {
+		return getDbLayer().search(mediaType, term, maxResults);
 	}
 
 	@Override
-	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
-		return getDbLayer().simpleSearch(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+		return getDbLayer().search(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
 	@Override

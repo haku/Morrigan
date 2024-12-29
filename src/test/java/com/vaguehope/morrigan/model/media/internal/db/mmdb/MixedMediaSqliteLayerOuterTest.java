@@ -295,7 +295,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	/**
-	 * Example to prove Saved Search does same as simpleSearch().
+	 * Example to prove Saved Search does same as search().
 	 * TODO add other cases to be more sure?
 	 */
 	@Test
@@ -520,7 +520,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	private List<IMediaItem> runSearch (final String term) throws DbException {
-		return this.undertest.simpleSearch(MediaType.TRACK, term, 10);
+		return this.undertest.search(MediaType.TRACK, term, 10);
 	}
 
 	private static void assertSingleResult (final IMediaItem expected, final List<IMediaItem> actual) {
