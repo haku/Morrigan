@@ -17,7 +17,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class ContentDirectoryDb extends EphemeralMixedMediaDb {
+public class ContentDirectoryDb extends EphemeralMediaList {
 
 	private static final int MAX_TRIES = 2;
 

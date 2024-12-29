@@ -25,7 +25,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public abstract class EphemeralMixedMediaDb implements IMediaItemList {
+public abstract class EphemeralMediaList implements IMediaItemList {
 
 	@Override
 	public void dispose () {}
