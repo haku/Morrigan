@@ -108,7 +108,7 @@ public interface IMediaItemList {
 	MediaAlbum getAlbum (String name) throws MorriganException;
 	void removeAlbum (MediaAlbum album) throws MorriganException;
 	Collection<MediaAlbum> getAlbums () throws MorriganException;
-	Collection<IMediaItem> getAlbumItems (MediaAlbum album) throws MorriganException;
+	Collection<IMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
 	/**
 	 * Will have no effect if already in album.
 	 */
@@ -118,6 +118,11 @@ public interface IMediaItemList {
 	 * Returns number of items removed.
 	 */
 	int removeFromAllAlbums (IDbItem item) throws MorriganException;
+
+	/**
+	 * @return File path to cover art or null.
+	 */
+	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // track

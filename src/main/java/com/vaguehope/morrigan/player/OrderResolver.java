@@ -283,7 +283,7 @@ public class OrderResolver {
 		tagsToSearchForInOrder.addAll(lowPri);
 
 		for (final String tag : tagsToSearchForInOrder) {
-			final List<IMediaItem> itemsWithTag = db.simpleSearchMedia(
+			final List<IMediaItem> itemsWithTag = db.simpleSearch(
 					MediaType.TRACK,
 					String.format("t=\"%s\"", tag),
 					FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH,

@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -748,12 +749,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			int albumsRemoved = 0;
 			for (final MediaAlbum album : this.itemList.getAlbums()) {
 				if (taskEventListener.isCanceled()) break;
-				for (final IMediaItem item : this.itemList.getAlbumItems(album)) {
+				for (final IMediaItem item : this.itemList.getAlbumItems(MediaType.UNKNOWN, album)) {
 					if (!isDirectoryAnAlbum(this.fileSystem.makeFile(item.getFilepath()).getParentFile())) {
 						this.itemList.removeFromAlbum(album, item);
 					}
 				}
-				if (this.itemList.getAlbumItems(album).size() < 1) {
+				if (this.itemList.getAlbumItems(MediaType.UNKNOWN, album).size() < 1) {
 					this.itemList.removeAlbum(album);
 					albumsRemoved += 1;
 				}

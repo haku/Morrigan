@@ -20,7 +20,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
@@ -80,7 +79,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 	}
 
 	private static void readHttp (final IRemoteMixedMediaDb mmdb, final URI uri, final HttpStreamHandler feedReader) throws DbException, IOException, HttpStreamHandlerException, MalformedURLException, MorriganException {
-		final Map<String, String> headers = new HashMap<String, String>();
+		final Map<String, String> headers = new HashMap<>();
 		Auth.addTo(headers, uri, mmdb.getPass());
 		final HttpResponse response = HttpClient.doHttpRequest(uri.toURL(), headers, feedReader);
 		if (response.getCode() != 200) {
@@ -127,7 +126,6 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		IRemoteMixedMediaDb transClone = null;
 		try {
 			transClone = RemoteMixedMediaDbFactory.getTransactionalClone(this.mmdb);
-			transClone.setDefaultMediaType(MediaType.UNKNOWN, false);
 			transClone.readFromCache();
 			transClone.beginBulkUpdate();
 			try {

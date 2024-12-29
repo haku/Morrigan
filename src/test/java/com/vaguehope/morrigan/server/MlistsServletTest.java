@@ -103,8 +103,6 @@ public class MlistsServletTest {
 
 	@Test
 	public void itServesSha1Tags() throws Exception {
-		this.testDb.setDefaultMediaType(MediaType.TRACK, true);
-
 		final IMediaItem t0 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567890abcdefL));
 		this.testDb.addTag(t0, "foo", MediaTagType.MANUAL, null, new Date(123456789000L), false);
 		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, null, new Date(987654321000L), false);

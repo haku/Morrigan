@@ -759,7 +759,7 @@ public class MlistsServlet extends HttpServlet {
 
 		List<IMediaItem> items;
 		if (queryString != null) {
-			items = ml.simpleSearch(queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
+			items = ml.simpleSearch(MediaType.TRACK, queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			items = ml.getMediaItems();
@@ -784,7 +784,6 @@ public class MlistsServlet extends HttpServlet {
 			dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
 			dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
 
-			dw.dataElement("defaulttype", String.valueOf(ml.getDefaultMediaType().getN()));
 			dw.dataElement("sortcolumn", ml.getSort().getHumanName());
 			dw.dataElement("sortdirection", ml.getSortDirection().toString());
 		}

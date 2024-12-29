@@ -1,32 +1,13 @@
 package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
 public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Read methods.
-
-	/**
-	 * Set the default media type for the untyped getters to return.
-	 */
-	void setDefaultMediaType (MediaType mediaType);
-	MediaType getDefaultMediaType();
-
-	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
-	List<IMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumn, SortDirection[] sortDirection, boolean includeDisabled) throws DbException;
-
-	Collection<IMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for generic MediaItem.
 

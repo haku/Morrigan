@@ -29,73 +29,18 @@ public abstract class AbstractMixedMediaDb
 
 	protected AbstractMixedMediaDb (final String listName, final MediaItemDbConfig config, final IMixedMediaStorageLayer dbLayer) {
 		super(listName, config, dbLayer);
-
-		try {
-			readDefaultMediaTypeFromDb();
-		}
-		catch (DbException e) {
-			e.printStackTrace();
-		}
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Default MediaType.
-
-	@Override
-	public void setDefaultMediaType (final MediaType mediaType) throws MorriganException {
-		setDefaultMediaType(mediaType, true);
-	}
-
-	@Override
-	public void setDefaultMediaType (final MediaType mediaType, final boolean saveToDb) throws MorriganException {
-		this.getDbLayer().setDefaultMediaType(mediaType);
-		updateRead();
-		if (saveToDb) saveDefaultMediaTypeToDbInNewThread();
-	}
-
-	@Override
-	public MediaType getDefaultMediaType () {
-		return this.getDbLayer().getDefaultMediaType();
-	}
-
-	public static final String KEY_DEFAULTMEDIATYPE = "DEFAULTMEDIATYPE";
-
-	private void saveDefaultMediaTypeToDbInNewThread () {
-		new Thread() {
-			@Override
-			public void run () {
-				try {
-					saveDefaultMediaTypeToDb();
-				}
-				catch (DbException e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-
-	void saveDefaultMediaTypeToDb () throws DbException {
-		getDbLayer().setProp(KEY_DEFAULTMEDIATYPE, String.valueOf(getDefaultMediaType().getN()));
-	}
-
-	private void readDefaultMediaTypeFromDb () throws DbException {
-		String s = getDbLayer().getProp(KEY_DEFAULTMEDIATYPE);
-		if (s != null) {
-			MediaType mt = MediaType.parseInt(Integer.parseInt(s));
-			this.getDbLayer().setDefaultMediaType(mt);
-		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
-		return getDbLayer().simpleSearchMedia(mediaType, term, maxResults);
+	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults) throws DbException {
+		return getDbLayer().simpleSearch(mediaType, term, maxResults);
 	}
 
 	@Override
-	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
-		return getDbLayer().simpleSearchMedia(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
+	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+		return getDbLayer().simpleSearch(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
 	@Override
@@ -117,16 +62,6 @@ public abstract class AbstractMixedMediaDb
 
 	@Override
 	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
-
-		if (item.getMediaType() != newType) {
-			if (newType == getDefaultMediaType()) {
-				// TODO add this item to the list.
-			}
-			else if (item.getMediaType() == getDefaultMediaType()) {
-				// TODO remove item from the list.
-			}
-		}
-
 		item.setMediaType(newType);
 		getChangeEventCaller().mediaItemsUpdated(item);
 		this.setDirtyState(DirtyState.METADATA);

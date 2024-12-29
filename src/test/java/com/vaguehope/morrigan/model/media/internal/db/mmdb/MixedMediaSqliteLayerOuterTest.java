@@ -51,9 +51,9 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itReturnsTrackItemsWhenDefaultTypeIsTrack () throws Exception {
-		this.undertest.setDefaultMediaType(MediaType.TRACK);
+	public void itReturnsTrackItemsWhenTypeIsTrack () throws Exception {
 		final List<IMediaItem> actual = this.undertest.getMedia(
+				MediaType.TRACK,
 				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
 				new SortDirection[] { SortDirection.ASC },
 				false);
@@ -62,9 +62,9 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itReturnsPictureItemsWhenDefaultTypeIsPicture () throws Exception {
-		this.undertest.setDefaultMediaType(MediaType.PICTURE);
+	public void itReturnsPictureItemsWhenTypeIsPicture () throws Exception {
 		final List<IMediaItem> actual = this.undertest.getMedia(
+				MediaType.PICTURE,
 				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
 				new SortDirection[] { SortDirection.ASC },
 				false);
@@ -305,6 +305,7 @@ public class MixedMediaSqliteLayerOuterTest {
 				"happy_track_nyan~");
 
 		final List<IMediaItem> actual = this.undertest.getMedia(
+				MediaType.TRACK,
 				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
 				new SortDirection[] { SortDirection.ASC },
 				true,
@@ -519,7 +520,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	private List<IMediaItem> runSearch (final String term) throws DbException {
-		return this.undertest.simpleSearchMedia(MediaType.TRACK, term, 10);
+		return this.undertest.simpleSearch(MediaType.TRACK, term, 10);
 	}
 
 	private static void assertSingleResult (final IMediaItem expected, final List<IMediaItem> actual) {

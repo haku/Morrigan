@@ -21,6 +21,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
@@ -239,12 +240,14 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 		long t0 = System.currentTimeMillis();
 		if (this.searchTerm != null) {
 			allMedia = this.dbLayer.getMedia(
+					MediaType.TRACK,
 					new IDbColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
 					this.hideMissing, this.searchTerm);
 		}
 		else {
 			allMedia = this.dbLayer.getMedia(
+					MediaType.TRACK,
 					new IDbColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
 					this.hideMissing);
@@ -438,16 +441,6 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	@Override
 	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		return this.dbLayer.getByMd5(md5);
-	}
-
-	@Override
-	public List<IMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
-		return this.dbLayer.simpleSearch(term, maxResults);
-	}
-
-	@Override
-	public List<IMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
-		return this.dbLayer.simpleSearch(term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -933,9 +926,9 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer>
 	}
 
 	@Override
-	public Collection<IMediaItem> getAlbumItems (final MediaAlbum album) throws MorriganException {
+	public Collection<IMediaItem> getAlbumItems(final MediaType mediaType, final MediaAlbum album) throws MorriganException {
 		try {
-			return this.dbLayer.getAlbumItems(album);
+			return this.dbLayer.getAlbumItems(mediaType, album);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);

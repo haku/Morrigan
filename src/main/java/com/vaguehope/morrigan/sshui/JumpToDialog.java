@@ -34,6 +34,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -229,7 +230,7 @@ public class JumpToDialog extends DialogWindow {
 							this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowAutocomplete(this.dlg, partialQuery, tags));
 						}
 
-						final List<IMediaItem> results = this.dlg.db.simpleSearch(partialQuery.fullText, MAX_RESULTS);
+						final List<IMediaItem> results = this.dlg.db.simpleSearch(MediaType.TRACK, partialQuery.fullText, MAX_RESULTS);
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new SetSearchResults(this.dlg, results));
 					}
 					else if (item instanceof IMediaItem) {

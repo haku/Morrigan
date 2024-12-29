@@ -54,41 +54,15 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 // Content.
 
 	@Override
-	public List<IMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
-		return simpleSearchMedia(getDefaultMediaType(), term, maxResults);
-	}
-
-	@Override
-	public List<IMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
-		return simpleSearchMedia(getDefaultMediaType(), term, maxResults, sortColumns, sortDirections, includeDisabled);
-	}
-
-	@Override
-	public List<IMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
-		return simpleSearchMedia(mediaType, term, maxResults, null, null, false);
+	public List<IMediaItem> simpleSearch(final MediaType mediaType, final String term, final int maxResults) throws DbException {
+		return simpleSearch(mediaType, term, maxResults, null, null, false);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Fake state.
 
-	private MediaType defaultMediaType = MediaType.UNKNOWN;
 	private IDbColumn sort = IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE;
 	private SortDirection direction = SortDirection.ASC;
-
-	@Override
-	public void setDefaultMediaType (final MediaType mediaType) throws MorriganException {
-		setDefaultMediaType(mediaType, true);
-	}
-
-	@Override
-	public void setDefaultMediaType (final MediaType mediaType, final boolean saveToDb) throws MorriganException {
-		this.defaultMediaType = mediaType;
-	}
-
-	@Override
-	public MediaType getDefaultMediaType () {
-		return this.defaultMediaType;
-	}
 
 	@Override
 	public IDbColumn getSort () {
@@ -420,8 +394,8 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public Collection<IMediaItem> getAlbumItems (final MediaAlbum album) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
+	public Collection<IMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -517,11 +491,6 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	@Override
 	public void completeBulkUpdate (final boolean thereWereErrors) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public Collection<IMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
-		return Collections.emptyList();
 	}
 
 	@Override

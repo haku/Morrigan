@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sqlitewrapper.IGenericDbLayer;
 
@@ -87,7 +88,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	MediaAlbum getAlbum (String name) throws DbException;
 	void removeAlbum (MediaAlbum album) throws DbException;
 	Collection<MediaAlbum> getAlbums () throws DbException;
-	Collection<IMediaItem> getAlbumItems (MediaAlbum album) throws DbException;
+	Collection<IMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
 	/**
 	 * Will have no effect if already in album.
 	 */
@@ -106,16 +107,16 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	IDbColumn getDefaultSortColumn ();
 
 	List<IMediaItem> getAllMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
+	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
 
 	FileExistance hasFile (File file) throws DbException;
 	FileExistance hasFile (String filePath) throws DbException;
 	IMediaItem getByFile (File file) throws DbException;
 	IMediaItem getByFile (String filePath) throws DbException;
 	IMediaItem getByMd5 (BigInteger md5) throws DbException;
-	List<IMediaItem> simpleSearch(String term, int maxResults) throws DbException;
-	List<IMediaItem> simpleSearch(String term, int maxResults, IDbColumn[] sorts, SortDirection[] directions, boolean includeDisabled) throws DbException;
+	List<IMediaItem> simpleSearch(MediaType mediaType, String term, int maxResults) throws DbException;
+	List<IMediaItem> simpleSearch(MediaType mediaType, String term, int maxResults, IDbColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
 	boolean[] addFiles (List<File> files) throws DbException;
 

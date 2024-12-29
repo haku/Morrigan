@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -34,8 +35,8 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer> extends IMediaIt
 	URI getRemote(String name) throws DbException;
 	Map<String, URI> getRemotes() throws DbException;
 
-	List<IMediaItem> simpleSearch (String term, int maxResults) throws DbException;
-	List<IMediaItem> simpleSearch (String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults) throws DbException;
+	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 	List<IMediaItem> getAllDbEntries () throws DbException;
 	IMediaItem getByFile (File file) throws DbException;
 	IMediaItem getByFile (String filepath) throws DbException;
