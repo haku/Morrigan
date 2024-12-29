@@ -10,10 +10,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public interface IMixedMediaDb
-		extends
-		IMediaItemList,
-		IMediaTrackDb<IMixedMediaStorageLayer> {
+public interface IMixedMediaDb extends IMediaItemDb<IMixedMediaStorageLayer> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void setDefaultMediaType (MediaType mediaType) throws MorriganException;
