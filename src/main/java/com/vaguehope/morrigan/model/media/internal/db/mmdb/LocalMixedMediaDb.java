@@ -14,8 +14,8 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public String getType () {
-		return MediaListType.LOCALMMDB.toString();
+	public MediaListType getType () {
+		return MediaListType.LOCALMMDB;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

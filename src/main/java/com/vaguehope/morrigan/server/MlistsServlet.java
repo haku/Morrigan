@@ -249,7 +249,7 @@ public class MlistsServlet extends HttpServlet {
 				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {
 					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
-					final IMediaItemDb mmdb = this.mediaFactory.getMixedMediaDbByMid(path, filter);
+					final IMediaItemList mmdb = this.mediaFactory.getMediaListByMid(path, filter);
 					mmdb.read();
 					final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
 					final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
@@ -279,7 +279,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemDb mmdb, final String path, final String afterPath) throws IOException, MorriganException, DbException {
+	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb, final String path, final String afterPath) throws IOException, MorriganException, DbException {
 		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
 			final String filepath = URLDecoder.decode(afterPath, "UTF-8");
 			if (mmdb.hasFile(filepath).isKnown()) {
@@ -310,7 +310,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemDb mmdb) throws IOException, MorriganException, DbException {
+	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -334,21 +334,31 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_SCAN)) {
-			final AsyncTask at = this.asyncActions.scheduleMmdbScan(mmdb);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("Scan scheduled desu~");
-			resp.getWriter().println("id=" + at.id());
-		}
-		else if (action.equals(CMD_PULL)) {
-			final String remote = req.getParameter(PARAM_REMOTE);
-			if (StringHelper.notBlank(remote)) {
-				final AsyncTask at = this.asyncActions.scheduleMmdbPull(mmdb, remote);
+			if (mmdb instanceof IMediaItemDb) {
+				final AsyncTask at = this.asyncActions.scheduleMmdbScan((IMediaItemDb) mmdb);
 				resp.setContentType("text/plain");
-				resp.getWriter().println("Pull scheduled desu~");
+				resp.getWriter().println("Scan scheduled desu~");
 				resp.getWriter().println("id=" + at.id());
 			}
 			else {
-				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'remote' parameter not set desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Only supported on DBs: " + action);
+			}
+		}
+		else if (action.equals(CMD_PULL)) {
+			if (mmdb instanceof IMediaItemDb) {
+				final String remote = req.getParameter(PARAM_REMOTE);
+				if (StringHelper.notBlank(remote)) {
+					final AsyncTask at = this.asyncActions.scheduleMmdbPull((IMediaItemDb) mmdb, remote);
+					resp.setContentType("text/plain");
+					resp.getWriter().println("Pull scheduled desu~");
+					resp.getWriter().println("id=" + at.id());
+				}
+				else {
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'remote' parameter not set desu~");
+				}
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Only supported on DBs: " + action);
 			}
 		}
 		else {
@@ -356,7 +366,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemDb mmdb, final IMediaItem item) throws IOException, MorriganException {
+	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb, final IMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -440,7 +450,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdbAlbum (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemDb mmdb, final MediaAlbum album) throws IOException, MorriganException {
+	private void postToMmdbAlbum (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb, final MediaAlbum album) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -506,7 +516,7 @@ public class MlistsServlet extends HttpServlet {
 //			dw.endElement("entry");
 //		}
 
-		for (final MediaListReference listRef : this.mediaFactory.getExternalDbs()) {
+		for (final MediaListReference listRef : this.mediaFactory.getExternalList()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "ext" } });
 			printMlistShort(dw, listRef);
 			dw.endElement("entry");
@@ -525,7 +535,7 @@ public class MlistsServlet extends HttpServlet {
 		ServletHelper.returnFile(file, CONTENT_TYPE_JSON, null, null, resp);
 	}
 
-	private void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMediaItemDb mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
+	private void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMediaItemList mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.NO, IncludeTags.NO);
 		}
@@ -626,15 +636,21 @@ public class MlistsServlet extends HttpServlet {
 					query, maxResults, sortColumns, sortDirections, includeDisabled, transcode);
 		}
 		else if (path.equals(PATH_SHA1TAGS)) {
-			final boolean includeAutoTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_AUTO_TAGS, false);
-			// TODO it would be nice to make the gson instance static and reusable, but ATM the type converted wraps the DB.
-			// TODO do not output entries that do not have any tags.
-			final Gson gson = new GsonBuilder()
-					.registerTypeHierarchyAdapter(IMediaItem.class, new Sha1TagsJsonSerializer(mmdb, includeAutoTags))
-					.create();
-			final Object[] items = mmdb.getAllDbEntries().stream().filter(i -> i.getSha1() != null).toArray();
-			resp.setContentType(CONTENT_TYPE_JSON);
-			gson.toJson(items, resp.getWriter());
+			if (mmdb instanceof IMediaItemDb) {
+				final IMediaItemDb db = (IMediaItemDb) mmdb;
+				final boolean includeAutoTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_AUTO_TAGS, false);
+				// TODO it would be nice to make the gson instance static and reusable, but ATM the type converted wraps the DB.
+				// TODO do not output entries that do not have any tags.
+				final Gson gson = new GsonBuilder()
+						.registerTypeHierarchyAdapter(IMediaItem.class, new Sha1TagsJsonSerializer(db, includeAutoTags))
+						.create();
+				final Object[] items = db.getAllDbEntries().stream().filter(i -> i.getSha1() != null).toArray();
+				resp.setContentType(CONTENT_TYPE_JSON);
+				gson.toJson(items, resp.getWriter());
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Only supported on local DBs: " + path);
+			}
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
@@ -642,10 +658,10 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private static class Sha1TagsJsonSerializer implements JsonSerializer<IMediaItem> {
-		private final IMediaItemDb db;
+		private final IMediaItemList db;
 		private final boolean includeAutoTags;
 
-		public Sha1TagsJsonSerializer(IMediaItemDb db, boolean includeAutoTags) {
+		public Sha1TagsJsonSerializer(IMediaItemList db, boolean includeAutoTags) {
 			this.db = db;
 			this.includeAutoTags = includeAutoTags;
 		}
@@ -740,13 +756,13 @@ public class MlistsServlet extends HttpServlet {
 		NO, YES, YES_INCLUDING_DELETED;
 	}
 
-	private void printMlistLong (final HttpServletResponse resp, final IMediaItemDb ml,
+	private void printMlistLong (final HttpServletResponse resp, final IMediaItemList ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags)
 					throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, includeSrcs, includeItems, includeTags, null, 0, null, null, false, null);
 	}
 
-	private void printMlistLong (final HttpServletResponse resp, final IMediaItemDb ml,
+	private void printMlistLong (final HttpServletResponse resp, final IMediaItemList ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags,
 			final String queryString, final int maxQueryResults,
 			final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled,
@@ -783,23 +799,29 @@ public class MlistsServlet extends HttpServlet {
 			dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
 			dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
 
-			dw.dataElement("sortcolumn", ml.getSort().getHumanName());
-			dw.dataElement("sortdirection", ml.getSortDirection().toString());
+			if (ml instanceof IMediaItemDb) {
+				final IMediaItemDb db = (IMediaItemDb) ml;
+				dw.dataElement("sortcolumn", db.getSort().getHumanName());
+				dw.dataElement("sortdirection", db.getSortDirection().toString());
+			}
 		}
 
-		final String pathToSelf = REL_CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
+		final String pathToSelf = REL_CONTEXTPATH + "/" + ml.getType().toString() + "/" + listFile;
 		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
 		if (includeItems == IncludeItems.NO) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 
-		for (final String remote : ml.getRemotes().keySet()) {
-			FeedHelper.addElement(dw, "remote", remote);
-		}
+		if (ml instanceof IMediaItemDb) {
+			final IMediaItemDb db = (IMediaItemDb) ml;
+			for (final String remote : db.getRemotes().keySet()) {
+				FeedHelper.addElement(dw, "remote", remote);
+			}
 
-		if (includeSrcs == IncludeSrcs.YES) {
-			for (final String s : ml.getSources()) {
-				FeedHelper.addElement(dw, "src", s);
+			if (includeSrcs == IncludeSrcs.YES) {
+				for (final String s : db.getSources()) {
+					FeedHelper.addElement(dw, "src", s);
+				}
 			}
 		}
 
@@ -907,7 +929,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static void printAlbums (final HttpServletResponse resp, final IMediaItemDb ml) throws SAXException, IOException, MorriganException {
+	private static void printAlbums (final HttpServletResponse resp, final IMediaItemList ml) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "albums");
@@ -919,7 +941,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "albums");
 	}
 
-	private static void printAlbum (final HttpServletResponse resp, final IMediaItemDb ml, final MediaAlbum album) throws SAXException, IOException, MorriganException {
+	private static void printAlbum (final HttpServletResponse resp, final IMediaItemList ml, final MediaAlbum album) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "album");
@@ -927,7 +949,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "album");
 	}
 
-	public static void printAlbumBody (final DataWriter dw, final IMediaItemDb ml, final MediaAlbum album) throws SAXException, MorriganException {
+	public static void printAlbumBody (final DataWriter dw, final IMediaItemList ml, final MediaAlbum album) throws SAXException, MorriganException {
 		FeedHelper.addElement(dw, "name", album.getName());
 		FeedHelper.addLink(dw, fileLink(album), "self");
 		FeedHelper.addElement(dw, "trackcount", album.getTrackCount());

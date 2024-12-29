@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -42,7 +42,7 @@ public class ContentDirectoryHolder {
 	public void dispose () {
 		if (this.alive.compareAndSet(true, false)) {
 			for (final String id : this.contentDirectories.keySet()) {
-				dispose(this.mediaFactory.removeExternalDb(id));
+				dispose(this.mediaFactory.removeExternalList(id));
 			}
 			this.contentDirectories.clear();
 		}
@@ -54,7 +54,7 @@ public class ContentDirectoryHolder {
 		this.contentDirectories.put(id, contentDirectory);
 		try {
 			final IMediaItemStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
-			this.mediaFactory.addExternalDb(new ContentDirectoryDb(id, this.upnpService.getControlPoint(), device, contentDirectory, storage));
+			this.mediaFactory.addExternalList(new ContentDirectoryDb(id, this.upnpService.getControlPoint(), device, contentDirectory, storage));
 		}
 		catch (final DbException e) {
 			LOG.warn("Failed to create storage: {}", ErrorHelper.oneLineCauseTrace(e));
@@ -65,14 +65,14 @@ public class ContentDirectoryHolder {
 		checkAlive();
 		final String id = idForDevice(device);
 		this.contentDirectories.remove(id);
-		dispose(this.mediaFactory.removeExternalDb(id));
+		dispose(this.mediaFactory.removeExternalList(id));
 	}
 
 	private static String idForDevice (final RemoteDevice device) {
 		return device.getIdentity().getUdn().getIdentifierString();
 	}
 
-	private static void dispose (final IMediaItemDb db) {
+	private static void dispose (final IMediaItemList db) {
 		if (db == null) return;
 		db.dispose();
 	}

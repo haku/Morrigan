@@ -24,9 +24,10 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -63,7 +64,7 @@ public class DbFace extends DefaultFace {
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
 	private final SessionState sessionState;
-	private final IMediaItemDb db;
+	private final IMediaItemList list;
 	private final Player defaultPlayer;
 	private final DbHelper dbHelper;
 
@@ -87,13 +88,13 @@ public class DbFace extends DefaultFace {
 			final FaceNavigation navigation,
 			final MnContext mnContext,
 			final SessionState sessionState,
-			final IMediaItemDb db,
+			final IMediaItemList list,
 			final Player defaultPlayer) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
 		this.sessionState = sessionState;
-		this.db = db;
+		this.list = list;
 		this.defaultPlayer = defaultPlayer;
 		this.dbHelper = new DbHelper(navigation, mnContext, sessionState, this.defaultPlayer, this.lastActionMessage, this);
 		refreshData(false);
@@ -107,16 +108,16 @@ public class DbFace extends DefaultFace {
 
 	@Override
 	public String getTitle() {
-		return this.db.getListName();
+		return this.list.getListName();
 	}
 
 	public void restoreSavedScroll () throws MorriganException {
 		try {
-			final int limit = Math.max(this.db.getCount() - 1, 0);
-			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.db.getSerial(), this.scrollTop);
+			final int limit = Math.max(this.list.getCount() - 1, 0);
+			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.list.getSerial(), this.scrollTop);
 			this.scrollTop = Math.max(Math.min(limit, scrollTopToRestore), 0);
 
-			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.db.getSerial(),
+			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.list.getSerial(),
 					this.scrollTop > 0 ? this.scrollTop : this.selectedItemIndex);
 			setSelectedItem(selectedItemIndexToRestore);
 
@@ -130,8 +131,8 @@ public class DbFace extends DefaultFace {
 	private void saveScrollIfRequired () throws MorriganException {
 		if (!this.saveScrollOnClose) return;
 		try {
-			this.mnContext.getUserPrefs().putValue(PREF_SCROLL_INDEX, this.db.getSerial(), this.scrollTop);
-			this.mnContext.getUserPrefs().putValue(PREF_SELECTED_INDEX, this.db.getSerial(), this.selectedItemIndex);
+			this.mnContext.getUserPrefs().putValue(PREF_SCROLL_INDEX, this.list.getSerial(), this.scrollTop);
+			this.mnContext.getUserPrefs().putValue(PREF_SELECTED_INDEX, this.list.getSerial(), this.selectedItemIndex);
 		}
 		catch (final IOException e) {
 			throw new MorriganException("Failed to save scroll position.", e);
@@ -149,14 +150,14 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void refreshData (final boolean force) throws MorriganException {
-		if (this.db == null) return;
+		if (this.list == null) return;
 		if (force) {
-			this.db.forceRead();
+			this.list.forceRead();
 		}
 		else {
-			this.db.read();
+			this.list.read();
 		}
-		this.mediaItems = this.db.getMediaItems();
+		this.mediaItems = this.list.getMediaItems();
 	}
 
 	private void updateItemDetailsBar () {
@@ -166,7 +167,7 @@ public class DbFace extends DefaultFace {
 		this.mnContext.getUnreliableEs().submit(new Callable<Void>() {
 			@Override
 			public Void call () throws MorriganException {
-				final String tags = PrintingThingsHelper.summariseItemTags(DbFace.this.db, item);
+				final String tags = PrintingThingsHelper.summariseItemTags(DbFace.this.list, item);
 				scheduleOnUiThread(new Callable<Void>() {
 					@Override
 					public Void call () {
@@ -250,7 +251,12 @@ public class DbFace extends DefaultFace {
 						askSearch(gui);
 						return true;
 					case 'p':
-						this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, this.db));
+						if (this.list instanceof IMediaItemDb) {
+							this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (IMediaItemDb) this.list));
+						}
+						else {
+							this.lastActionMessage.setLastActionMessage(String.format("Can not show properties for non-DB."));
+						}
 						return true;
 					case 'r':
 						refreshData(true);
@@ -316,7 +322,7 @@ public class DbFace extends DefaultFace {
 
 	private void enqueueDb (final WindowBasedTextGUI gui) {
 		final Player player = getPlayer(gui, "Enqueue DB");
-		if (player != null) enqueuePlayItem(new PlayItem(this.db, null), player);
+		if (player != null) enqueuePlayItem(new PlayItem(this.list, null), player);
 	}
 
 	protected void enqueuePlayItem (final PlayItem playItem, final Player player) {
@@ -337,7 +343,7 @@ public class DbFace extends DefaultFace {
 		if (tracks.size() < 1) return;
 		final Player player = getPlayer(gui, String.format("Enqueue %s items", tracks.size()));
 		if (player == null) return;
-		PlayerHelper.enqueueAll(this.db, tracks, player);
+		PlayerHelper.enqueueAll(this.list, tracks, player);
 		this.lastActionMessage.setLastActionMessage(String.format("Enqueued %s items in %s.", tracks.size(), player.getName()));
 	}
 
@@ -350,13 +356,13 @@ public class DbFace extends DefaultFace {
 		final Player player = getPlayer(gui, String.format("Play %s items", tracks.size()));
 		if (player == null) return;
 		this.lastActionMessage.setLastActionMessage(String.format("Playing %s items in %s.", tracks.size(), player.getName()));
-		PlayerHelper.playAll(this.db, tracks, player);
+		PlayerHelper.playAll(this.list, tracks, player);
 	}
 
 	private void showEditTagsForSelectedItem (final WindowBasedTextGUI gui) throws MorriganException {
 		final IMediaItem item = getSelectedItem();
 		if (item == null) return;
-		TagEditor.show(gui, this.db, item);
+		TagEditor.show(gui, this.list, item);
 	}
 
 	private void toggleSelection () throws MorriganException {
@@ -379,7 +385,7 @@ public class DbFace extends DefaultFace {
 		if (items.size() < 1) return;
 		final File dir = DirDialog.show(gui, String.format("Export %s tracks", items.size()), "Export", this.sessionState.initialDir);
 		if (dir == null) return;
-		final MorriganTask task = this.mnContext.getMediaFactory().getMediaFileCopyTask(this.db, items, dir);
+		final MorriganTask task = this.mnContext.getMediaFactory().getMediaFileCopyTask(this.list, items, dir);
 		this.mnContext.getAsyncTasksRegister().scheduleTask(task);
 		this.lastActionMessage.setLastActionMessage(String.format("Started copying %s tracks ...", items.size()));
 	}
@@ -387,23 +393,29 @@ public class DbFace extends DefaultFace {
 	private void toggleEnabledSelection () throws MorriganException {
 		final List<IMediaItem> items = getSelectedItems();
 		for (final IMediaItem item : items) {
-			this.db.setItemEnabled(item, !item.isEnabled());
+			this.list.setItemEnabled(item, !item.isEnabled());
 		}
 		this.lastActionMessage.setLastActionMessage(String.format("Toggled enabled on %s items.", items.size()));
 	}
 
 	private void askSortColumn (final WindowBasedTextGUI gui) {
-		final List<IDbColumn> cols = this.db.getDbLayer().getMediaTblColumns();
+		if (!(this.list instanceof IMediaItemDb)) {
+			this.lastActionMessage.setLastActionMessage("Can not sort non-local DBs.");
+			return;
+		}
+		final IMediaItemDb db = (IMediaItemDb) this.list;
+
+		final List<IDbColumn> cols = db.getDbLayer().getMediaTblColumns();
 		final List<Runnable> actions = new ArrayList<>();
 		for (final IDbColumn col : cols) {
 			if (col.getHumanName() != null) {
-				actions.add(new SortColumnAction(this.db, col, SortDirection.ASC));
-				actions.add(new SortColumnAction(this.db, col, SortDirection.DESC));
+				actions.add(new SortColumnAction(db, col, SortDirection.ASC));
+				actions.add(new SortColumnAction(db, col, SortDirection.DESC));
 			}
 		}
 		final ActionListDialog dlg = new ActionListDialogBuilder()
 				.setTitle("Sort Order")
-				.setDescription("Current: " + PrintingThingsHelper.sortSummary(this.db))
+				.setDescription("Current: " + PrintingThingsHelper.sortSummary(db))
 				.addActions(actions.toArray(new Runnable[actions.size()]))
 				.build();
 		dlg.setCloseWindowWithEscape(true);
@@ -411,12 +423,12 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		this.dbHelper.askSearch(gui, this.db);
+		this.dbHelper.askSearch(gui, this.list);
 	}
 
 	@Override
 	public void writeScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
-		if (this.db != null) {
+		if (this.list != null) {
 			writeDbToScreen(scr, tg, top, bottom, columns);
 		}
 		else {
@@ -427,10 +439,14 @@ public class DbFace extends DefaultFace {
 	private void writeDbToScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		int l = top;
 
-		tg.putString(0, l++, String.format("DB %s: %s   %s",
-				this.db.getListName(),
-				PrintingThingsHelper.dbSummary(this.db),
-				PrintingThingsHelper.sortSummary(this.db)));
+		String summary = String.format("DB %s", this.list.getListName());
+		if (this.list instanceof IMediaItemDb) {
+			final IMediaItemDb db = (IMediaItemDb) this.list;
+			summary += ": " + PrintingThingsHelper.dbSummary(db);
+			summary += "   " + PrintingThingsHelper.sortSummary(db);
+		}
+
+		tg.putString(0, l++, summary);
 		this.lastActionMessage.drawLastActionMessage(tg, l++);
 
 		this.pageSize = bottom - l;

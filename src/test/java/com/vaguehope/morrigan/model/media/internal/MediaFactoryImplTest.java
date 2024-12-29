@@ -31,13 +31,13 @@ public class MediaFactoryImplTest {
 	public void itGetsLocalByMid() throws Exception {
 		final IMediaItemDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
 		final MediaListReference ref = this.undertest.getAllLocalMixedMediaDbs().iterator().next();
-		assertEquals(db, this.undertest.getMixedMediaDbByMid(ref.getMid(), null));
-		assertEquals(db, this.undertest.getMixedMediaDbByRef(ref));
+		assertEquals(db, this.undertest.getMediaListByMid(ref.getMid(), null));
+		assertEquals(db, this.undertest.getMediaListByRef(ref));
 
 		final String filter = "some-filter" + RND.nextLong();
 		final IMediaItemDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
-		assertEquals(dbWithFilter, this.undertest.getMixedMediaDbByMid(ref.getMid(), filter));
-		assertEquals(dbWithFilter, this.undertest.getMixedMediaDbByRef(ref, filter));
+		assertEquals(dbWithFilter, this.undertest.getMediaListByMid(ref.getMid(), filter));
+		assertEquals(dbWithFilter, this.undertest.getMediaListByRef(ref, filter));
 	}
 
 	@Test
@@ -46,11 +46,11 @@ public class MediaFactoryImplTest {
 		final String id = "id" + RND.nextLong();
 		when(external.getListId()).thenReturn(id);
 		when(external.getListName()).thenReturn("name for " + id);
-		this.undertest.addExternalDb(external);
+		this.undertest.addExternalList(external);
 
-		final MediaListReference ref = this.undertest.getExternalDbs().iterator().next();
-		assertEquals(external, this.undertest.getMixedMediaDbByMid(ref.getMid(), null));
-		assertEquals(external, this.undertest.getMixedMediaDbByRef(ref));
+		final MediaListReference ref = this.undertest.getExternalList().iterator().next();
+		assertEquals(external, this.undertest.getMediaListByMid(ref.getMid(), null));
+		assertEquals(external, this.undertest.getMediaListByRef(ref));
 	}
 
 }

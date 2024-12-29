@@ -211,7 +211,7 @@ public class DbPropertiesFace extends MenuFace {
 
 	// TODO replace with AsyncActions() ?
 	private void rescanSources () {
-		if (this.db.getType().equals(MediaListType.LOCALMMDB.toString())) {
+		if (this.db.getType() == MediaListType.LOCALMMDB) {
 			final MorriganTask task = this.mnContext.getMediaFactory().getLocalMixedMediaDbUpdateTask(this.db);
 			if (task != null) {
 				this.mnContext.getAsyncTasksRegister().scheduleTask(task);

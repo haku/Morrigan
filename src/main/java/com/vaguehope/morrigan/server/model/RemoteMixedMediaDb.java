@@ -115,8 +115,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public String getType() {
-		return MediaListType.REMOTEMMDB.toString();
+	public MediaListType getType() {
+		return MediaListType.REMOTEMMDB;
 	}
 
 	@Override

@@ -57,8 +57,8 @@ public class ContentDirectoryDb extends EphemeralMixedMediaDb {
 	}
 
 	@Override
-	public String getType () {
-		return MediaListType.EXTMMDB.toString();
+	public MediaListType getType () {
+		return MediaListType.EXTMMDB;
 	}
 
 	@Override

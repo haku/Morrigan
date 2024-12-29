@@ -3,25 +3,19 @@ package com.vaguehope.morrigan.dlna.extcd;
 import java.io.File;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -31,7 +25,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
+public abstract class EphemeralMixedMediaDb implements IMediaItemList {
 
 	@Override
 	public void dispose () {}
@@ -58,28 +52,6 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Fake state.
-
-	private IDbColumn sort = IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE;
-	private SortDirection direction = SortDirection.ASC;
-
-	@Override
-	public IDbColumn getSort () {
-		return this.sort;
-	}
-
-	@Override
-	public SortDirection getSortDirection () {
-		return this.direction;
-	}
-
-	@Override
-	public void setSort (final IDbColumn sort, final SortDirection direction) throws MorriganException {
-		this.sort = sort;
-		this.direction = direction;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Getters that return nothing.
 
 	@Override
@@ -100,16 +72,6 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 	@Override
 	public List<IMediaItem> getMediaItems () {
 		return Collections.emptyList();
-	}
-
-	@Override
-	public List<IMediaItem> getAllDbEntries () throws DbException {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public FileExistance hasFile (final File file) throws MorriganException, DbException {
-		return FileExistance.UNKNOWN;
 	}
 
 	@Override
@@ -134,11 +96,6 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Not supported - but possible to implement.
-
-	@Override
-	public void setHideMissing(final boolean v) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
 
 	@Override
 	public void copyItemFile (final IMediaItem item, final OutputStream os) throws MorriganException {
@@ -240,12 +197,6 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 	public void removeChangeEventListener (final MediaItemListChangeListener listener) {}
 
 	@Override
-	public void registerSortChangeListener (final IMediaItemDb.SortChangeListener scl) {}
-
-	@Override
-	public void unregisterSortChangeListener (final IMediaItemDb.SortChangeListener scl) {}
-
-	@Override
 	public void incTrackStartCnt (final IMediaItem item, final long n) throws MorriganException {}
 
 	@Override
@@ -283,22 +234,7 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 	}
 
 	@Override
-	public IMediaItem addFile(final MediaType mediaType, final File file) throws MorriganException, DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public List<IMediaItem> addFiles(final MediaType mediaType, final List<File> files) throws MorriganException, DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
 	public void removeItem (final IMediaItem item) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public IMediaItem getByFile (final File file) throws DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -368,11 +304,6 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 	}
 
 	@Override
-	public IMediaItem updateItem (final IMediaItem item) throws MorriganException, DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
 	public MediaAlbum createAlbum (final String name) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
@@ -414,81 +345,6 @@ public abstract class EphemeralMixedMediaDb implements IMediaItemDb {
 
 	@Override
 	public void setPictureWidthAndHeight (final IMediaItem item, final int width, final int height) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void commitOrRollback () throws DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void rollback () throws DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public String getDbPath () {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public IMediaItemStorageLayer getDbLayer () {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public List<String> getSources () throws MorriganException {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public void addSource (final String source) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void removeSource (final String source) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void addRemote (final String name, final URI uri) throws DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void rmRemote (final String name) throws DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public URI getRemote (final String name) throws DbException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public Map<String, URI> getRemotes () throws DbException {
-		return Collections.emptyMap();
-	}
-
-	@Override
-	public boolean isMarkedAsUnreadable (final IMediaItem mi) throws MorriganException {
-		return false;
-	}
-
-	@Override
-	public void markAsUnreadabled (final IMediaItem mi) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void beginBulkUpdate () {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public void completeBulkUpdate (final boolean thereWereErrors) throws MorriganException, DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

@@ -21,8 +21,8 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -431,7 +431,7 @@ public class PlayersServlet extends HttpServlet {
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
-			listUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
+			listUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getType().toString() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
 			listView = StringHelper.trimToEmpty(currentList.getSearchTerm());
 		}
 		else {

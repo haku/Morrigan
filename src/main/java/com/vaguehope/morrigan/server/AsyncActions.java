@@ -33,7 +33,7 @@ public class AsyncActions {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public AsyncTask scheduleMmdbScan (final IMediaItemDb mmdb) {
-		if (mmdb.getType().equals(MediaListType.LOCALMMDB.toString())) {
+		if (mmdb.getType() == MediaListType.LOCALMMDB) {
 			return scheduleLocalMmdbScan(mmdb);
 		}
 		else if (mmdb instanceof IRemoteMixedMediaDb) {

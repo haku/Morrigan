@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
 public interface IMediaItemList {
@@ -23,8 +27,13 @@ public interface IMediaItemList {
 	String getListName ();
 	UUID getUuid ();
 
-	String getType (); // TODO make something better than string!
+	MediaListType getType ();
+
+	/**
+	 * May contain a :, e.g. "/some/path.db:filter".
+	 */
 	String getSerial (); // TODO rename to something more helpful?
+
 	String getSearchTerm ();
 
 	DirtyState getDirtyState ();
@@ -123,6 +132,23 @@ public interface IMediaItemList {
 	 * @return File path to cover art or null.
 	 */
 	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
+
+	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults) throws DbException;
+	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+
+	/**
+	 * filepath is anything the list identifies entries by, eg could also be an ID.
+	 * has to match getByFile();
+	 */
+	FileExistance hasFile (String filepath) throws MorriganException, DbException;
+
+	/**
+	 * filepath is anything the list identifies entries by, eg could also be an ID.
+	 * has to match hasFile();
+	 */
+	IMediaItem getByFile (String filepath) throws DbException;
+
+	IMediaItem getByMd5 (BigInteger md5) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // track

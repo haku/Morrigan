@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -35,18 +34,17 @@ public interface IMediaItemDb extends IMediaItemList {
 	URI getRemote(String name) throws DbException;
 	Map<String, URI> getRemotes() throws DbException;
 
-	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMediaItem> simpleSearch (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	/**
+	 * Returns a copy of the main list updated with all items from the DB.
+	 */
 	List<IMediaItem> getAllDbEntries () throws DbException;
+
 	IMediaItem getByFile (File file) throws DbException;
-	IMediaItem getByFile (String filepath) throws DbException;
-	IMediaItem getByMd5 (BigInteger md5) throws DbException;
 
 	/**
 	 * Note: returned item will be missing DB rowId.
 	 */
 	IMediaItem addFile (MediaType mediaType, File file) throws MorriganException, DbException;
-	FileExistance hasFile (String filepath) throws MorriganException, DbException;
 	FileExistance hasFile (File file) throws MorriganException, DbException;
 	List<IMediaItem> addFiles (MediaType mediaType, List<File> files) throws MorriganException, DbException;
 

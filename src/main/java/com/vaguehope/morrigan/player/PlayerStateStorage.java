@@ -21,6 +21,7 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -33,7 +34,7 @@ public class PlayerStateStorage {
 	private static final String DIR_NAME = "playerstate";
 	private static final Logger LOG = Logger.getLogger(PlayerStateStorage.class.getName());
 
-	private final Map<String, IMediaItemDb> listCache = new ConcurrentHashMap<>();
+	private final Map<String, IMediaItemList> listCache = new ConcurrentHashMap<>();
 	private final MediaFactory mf;
 	private final ScheduledExecutorService schEx;
 	private Config config;
@@ -172,7 +173,7 @@ public class PlayerStateStorage {
 		}
 		else {
 			if (item.hasList()) {
-				w.append(item.getList().getType()).append("|").append(item.getList().getSerial());
+				w.append(item.getList().getType().toString()).append("|").append(item.getList().getSerial());
 			}
 			w.append("\n");
 			if (item.hasTrack()) {
@@ -228,7 +229,7 @@ public class PlayerStateStorage {
 			listSerial = listTypeAndSerial;
 		}
 
-		IMediaItemDb list = this.listCache.get(listSerial);
+		IMediaItemList list = this.listCache.get(listSerial);
 		if (list == null) {
 			switch (listType) {
 				case LOCALMMDB:
@@ -241,7 +242,7 @@ public class PlayerStateStorage {
 					this.listCache.put(listSerial, list);
 					break;
 				case EXTMMDB:
-					list = this.mf.getExternalDb(listSerial);
+					list = this.mf.getExternalList(listSerial);
 					if (list == null) {
 						LOG.warning("Unknown list: " + listSerial);
 						return null;

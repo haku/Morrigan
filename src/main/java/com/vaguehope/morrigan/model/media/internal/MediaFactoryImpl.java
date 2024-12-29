@@ -98,7 +98,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/id%3D1fcee07abcdefghiujklmnopqrstuvwxyz810c6e-foo_bar
 	 */
 	@Override
-	public IMediaItemDb getMixedMediaDbByMid(final String mid, final String filter) throws DbException, MorriganException {
+	public IMediaItemList getMediaListByMid(final String mid, final String filter) throws DbException, MorriganException {
 		final String[] parts = mid.split("/");
 		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
 
@@ -117,19 +117,25 @@ public class MediaFactoryImpl implements MediaFactory {
 			return RemoteMixedMediaDbFactory.getExisting(f, filter);
 		}
 		else if (type.equals(MediaListType.EXTMMDB.toString())) {
-			return getExternalDb(name);
+			return getExternalList(name);
 		}
 		throw new IllegalArgumentException("Invalid MID: " + mid);
 	}
 
 	@Override
-	public IMediaItemDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException {
-		return getMixedMediaDbByMid(ref.getMid(), null);
+	public IMediaItemList getMediaListByRef(MediaListReference ref) throws DbException, MorriganException {
+		return getMediaListByMid(ref.getMid(), null);
 	}
 
 	@Override
-	public IMediaItemDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException {
-		return getMixedMediaDbByMid(ref.getMid(), filter);
+	public IMediaItemList getMediaListByRef(MediaListReference ref, String filter) throws DbException, MorriganException {
+		return getMediaListByMid(ref.getMid(), filter);
+	}
+
+	@Override
+	public IMediaItemList getMediaListView(IMediaItemList list, String filter) throws DbException, MorriganException {
+		final MediaListReference ref = new MediaListReferenceImpl(list.getType(), list.getListId(), list.getListName());
+		return getMediaListByRef(ref, filter);
 	}
 
 	/**
@@ -186,30 +192,30 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<String, IMediaItemDb> externalDbs = new ConcurrentSkipListMap<>();
+	private final Map<String, IMediaItemList> externalLists = new ConcurrentSkipListMap<>();
 
 	@Override
-	public Collection<MediaListReference> getExternalDbs () {
+	public Collection<MediaListReference> getExternalList () {
 		final List<MediaListReference> ret = new ArrayList<>();
-		for (IMediaItemDb db : this.externalDbs.values()) {
-			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, db.getListId(), db.getListName()));
+		for (IMediaItemList list : this.externalLists.values()) {
+			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, list.getListId(), list.getListName()));
 		}
 		return ret;
 	}
 
 	@Override
-	public IMediaItemDb getExternalDb (final String id) {
-		return this.externalDbs.get(id);
+	public IMediaItemList getExternalList (final String id) {
+		return this.externalLists.get(id);
 	}
 
 	@Override
-	public void addExternalDb (final IMediaItemDb db) {
-		this.externalDbs.put(db.getListId(), db);
+	public void addExternalList (final IMediaItemList db) {
+		this.externalLists.put(db.getListId(), db);
 	}
 
 	@Override
-	public IMediaItemDb removeExternalDb (final String id) {
-		return this.externalDbs.remove(id);
+	public IMediaItemList removeExternalList (final String id) {
+		return this.externalLists.remove(id);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -46,10 +46,12 @@ public interface MediaFactory {
 	 * MID is like:
 	 * LOCALMMDB/test.local.db3
 	 */
-	IMediaItemDb getMixedMediaDbByMid(String mid, String filter) throws DbException, MorriganException;
+	IMediaItemList getMediaListByMid(String mid, String filter) throws DbException, MorriganException;
 
-	IMediaItemDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException;
-	IMediaItemDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
+	IMediaItemList getMediaListByRef(MediaListReference ref) throws DbException, MorriganException;
+	IMediaItemList getMediaListByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
+
+	IMediaItemList getMediaListView(IMediaItemList list, String filter) throws DbException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -73,10 +75,10 @@ public interface MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	Collection<MediaListReference> getExternalDbs();
-	IMediaItemDb getExternalDb(String id);
-	void addExternalDb(IMediaItemDb db);
-	IMediaItemDb removeExternalDb(String id);
+	Collection<MediaListReference> getExternalList();
+	IMediaItemList getExternalList(String id);
+	void addExternalList(IMediaItemList db);
+	IMediaItemList removeExternalList(String id);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -305,9 +305,6 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		this.dbLayer.rollback();
 	}
 
-	/**
-	 * Returns a copy of the main list updated with all items from the DB.
-	 */
 	@Override
 	public List<IMediaItem> getAllDbEntries () throws DbException {
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.

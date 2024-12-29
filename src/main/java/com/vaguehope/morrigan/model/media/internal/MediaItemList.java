@@ -77,17 +77,6 @@ public abstract class MediaItemList implements IMediaItemList {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	@Override
-	public abstract String getType ();
-
-	/**
-	 * May contain a :, e.g. "/some/path.db:filter".
-	 */
-	@Override
-	public abstract String getSerial ();
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Dirty state and event listeners.
 
 	private volatile DirtyState dirtyState = DirtyState.CLEAN;
