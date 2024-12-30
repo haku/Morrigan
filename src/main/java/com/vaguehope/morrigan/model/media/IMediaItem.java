@@ -8,7 +8,7 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 
 
 
-public interface IMediaItem extends IDbItem {
+public interface IMediaItem extends AbstractItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
@@ -160,6 +160,7 @@ public interface IMediaItem extends IDbItem {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@Override
 	String getTitle ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -24,10 +24,12 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -65,6 +67,7 @@ public class DbFace extends DefaultFace {
 	private final MnContext mnContext;
 	private final SessionState sessionState;
 	private final IMediaItemList list;
+	private final String nodeId;
 	private final Player defaultPlayer;
 	private final DbHelper dbHelper;
 
@@ -74,7 +77,7 @@ public class DbFace extends DefaultFace {
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
 	private final Set<IMediaItem> selectedItems = new HashSet<>();
 
-	private List<IMediaItem> mediaItems;
+	private MediaNode mediaNode;
 	private int selectedItemIndex = -1;
 	private int scrollTop = 0;
 	private int pageSize = 1;
@@ -89,12 +92,14 @@ public class DbFace extends DefaultFace {
 			final MnContext mnContext,
 			final SessionState sessionState,
 			final IMediaItemList list,
+			final String nodeId,
 			final Player defaultPlayer) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
 		this.sessionState = sessionState;
 		this.list = list;
+		this.nodeId = nodeId;
 		this.defaultPlayer = defaultPlayer;
 		this.dbHelper = new DbHelper(navigation, mnContext, sessionState, this.defaultPlayer, this.lastActionMessage, this);
 		refreshData(false);
@@ -140,7 +145,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	public void revealItem (final IMediaItem track) throws MorriganException {
-		final int i = this.mediaItems.indexOf(track);
+		final int i = this.mediaNode.indexOf(track);
 		if (i >= 0) {
 			setSelectedItem(i);
 		}
@@ -151,27 +156,43 @@ public class DbFace extends DefaultFace {
 
 	private void refreshData (final boolean force) throws MorriganException {
 		if (this.list == null) return;
+
+		if (this.list.hasNodes()) {
+			if (this.mediaNode == null || force) {
+				if (this.nodeId == null) {
+					this.mediaNode = this.list.getRootNode();
+				}
+				else {
+					this.mediaNode = this.list.getNode(this.nodeId);
+				}
+			}
+			return;
+		}
+
 		if (force) {
 			this.list.forceRead();
 		}
 		else {
 			this.list.read();
 		}
-		this.mediaItems = this.list.getMediaItems();
+		this.mediaNode = new MediaNode(null, null, null, Collections.emptyList(), this.list.getMediaItems());
 	}
 
 	private void updateItemDetailsBar () {
-		final IMediaItem item = getSelectedItem();
+		final AbstractItem item = getSelectedItem();
 		if (this.itemDetailsBarItem != null && this.itemDetailsBarItem.equals(item)) return;
+
+		if (!(item instanceof IMediaItem)) return;
+		final IMediaItem mi = (IMediaItem) item;
 
 		this.mnContext.getUnreliableEs().submit(new Callable<Void>() {
 			@Override
 			public Void call () throws MorriganException {
-				final String tags = PrintingThingsHelper.summariseItemTags(DbFace.this.list, item);
+				final String tags = PrintingThingsHelper.summariseItemTags(DbFace.this.list, mi);
 				scheduleOnUiThread(new Callable<Void>() {
 					@Override
 					public Void call () {
-						DbFace.this.itemDetailsBarItem = item;
+						DbFace.this.itemDetailsBarItem = mi;
 						DbFace.this.itemDetailsBar = tags;
 						return null;
 					}
@@ -206,7 +227,7 @@ public class DbFace extends DefaultFace {
 				menuMoveEnd(VDirection.DOWN);
 				return true;
 			case Enter:
-				playSelection(gui);
+				itemClicked(gui);
 				return true;
 			case Character:
 				switch (k.getCharacter()) {
@@ -270,18 +291,18 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void menuMove(final VDirection direction, final int distance) {
-		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.mediaItems));
+		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.mediaNode));
 		this.lastMoveDirection = direction;
 	}
 
 	private void menuMoveEnd (final VDirection direction) throws MorriganException {
-		if (this.mediaItems == null || this.mediaItems.size() < 1) return;
+		if (this.mediaNode == null || this.mediaNode.size() < 1) return;
 		switch (direction) {
 			case UP:
 				setSelectedItem(0);
 				break;
 			case DOWN:
-				setSelectedItem(this.mediaItems.size() - 1);
+				setSelectedItem(this.mediaNode.size() - 1);
 				break;
 			default:
 		}
@@ -293,27 +314,52 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void setSelectedItem (final int index) {
-		this.selectedItemIndex = Math.min(index, this.mediaItems.size() - 1);
+		this.selectedItemIndex = Math.min(index, this.mediaNode.size() - 1);
 		this.selectedItemIndex = Math.max(this.selectedItemIndex, 0);
 		updateItemDetailsBar();
 	}
 
-	private IMediaItem getSelectedItem () {
+	private AbstractItem getSelectedItem () {
 		if (this.selectedItemIndex < 0) return null;
-		if (this.selectedItemIndex >= this.mediaItems.size()) return null;
-		return this.mediaItems.get(this.selectedItemIndex);
+		if (this.selectedItemIndex >= this.mediaNode.size()) return null;
+		return this.mediaNode.get(this.selectedItemIndex);
 	}
 
 	private List<IMediaItem> getSelectedItems () {
 		if (this.selectedItems.size() > 0) {
 			final List<IMediaItem> ret = new ArrayList<>();
-			for (final IMediaItem item : this.mediaItems) {
-				if (this.selectedItems.contains(item)) ret.add(item);
+			for (final AbstractItem item : this.mediaNode) {
+				if (this.selectedItems.contains(item)) ret.add((IMediaItem) item);
 			}
 			return ret;
 		}
-		if (this.selectedItemIndex >= 0) return Collections.singletonList(this.mediaItems.get(this.selectedItemIndex));
+
+		if (this.selectedItemIndex >= 0) {
+			final AbstractItem item = this.mediaNode.get(this.selectedItemIndex);
+			if (item instanceof IMediaItem) return Collections.singletonList((IMediaItem) item);
+		}
+
 		return Collections.emptyList();
+	}
+
+	private void itemClicked(final WindowBasedTextGUI gui) {
+		final AbstractItem item = getSelectedItem();
+		if (item instanceof MediaNode) {
+			navToNode(((MediaNode) item).getId());
+			return;
+		}
+
+		playSelection(gui);
+	}
+
+	private void navToNode(final String id) {
+		try {
+			this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState, this.list, id, this.defaultPlayer));
+		}
+		catch (final MorriganException e) {
+			// TODO make this message more friendly.
+			this.lastActionMessage.setLastActionMessage(e.toString());
+		}
 	}
 
 	private Player getPlayer (final WindowBasedTextGUI gui, final String title) {
@@ -360,15 +406,17 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void showEditTagsForSelectedItem (final WindowBasedTextGUI gui) throws MorriganException {
-		final IMediaItem item = getSelectedItem();
+		final AbstractItem item = getSelectedItem();
 		if (item == null) return;
-		TagEditor.show(gui, this.list, item);
+		if (!(item instanceof IMediaItem)) return;
+		TagEditor.show(gui, this.list, (IMediaItem) item);
 	}
 
 	private void toggleSelection () throws MorriganException {
-		final IMediaItem item = getSelectedItem();
+		final AbstractItem item = getSelectedItem();
 		if (item == null) return;
-		if (!this.selectedItems.remove(item)) this.selectedItems.add(item);
+		if (!(item instanceof IMediaItem)) return;
+		if (!this.selectedItems.remove(item)) this.selectedItems.add((IMediaItem) item);
 		updateItemDetailsBar();
 	}
 
@@ -456,73 +504,28 @@ public class DbFace extends DefaultFace {
 		final int colRightPlayCount = colRightDuration - 8;
 		final int colRightLastPlayed = colRightPlayCount - 8;
 
-		for (int i = this.scrollTop; i < this.mediaItems.size(); i++) {
+		for (int i = this.scrollTop; i < this.mediaNode.size(); i++) {
 			if (i < 0) break;
 			if (i >= this.scrollTop + this.pageSize) break;
-			if (i >= this.mediaItems.size()) break;
+			if (i >= this.mediaNode.size()) break;
 
-			final IMediaItem item = this.mediaItems.get(i);
-			final String name = String.valueOf(item);
+			final AbstractItem item = this.mediaNode.get(i);
+			final String name = item.getTitle();
+			final boolean invert = i == this.selectedItemIndex;
 
-			final boolean selectedItem = this.selectedItems.contains(item);
-			if (selectedItem) {
-				tg.enableModifiers(SGR.REVERSE);
+			if (item instanceof IMediaItem) {
+				drawMediaItem(tg, (IMediaItem) item, name,
+						invert, l,
+						colRightDuration, colRightPlayCount, colRightLastPlayed);
 			}
 			else {
-				tg.disableModifiers(SGR.REVERSE);
-			}
-
-			if (item.isMissing()) {
-				this.textGuiUtils.drawTextWithFg(tg, 0, l, "m", TextColor.ANSI.YELLOW);
-			}
-			else if (!item.isEnabled()) {
-				this.textGuiUtils.drawTextWithFg(tg, 0, l, "d", TextColor.ANSI.RED);
-			}
-			else if (selectedItem) {
-				tg.putString(0, l, ">");
-			}
-
-			if (i == this.selectedItemIndex) {
-				tg.enableModifiers(SGR.REVERSE);
-			}
-			else {
-				tg.disableModifiers(SGR.REVERSE);
-			}
-
-			// Item title.
-			tg.putString(1, l, name);
-
-			// Rest of item title space if selected.
-			if (i == this.selectedItemIndex) {
-				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < colRightDuration; x++) {
-					tg.setCharacter(x, l, ' ');
+				if (invert) {
+					tg.enableModifiers(SGR.REVERSE);
 				}
-			}
-
-			// Warning labels.
-			if (item.isMissing()) {
-				this.textGuiUtils.drawTextWithFg(tg, name.length() + 2, l, "(missing)", TextColor.ANSI.YELLOW);
-			}
-			else if (!item.isEnabled()) {
-				this.textGuiUtils.drawTextWithFg(tg, name.length() + 2, l, "(disabled)", TextColor.ANSI.RED);
-			}
-
-			// Last played column.
-			if (item.getDateLastPlayed() != null) {
-				final String lastPlayed = String.format(" %s", this.dateFormat.format(item.getDateLastPlayed()));
-				tg.putString(colRightLastPlayed - lastPlayed.length(), l, lastPlayed);
-			}
-
-			// Play count column.
-			if (item.getStartCount() > 0 || item.getEndCount() > 0) {
-				final String counts = String.format("%4s/%-3s", item.getStartCount(), item.getEndCount());
-				tg.putString(colRightPlayCount - counts.length(), l, counts);
-			}
-
-			// Duration column.
-			if (item.getDuration() > 0) {
-				final String dur = formatTimeSecondsLeftPadded(item.getDuration());
-				tg.putString(colRightDuration - dur.length(), l, dur);
+				else {
+					tg.disableModifiers(SGR.REVERSE);
+				}
+				tg.putString(1, l, name);
 			}
 
 			l++;
@@ -530,7 +533,7 @@ public class DbFace extends DefaultFace {
 		tg.disableModifiers(SGR.REVERSE);
 
 		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
-		final String scroll = " " + PrintingThingsHelper.scrollSummary(this.mediaItems.size(), this.pageSize, this.scrollTop);
+		final String scroll = " " + PrintingThingsHelper.scrollSummary(this.mediaNode.size(), this.pageSize, this.scrollTop);
 		int left = columns - scroll.length();
 		this.textGuiUtils.drawTextWithBg(tg, left, bottom, scroll, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 		if (this.selectedItems.size() > 0) {
@@ -538,6 +541,69 @@ public class DbFace extends DefaultFace {
 			left -= status.length();
 			this.textGuiUtils.drawTextWithBg(tg, left, bottom, status, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 
+		}
+	}
+
+	private void drawMediaItem(final TextGraphics tg, final IMediaItem item, final String name, boolean invert,
+			int l, final int colRightDuration, final int colRightPlayCount, final int colRightLastPlayed) {
+		final boolean selectedItem = this.selectedItems.contains(item);
+		if (selectedItem) {
+			tg.enableModifiers(SGR.REVERSE);
+		}
+		else {
+			tg.disableModifiers(SGR.REVERSE);
+		}
+
+		if (item.isMissing()) {
+			this.textGuiUtils.drawTextWithFg(tg, 0, l, "m", TextColor.ANSI.YELLOW);
+		}
+		else if (!item.isEnabled()) {
+			this.textGuiUtils.drawTextWithFg(tg, 0, l, "d", TextColor.ANSI.RED);
+		}
+		else if (selectedItem) {
+			tg.putString(0, l, ">");
+		}
+
+		if (invert) {
+			tg.enableModifiers(SGR.REVERSE);
+		}
+		else {
+			tg.disableModifiers(SGR.REVERSE);
+		}
+
+		tg.putString(1, l, name);
+
+		// Rest of item title space if selected.
+		if (invert) {
+			for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < colRightDuration; x++) {
+				tg.setCharacter(x, l, ' ');
+			}
+		}
+
+		// Warning labels.
+		if (item.isMissing()) {
+			this.textGuiUtils.drawTextWithFg(tg, name.length() + 2, l, "(missing)", TextColor.ANSI.YELLOW);
+		}
+		else if (!item.isEnabled()) {
+			this.textGuiUtils.drawTextWithFg(tg, name.length() + 2, l, "(disabled)", TextColor.ANSI.RED);
+		}
+
+		// Last played column.
+		if (item.getDateLastPlayed() != null) {
+			final String lastPlayed = String.format(" %s", this.dateFormat.format(item.getDateLastPlayed()));
+			tg.putString(colRightLastPlayed - lastPlayed.length(), l, lastPlayed);
+		}
+
+		// Play count column.
+		if (item.getStartCount() > 0 || item.getEndCount() > 0) {
+			final String counts = String.format("%4s/%-3s", item.getStartCount(), item.getEndCount());
+			tg.putString(colRightPlayCount - counts.length(), l, counts);
+		}
+
+		// Duration column.
+		if (item.getDuration() > 0) {
+			final String dur = formatTimeSecondsLeftPadded(item.getDuration());
+			tg.putString(colRightDuration - dur.length(), l, dur);
 		}
 	}
 

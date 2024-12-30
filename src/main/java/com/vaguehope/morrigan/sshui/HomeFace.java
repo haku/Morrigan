@@ -183,14 +183,14 @@ public class HomeFace extends MenuFace {
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final IMediaItemList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
 			final SavedView sv = (SavedView) this.selectionAndScroll.selectedItem;
 			final IMediaItemList db = this.mnContext.getMediaFactory().getMediaListByMid(sv.getDbmid(), sv.getQuery());
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
