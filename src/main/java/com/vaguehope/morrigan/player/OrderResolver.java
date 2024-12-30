@@ -240,9 +240,6 @@ public class OrderResolver {
 		catch (final MorriganException e) {
 			throw new IllegalStateException(e);
 		}
-		catch (final DbException e) {
-			throw new IllegalStateException(e);
-		}
 	}
 
 	private IMediaItem getNextTrackFollowTagsOrThrow (final IMediaItemList list, final IMediaItem current) throws MorriganException, DbException {

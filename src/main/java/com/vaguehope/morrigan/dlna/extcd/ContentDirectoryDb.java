@@ -13,6 +13,7 @@ import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -20,6 +21,7 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 public class ContentDirectoryDb extends EphemeralMediaList {
 
 	private static final int MAX_TRIES = 2;
+	private static final int MAX_ITEMS = 500;
 
 	private final String listId;
 	private final RemoteDevice device;
@@ -78,6 +80,21 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	@Override
 	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return this.contentDirectory.searchWithRetry(term, maxResults, MAX_TRIES);
+	}
+
+	@Override
+	public boolean hasNodes() {
+		return true;
+	}
+
+	@Override
+	public MediaNode getRootNode() throws MorriganException {
+		return this.contentDirectory.fetchRootContainer(MAX_ITEMS);
+	}
+
+	@Override
+	public MediaNode getNode(String id) throws MorriganException {
+		return this.contentDirectory.fetchContainer(id, MAX_ITEMS);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

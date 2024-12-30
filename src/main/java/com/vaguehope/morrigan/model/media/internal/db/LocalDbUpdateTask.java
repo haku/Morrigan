@@ -764,9 +764,6 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		catch (final MorriganException e) {
 			return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
 		}
-		catch (final DbException e) {
-			return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
-		}
 		return null;
 	}
 

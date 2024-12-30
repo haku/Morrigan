@@ -70,9 +70,6 @@ public class MediaFileLocator implements FileLocator {
 		catch (final MorriganException e) {
 			throw new IOException("Failed to resolve ID: " + id, e);
 		}
-		catch (final DbException e) {
-			throw new IOException("Failed to resolve ID: " + id, e);
-		}
 	}
 
 	public File idToFileUnsafe (final String id) throws DbException, MorriganException {

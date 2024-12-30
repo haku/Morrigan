@@ -23,8 +23,10 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.dlna.util.Cache;
 import com.vaguehope.morrigan.dlna.util.Quietly;
 import com.vaguehope.morrigan.dlna.util.StringHelper;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class ContentDirectory {
@@ -88,33 +90,13 @@ public class ContentDirectory {
 		if (cached != null) return cached;
 
 		final CountDownLatch cdl = new CountDownLatch(1);
-		final AtomicReference<DIDLContent> ref = new AtomicReference<DIDLContent>();
-		final AtomicReference<String> err = new AtomicReference<String>();
+		final SyncBrowse req = new SyncBrowse(cdl, this.contentDirectory, remoteId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 2L);
+		this.controlPoint.execute(req);
 
-		this.controlPoint.execute(new Browse(this.contentDirectory, remoteId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 2L) {
-			@Override
-			public void failure (final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
-				final String msg = "Failed to fetch item " + remoteId + ": " + defaultMsg;
-				LOG.warn(msg);
-				err.set(msg);
-				cdl.countDown();
-			}
-
-			@Override
-			public void received (final ActionInvocation invocation, final DIDLContent didl) {
-				ref.set(didl);
-				cdl.countDown();
-			}
-
-			@Override
-			public void updateStatus (final Status status) {
-				// Unused.
-			}
-		});
 		await(cdl, "Fetch '%s' from content directory '%s'.", remoteId, this.contentDirectory);
-		if (ref.get() == null) throw new DbException(err.get());
+		if (req.getRef() == null) throw new DbException(req.getErr());
 
-		final List<Item> items = ref.get().getItems();
+		final List<Item> items = req.getRef().getItems();
 		if (items.size() < 1) return null;
 		if (items.size() > 1) LOG.warn("Fetching item {} returned more than 1 result.", remoteId);
 		final IMediaItem item = didlItemToMnItem(items.get(0));
@@ -124,78 +106,65 @@ public class ContentDirectory {
 
 	public List<IMediaItem> search (final String term, final int maxResults) throws DbException {
 		if (StringHelper.blank(term) || "*".equals(term)) {
-			return dlnaBrowse(maxResults);
+			return oldDlnaBrowseRoot(maxResults);
 		}
 		else if (term.startsWith(SEARCH_BY_ID_PREFIX)) {
-			return dlnaBrowse(StringHelper.removeStart(term, SEARCH_BY_ID_PREFIX), maxResults);
+			return oldDlnaBrowse(StringHelper.removeStart(term, SEARCH_BY_ID_PREFIX), maxResults);
 		}
 		return dlnaSearch(term, maxResults);
 	}
 
-	private List<IMediaItem> dlnaBrowse (final int maxResults) throws DbException {
-		return dlnaBrowse(ROOT_CONTENT_ID, maxResults);
+	public MediaNode fetchRootContainer (final int maxResults) throws MorriganException {
+		return fetchContainer(ROOT_CONTENT_ID, maxResults);
 	}
 
-	private List<IMediaItem> dlnaBrowse (final String containerId, final int maxResults) throws DbException {
+	public MediaNode fetchContainer (final String containerId, final int maxResults) throws MorriganException {
 		final CountDownLatch cdl = new CountDownLatch(2);
-		final AtomicReference<DIDLContent> refMetadata = new AtomicReference<DIDLContent>();
-		final AtomicReference<DIDLContent> refChildren = new AtomicReference<DIDLContent>();
-		final AtomicReference<String> errMetadata = new AtomicReference<String>();
-		final AtomicReference<String> errChildren = new AtomicReference<String>();
-
-		this.controlPoint.execute(new Browse(this.contentDirectory, containerId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L) {
-			@Override
-			public void failure (final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
-				final String msg = "Failed to get container metadata: " + defaultMsg;
-				LOG.warn(msg);
-				errMetadata.set(msg);
-				cdl.countDown();
-			}
-
-			@Override
-			public void received (final ActionInvocation invocation, final DIDLContent didl) {
-				refMetadata.set(didl);
-				cdl.countDown();
-			}
-
-			@Override
-			public void updateStatus (final Status status) {
-				// Unused.
-			}
-		});
-
-		this.controlPoint.execute(new Browse(this.contentDirectory, containerId, BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) maxResults) {
-			@Override
-			public void failure (final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
-				final String msg = "Failed to browse container: " + defaultMsg;
-				LOG.warn(msg);
-				errChildren.set(msg);
-				cdl.countDown();
-			}
-
-			@Override
-			public void received (final ActionInvocation invocation, final DIDLContent didl) {
-				refChildren.set(didl);
-				cdl.countDown();
-			}
-
-			@Override
-			public void updateStatus (final Status status) {
-				// Unused.
-			}
-		});
+		final SyncBrowse mdReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L);
+		final SyncBrowse dcReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) maxResults);
+		this.controlPoint.execute(mdReq);
+		this.controlPoint.execute(dcReq);
 
 		await(cdl, "Browse '%s' on content directory '%s'.", containerId, this.contentDirectory);
-		if (refMetadata.get() == null) throw new DbException(errMetadata.get());
-		if (refChildren.get() == null) throw new DbException(errChildren.get());
+		if (mdReq.getRef() == null) throw new MorriganException(mdReq.getErr());
+		if (dcReq.getRef() == null) throw new MorriganException(dcReq.getErr());
+
+		if (mdReq.getRef().getContainers().size() < 1) {
+			throw new MorriganException("Container not found: " + containerId);
+		}
+
+		final Container cont = mdReq.getRef().getContainers().get(0);
+		final String nodeTitle = cont.getTitle();
+		final String parentId = "-1".equals(cont.getParentID()) ? null : cont.getParentID();
+
+		final List<MediaNode> nodes = didlContainersToNodes(dcReq.getRef().getContainers());
+		final List<IMediaItem> items = didlItemsToMnItems(dcReq.getRef().getItems());
+
+		return new MediaNode(containerId, nodeTitle, parentId, nodes, items);
+	}
+
+	private List<IMediaItem> oldDlnaBrowseRoot (final int maxResults) throws DbException {
+		return oldDlnaBrowse(ROOT_CONTENT_ID, maxResults);
+	}
+
+	private List<IMediaItem> oldDlnaBrowse (final String containerId, final int maxResults) throws DbException {
+		final CountDownLatch cdl = new CountDownLatch(2);
+		final SyncBrowse mdReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L);
+		final SyncBrowse dcReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) maxResults);
+		this.controlPoint.execute(mdReq);
+		this.controlPoint.execute(dcReq);
+
+		await(cdl, "Browse '%s' on content directory '%s'.", containerId, this.contentDirectory);
+		if (mdReq.getRef() == null) throw new DbException(mdReq.getErr());
+		if (dcReq.getRef() == null) throw new DbException(dcReq.getErr());
 
 		final List<IMediaItem> ret = new ArrayList<>();
-		if (refMetadata.get().getContainers().size() > 0) {
-			final String parentId = refMetadata.get().getContainers().get(0).getParentID();
+		if (mdReq.getRef().getContainers().size() > 0) {
+			final String parentId = mdReq.getRef().getContainers().get(0).getParentID();
 			if (!"-1".equals(parentId)) ret.add(new DidlContainer(parentId, ".."));
 		}
-		ret.addAll(didlContainersToMnItems(refChildren.get().getContainers()));
-		ret.addAll(didlItemsToMnItems(refChildren.get().getItems()));
+		ret.addAll(didlContainersToMnItems(dcReq.getRef().getContainers()));
+		ret.addAll(didlItemsToMnItems(dcReq.getRef().getItems()));
 		return ret;
 	}
 
@@ -203,8 +172,8 @@ public class ContentDirectory {
 		final String searchCriteria = String.format("(%s and dc:title contains \"%s\")", TYPE_CRITERIA, term);
 
 		final CountDownLatch cdl = new CountDownLatch(1);
-		final AtomicReference<DIDLContent> ref = new AtomicReference<DIDLContent>();
-		final AtomicReference<String> err = new AtomicReference<String>();
+		final AtomicReference<DIDLContent> ref = new AtomicReference<>();
+		final AtomicReference<String> err = new AtomicReference<>();
 
 		this.controlPoint.execute(new Search(this.contentDirectory, ROOT_CONTENT_ID, searchCriteria, Search.CAPS_WILDCARD, 0, (long) maxResults) {
 			@Override
@@ -216,7 +185,7 @@ public class ContentDirectory {
 			}
 
 			@Override
-			public void received (final ActionInvocation invocation, final DIDLContent didl) {
+			public void received (final ActionInvocation<?> invocation, final DIDLContent didl) {
 				ref.set(didl);
 				cdl.countDown();
 			}
@@ -230,6 +199,14 @@ public class ContentDirectory {
 		await(cdl, "Search '%s' on content directory '%s'.", term, this.contentDirectory);
 		if (ref.get() == null) throw new DbException(err.get());
 		return didlItemsToMnItems(ref.get().getItems());
+	}
+
+	private static List<MediaNode> didlContainersToNodes (final List<Container> containers) {
+		final List<MediaNode> ret = new ArrayList<>();
+		for (final Container c : containers) {
+			ret.add(new MediaNode(c.getId(), c.getTitle(), c.getParentID(), null, null));
+		}
+		return ret;
 	}
 
 	private static List<IMediaItem> didlContainersToMnItems (final List<Container> containers) {

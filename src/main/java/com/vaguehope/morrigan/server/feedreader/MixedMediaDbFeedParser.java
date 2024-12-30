@@ -20,7 +20,6 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.StringHelper;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedParser extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -138,9 +137,6 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 				clearCurrentItemCache();
 			}
 			catch (final MorriganException e) {
-				throw new SAXException(e);
-			}
-			catch (final DbException e) {
 				throw new SAXException(e);
 			}
 

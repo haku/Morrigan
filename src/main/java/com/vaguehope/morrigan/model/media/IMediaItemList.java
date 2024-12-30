@@ -63,6 +63,16 @@ public interface IMediaItemList {
 	void forceRead () throws MorriganException;
 	long getDurationOfLastRead();
 
+	default boolean hasNodes() {
+		return false;
+	}
+	default MediaNode getRootNode() throws MorriganException {
+		throw new UnsupportedOperationException();
+	}
+	default MediaNode getNode(String id) throws MorriganException {
+		throw new UnsupportedOperationException();
+	}
+
 	void addItem (IMediaItem item);
 	void removeItem (IMediaItem item) throws MorriganException;
 
