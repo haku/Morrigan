@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.player.internal;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.util.MnLogger;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -226,18 +228,25 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	@Override
 	protected void loadAndPlay (final PlayItem item) throws MorriganException {
-		final File file = item.hasAltFile() ? item.getAltFile() : new File(item.getTrack().getFilepath());
-
-		// TODO FIXME Might be passed a remote file, but not supported yet.
-		// To check it is a valid local file.
-		if (!file.exists()) throw new MorriganException("File not found for item " + item + ": " + file.getAbsolutePath());
+		final String mediaLocation;
+		if (item.hasAltFile()) {
+			mediaLocation = item.getAltFile().getAbsolutePath();
+			if (!Files.isReadable(Paths.get(mediaLocation))) throw new MorriganException("Alt file not found for item " + item + ": " + mediaLocation);
+		}
+		else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
+			mediaLocation = item.getTrack().getRemoteLocation();
+		}
+		else {
+			mediaLocation = item.getTrack().getFilepath();
+			if (!Files.isReadable(Paths.get(mediaLocation))) throw new MorriganException("File not found for item " + item + ": " + mediaLocation);
+		}
 
 		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
 			LOG.d("Loading '{}'...", item.getTrack().getTitle());
 			setCurrentItem(item);
 
-			engine.setFile(file.getAbsolutePath());
+			engine.setFile(mediaLocation);
 			engine.loadTrack();
 			engine.startPlaying();
 

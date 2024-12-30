@@ -1,6 +1,5 @@
 package com.vaguehope.morrigan.playbackimpl.vlc;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -156,8 +155,7 @@ class PlaybackEngine implements IPlaybackEngine {
 				player.mediaPlayer().controls().stop();
 			}
 
-			final String path = new File(this.m_filepath).getAbsolutePath();
-			if (!player.mediaPlayer().media().startPaused(path)) {
+			if (!player.mediaPlayer().media().startPaused(this.m_filepath)) {
 				throw new IllegalStateException("startPaused() failed.");
 			}
 		}
