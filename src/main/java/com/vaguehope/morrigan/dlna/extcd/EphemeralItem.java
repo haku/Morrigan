@@ -93,6 +93,11 @@ public abstract class EphemeralItem implements IMediaItem {
 		return BigInteger.ZERO;
 	}
 
+	@Override
+	public boolean hasMimeType() {
+		return getMimeType() != null;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Unsupported metadata.
 
@@ -201,6 +206,11 @@ public abstract class EphemeralItem implements IMediaItem {
 
 	@Override
 	public boolean setFromMediaPicture (final IMediaItem mp) {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void setMimeType(String newType) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

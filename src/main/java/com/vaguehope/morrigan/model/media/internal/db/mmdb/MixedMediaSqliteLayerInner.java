@@ -51,6 +51,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		SQL_TBL_MEDIAFILES_COL_ID,
 		SQL_TBL_MEDIAFILES_COL_FILE,
 		SQL_TBL_MEDIAFILES_COL_TYPE,
+		SQL_TBL_MEDIAFILES_COL_MIMETYPE,
 		SQL_TBL_MEDIAFILES_COL_MD5,
 		SQL_TBL_MEDIAFILES_COL_SHA1,
 		SQL_TBL_MEDIAFILES_COL_DADDED,
@@ -79,7 +80,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 	}
 
 	static protected List<IDbColumn> generateSqlTblMediaFilesColumns () {
-		List<IDbColumn> l = new ArrayList<IDbColumn>();
+		List<IDbColumn> l = new ArrayList<>();
 		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
 			l.add(c);
 		}
@@ -94,14 +95,14 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 
 	private static final String _SQL_MEDIAFILES_SELECT =
 		"SELECT"
-		+ " id, file, type, md5, sha1, added, modified, enabled, enabledmodified, missing, remloc"
+		+ " id, file, type, mimetype, md5, sha1, added, modified, enabled, enabledmodified, missing, remloc"
 		+ ",startcnt,endcnt,lastplay,duration"
     	+ ",width,height"
     	+ " FROM tbl_mediafiles";
 
 	private static final String _SQL_MEDIAFILESALBUMS_SELECT = // TODO FIXME is this the same as _SQL_MEDIAFILES_SELECT?
 		"SELECT"
-		+ " distinct m.id AS id,m.type AS type,file,md5,sha1,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+		+ " distinct m.id AS id,m.type AS type,mimetype,file,md5,sha1,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 		+ " FROM tbl_mediafiles AS m";
 
 	private static final String _SQL_WHERE = " WHERE";
@@ -218,6 +219,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		"UPDATE tbl_mediafiles SET type=?" +
 		" WHERE file=?;";
 
+	private static final String SQL_TBL_MEDIAFILES_SETMIMETYPE =
+			"UPDATE tbl_mediafiles SET mimetype=?" +
+					" WHERE file=?;";
+
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Setting MediaTrack data.
 
@@ -275,6 +280,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 	protected void migrateDb() throws SQLException, ClassNotFoundException {
 		super.migrateDb();
 		addColumnIfMissing(SQL_TBL_MEDIAFILES_COL_SHA1);
+		addColumnIfMissing(SQL_TBL_MEDIAFILES_COL_MIMETYPE);
 	}
 
 	private void addColumnIfMissing(final IDbColumn column) throws SQLException, ClassNotFoundException {
@@ -702,6 +708,22 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
+	protected void local_setItemMimeType(final IMediaItem item, final String newType) throws DbException, SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMIMETYPE);
+		int n;
+		try {
+			ps.setString(1, newType);
+			ps.setString(2, item.getFilepath());
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+		getChangeEventCaller().mediaItemUpdated(item);
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaTrack setters.
 
@@ -850,6 +872,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 	private static class ColumnIndexes {
 		final int colFile;
 		final int colType;
+		final int colMimeType;
 		final int colAdded;
 		final int colMd5;
 		final int colSha1;
@@ -869,6 +892,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		public ColumnIndexes (final ResultSet rs) throws SQLException {
 			this.colFile = rs.findColumn(SQL_TBL_MEDIAFILES_COL_FILE.getName());
 			this.colType = rs.findColumn(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
+			this.colMimeType = rs.findColumn(SQL_TBL_MEDIAFILES_COL_MIMETYPE.getName());
 			this.colAdded = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DADDED.getName());
 			this.colMd5 = rs.findColumn(SQL_TBL_MEDIAFILES_COL_MD5.getName());
 			this.colSha1 = rs.findColumn(SQL_TBL_MEDIAFILES_COL_SHA1.getName());
@@ -912,6 +936,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		int i = rs.getInt(indexes.colType);
 		MediaType t = MediaType.parseInt(i);
 		mi.setMediaType(t);
+
+		mi.setMimeType(rs.getString(indexes.colMimeType));
 
 		mi.setDateAdded(SqliteHelper.readDate(rs, indexes.colAdded));
 

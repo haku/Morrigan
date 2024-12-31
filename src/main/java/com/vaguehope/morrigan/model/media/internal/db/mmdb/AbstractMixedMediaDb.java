@@ -58,6 +58,17 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
+	public void setItemMimeType(IMediaItem item, String  newType) throws MorriganException {
+		item.setMimeType(newType);
+		try {
+			this.getDbLayer().setItemMimeType(item, newType);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
 	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
 		item.setMediaType(newType);
 		getChangeEventCaller().mediaItemsUpdated(item);

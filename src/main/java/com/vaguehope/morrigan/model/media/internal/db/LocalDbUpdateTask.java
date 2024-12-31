@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
 import com.vaguehope.morrigan.util.FileSystem;
+import com.vaguehope.morrigan.util.MimeType;
 
 public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -585,6 +586,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		try {
 			for (final IMediaItem mi : allLibraryEntries) {
 				if (taskEventListener.isCanceled()) break;
+
+				if (!mi.hasMimeType()) {
+					final MimeType mt = MimeType.identify(mi.getFilepath());
+					if (mt != null) this.itemList.setItemMimeType(mi, mt.getMimeType());
+				}
+
 				if (shouldTrackMetaData1(taskEventListener, this.itemList, mi) || changedItems.contains(mi)) {
 					if (mi.isEnabled()) {
 						taskEventListener.subTask("Reading metadata: " + mi.getTitle());

@@ -313,6 +313,16 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 		}
 	}
 
+	@Override
+	public void setItemMimeType (final IMediaItem item, final String newType) throws DbException {
+		try {
+			local_setItemMimeType(item, newType);
+		}
+		catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaTrack setters.
 

@@ -1,3 +1,4 @@
-2022-09-03
+2024-12-31
 
 ALTER TABLE tbl_mediafiles ADD COLUMN sha1 BLOB;
+ALTER TABLE tbl_mediafiles ADD COLUMN mimetype STRING;

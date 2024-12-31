@@ -244,6 +244,11 @@ public abstract class EphemeralMediaList implements IMediaItemList {
 	}
 
 	@Override
+	public void setItemMimeType(IMediaItem item, String newType) throws MorriganException {
+		throw new UnsupportedOperationException("Not supported.");
+	}
+
+	@Override
 	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}

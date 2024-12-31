@@ -141,6 +141,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	int removeFile (IDbItem dbItem) throws DbException;
 
 	void setItemMediaType(IMediaItem item, MediaType newType) throws DbException;
+	void setItemMimeType(IMediaItem item, String newType) throws DbException;
 	void setDateAdded(IMediaItem item, Date date) throws DbException;
 	void setMd5(IMediaItem item, BigInteger md5) throws DbException;
 	void setSha1(IMediaItem item, BigInteger sha1) throws DbException;

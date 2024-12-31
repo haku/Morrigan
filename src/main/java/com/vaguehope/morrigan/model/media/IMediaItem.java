@@ -23,7 +23,9 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 	/**
 	 * May return null.
 	 */
-	String getMimeType ();
+	boolean hasMimeType();
+	String getMimeType();
+	void setMimeType(String newType);
 
 	Date getDateAdded();
 	boolean setDateAdded(Date dateAdded);

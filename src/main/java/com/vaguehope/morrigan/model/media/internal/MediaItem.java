@@ -205,7 +205,7 @@ public abstract class MediaItem implements IMediaItem {
 	private File file = null;
 	private long fileSize = -1;
 	private String title = null;
-	private MimeType mimeType = null;
+	private String mimeType = null;
 
 	private void updateFilepathBasedThings () {
 		this.file = new File(this.filepath);
@@ -218,8 +218,6 @@ public abstract class MediaItem implements IMediaItem {
 		else {
 			this.title = this.filepath;
 		}
-
-		this.mimeType = MimeType.identify(this.filepath);
 	}
 
 	@Override
@@ -239,9 +237,22 @@ public abstract class MediaItem implements IMediaItem {
 	}
 
 	@Override
+	public boolean hasMimeType() {
+		return this.mimeType != null;
+	}
+
+	@Override
 	public String getMimeType () {
-		if (this.mimeType == null) return null;
-		return this.mimeType.getMimeType();
+		if (this.mimeType == null) {
+			final MimeType id = MimeType.identify(this.filepath);
+			if (id != null) return id.getMimeType();
+		}
+		return this.mimeType;
+	}
+
+	@Override
+	public void setMimeType(final String newType) {
+		this.mimeType = newType;
 	}
 
 

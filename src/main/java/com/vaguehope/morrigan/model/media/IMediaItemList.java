@@ -196,6 +196,7 @@ public interface IMediaItemList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // mixed
 
+	void setItemMimeType (IMediaItem item, String newType) throws MorriganException;
 	void setItemMediaType (IMediaItem item, MediaType newType) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

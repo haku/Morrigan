@@ -8,6 +8,7 @@ public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer {
 
 	IDbColumn SQL_TBL_MEDIAFILES_COL_ID        = new DbColumn("id",        "id",            "INTEGER PRIMARY KEY AUTOINCREMENT", null);
 	IDbColumn SQL_TBL_MEDIAFILES_COL_TYPE      = new DbColumn("type",      "type",          "INT",      "?");
+	IDbColumn SQL_TBL_MEDIAFILES_COL_MIMETYPE  = new DbColumn("mimetype",  "mimetype",      "STRING",   null);
 	IDbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("file",      "file path",     "VARCHAR(1000) NOT NULL COLLATE NOCASE UNIQUE", "?", " COLLATE NOCASE");
 	IDbColumn SQL_TBL_MEDIAFILES_COL_MD5       = new DbColumn("md5",       "MD5",           "BLOB",     null);
 	IDbColumn SQL_TBL_MEDIAFILES_COL_SHA1      = new DbColumn("sha1",      "SHA1",          "BLOB",     null);
