@@ -25,6 +25,7 @@ import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
+import com.vaguehope.morrigan.rpc.client.RpcRemotesManager;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 import com.vaguehope.morrigan.server.ServerConfig;
@@ -112,6 +113,11 @@ public final class Main {
 			dlna.start();
 
 			if (httpServer != null) httpServer.enableDlnaCtl(dlna);
+		}
+
+		if (args.getRemotes().size() > 0) {
+			final RpcRemotesManager remotes = new RpcRemotesManager(args, mediaFactory, config);
+			remotes.start();
 		}
 
 		new CountDownLatch(1).await();  // Block forever.

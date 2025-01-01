@@ -14,6 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<antlr.version>4.13.2</antlr.version>
+		<grpc.version>1.66.0</grpc.version>
 		<jetty.version>9.4.45.v20220203</jetty.version>
 		<jupnp.version>3.0.2</jupnp.version>
 		<junit.version>4.13.2</junit.version>
@@ -65,7 +66,7 @@
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.4.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -89,6 +90,7 @@
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -148,7 +150,37 @@
 				</configuration>
 			</plugin>
 
+			<!-- https://github.com/grpc/grpc-java/?tab=readme-ov-file#generated-code -->
+			<plugin>
+				<groupId>org.xolstice.maven.plugins</groupId>
+				<artifactId>protobuf-maven-plugin</artifactId>
+				<version>0.6.1</version>
+				<configuration>
+					<protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
+					<pluginId>grpc-java</pluginId>
+					<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.62.2:exe:${os.detected.classifier}</pluginArtifact>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>compile-custom</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
+		<extensions>
+
+			<!-- https://github.com/trustin/os-maven-plugin#issues-with-eclipse-m2e-or-other-ides -->
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.7.1</version>
+			</extension>
+
+		</extensions>
 	</build>
 
 	<dependencies>
@@ -161,7 +193,7 @@
 			<version>2.37</version>
 		</dependency>
 
-		<!-- HTTP -->
+		<!-- Jetty -->
 
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
@@ -173,6 +205,34 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-rewrite</artifactId>
 			<version>${jetty.version}</version>
+		</dependency>
+
+		<!-- RPC -->
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-stub</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-okhttp</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- necessary for Java 9+ -->
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>annotations-api</artifactId>
+			<version>6.0.53</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- DB -->
