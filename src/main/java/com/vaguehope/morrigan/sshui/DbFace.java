@@ -158,6 +158,7 @@ public class DbFace extends DefaultFace {
 		if (this.list == null) return;
 
 		if (this.list.hasNodes()) {
+			// TODO nicer error handling when RPC fails!
 			if (this.mediaNode == null || force) {
 				if (this.nodeId == null) {
 					this.mediaNode = this.list.getRootNode();
@@ -354,7 +355,9 @@ public class DbFace extends DefaultFace {
 
 	private void navToNode(final String id) {
 		try {
-			this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState, this.list, id, this.defaultPlayer));
+			final DbFace face = new DbFace(this.navigation, this.mnContext, this.sessionState, this.list, id, this.defaultPlayer);
+			face.restoreSavedScroll();
+			this.navigation.startFace(face);
 		}
 		catch (final MorriganException e) {
 			// TODO make this message more friendly.
