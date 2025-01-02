@@ -65,7 +65,7 @@ public class MlistsServletTest {
 
 	@Test
 	public void itServesRootList () throws Exception {
-		this.req.requestURI = "/mlists";
+		this.req.setRequestURI("/mlists");
 		this.undertest.service(this.req, this.resp);
 
 		final String expected = IoHelper.readAsString(getClass().getResourceAsStream("/mlists.xml"));
@@ -74,21 +74,21 @@ public class MlistsServletTest {
 
 	@Test
 	public void itServesSavedViewsNoFile () throws Exception {
-		this.req.requestURI = "/mlists/savedviews";
+		this.req.setRequestURI("/mlists/savedviews");
 		this.undertest.service(this.req, this.resp);
 		assertEquals("[]", this.resp.getOutputAsString());
 	}
 
 	@Test
 	public void itServesSavedViewsFile () throws Exception {
-		this.req.requestURI = "/mlists/savedviews";
+		this.req.setRequestURI("/mlists/savedviews");
 
 		final String expected = IoHelper.readAsString(getClass().getResourceAsStream("/savedviews.json"));
 		IoHelper.write(expected, this.tmp.newFile("savedviews.json"));
 
 		this.undertest.service(this.req, this.resp);
 		assertEquals(expected, this.resp.getOutputAsString());
-		assertEquals("text/json;charset=utf-8", this.resp.contentType);
+		assertEquals("text/json;charset=utf-8", this.resp.getContentType());
 	}
 
 	@Test
@@ -122,7 +122,7 @@ public class MlistsServletTest {
 		// The force read will query DB, applying DefaultMediaType to getMediaItems().
 		this.testDb.forceRead();
 
-		this.req.requestURI = "/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags";
+		this.req.setRequestURI("/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags");
 		for (final boolean includeautotags : Arrays.asList(false, true)) {  // TODO this should be 2 tests but its late.
 			this.req.params.put("includeautotags", includeautotags ? "true" : "");
 			this.resp = new MockHttpServletResponse();  // reset between runs.
@@ -140,7 +140,7 @@ public class MlistsServletTest {
 					+ "{\"tag\":\"pic\",\"mod\":155666888000,\"del\":false}"
 					+ "]}]";
 			assertEquals(expected, this.resp.getOutputAsString());
-			assertEquals("text/json;charset=utf-8", this.resp.contentType);
+			assertEquals("text/json;charset=utf-8", this.resp.getContentType());
 		}
 	}
 

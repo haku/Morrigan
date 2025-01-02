@@ -3,8 +3,11 @@ package com.vaguehope.morrigan.server;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -12,16 +15,22 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import com.vaguehope.morrigan.util.StringHelper;
+import org.apache.commons.lang3.StringUtils;
 
 public class MockHttpServletResponse implements HttpServletResponse {
 
-	String contentType;
-	final Map<String, String> headers = new HashMap<>();
-	final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-	final PrintWriter printWriter = new PrintWriter(this.outputStream);
-	final MockServletOutputStream servletOutputStream = new MockServletOutputStream(this.outputStream);
-	int status;
+	private String contentType;
+	private final Map<String, String> headers = new HashMap<>();
+	private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	private final PrintWriter printWriter = new PrintWriter(this.outputStream);
+	private final MockServletOutputStream servletOutputStream = new MockServletOutputStream(this.outputStream);
+	private int status;
+	private List<Cookie> cookies = new ArrayList<>();
+	private int contentLength;
+
+	public MockHttpServletResponse() {
+		reset();
+	}
 
 	public String getOutputAsString () throws IOException {
 		this.printWriter.flush();
@@ -29,12 +38,29 @@ public class MockHttpServletResponse implements HttpServletResponse {
 		return new String(this.outputStream.toByteArray());
 	}
 
+	public byte[] getOutputAsByteArray() throws IOException {
+		this.printWriter.flush();
+		this.servletOutputStream.flush();
+		return this.outputStream.toByteArray();
+	}
+
+	public List<Cookie> getCookies() {
+		return this.cookies;
+	}
+
+	public int getContentLength() {
+		return this.contentLength;
+	}
+
+	// HttpServletResponse
+
 	@Override
 	public void reset () {
 		this.contentType = null;
 		this.headers.clear();
 		this.outputStream.reset();
 		this.status = 200;
+		this.cookies.clear();
 	}
 
 	@Override
@@ -43,8 +69,43 @@ public class MockHttpServletResponse implements HttpServletResponse {
 	}
 
 	@Override
+	public String getContentType () {
+		return this.contentType;
+	}
+
+	@Override
+	public void setContentLength (final int length) {
+		this.contentLength = length;
+	}
+
+	@Override
+	public void setContentLengthLong(long len) {
+		setContentLength(Math.toIntExact(len));
+	}
+
+	@Override
 	public void addHeader (final String name, final String value) {
 		this.headers.put(name, value);
+	}
+
+	@Override
+	public void setHeader (final String name, final String value) {
+		addHeader(name, value);
+	}
+
+	@Override
+	public String getHeader (final String name) {
+		return this.headers.get(name);
+	}
+
+	@Override
+	public Collection<String> getHeaderNames () {
+		return this.headers.keySet();
+	}
+
+	@Override
+	public Collection<String> getHeaders (final String name) {
+		return Collections.singleton(getHeader(name));
 	}
 
 	@Override
@@ -85,11 +146,25 @@ public class MockHttpServletResponse implements HttpServletResponse {
 	@Override
 	public boolean isCommitted () {
 		try {
-			return StringHelper.notBlank(getOutputAsString());
+			return !StringUtils.isAllBlank(getOutputAsString());
 		}
 		catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void addCookie (final Cookie cookie) {
+		this.cookies.add(cookie);
+	}
+
+	@Override
+	public void sendError (final int s) throws IOException {
+		this.status = s;
+	}
+
+	@Override
+	public void setCharacterEncoding (final String arg0) {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -101,11 +176,6 @@ public class MockHttpServletResponse implements HttpServletResponse {
 
 	@Override
 	public String getCharacterEncoding () {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public String getContentType () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
@@ -125,22 +195,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public void setCharacterEncoding (final String arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void setContentLength (final int arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
 	public void setLocale (final Locale arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void addCookie (final Cookie arg0) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
@@ -180,26 +235,6 @@ public class MockHttpServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public String getHeader (final String arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public Collection<String> getHeaderNames () {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public Collection<String> getHeaders (final String arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void sendError (final int arg0) throws IOException {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
 	public void sendError (final int arg0, final String arg1) throws IOException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
@@ -210,17 +245,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public void setHeader (final String arg0, final String arg1) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
 	public void setIntHeader (final String arg0, final int arg1) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void setContentLengthLong(long len) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

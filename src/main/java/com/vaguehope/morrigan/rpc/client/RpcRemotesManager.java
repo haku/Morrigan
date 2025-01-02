@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Function;
 
 import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.Args.ArgsException;
@@ -15,6 +16,8 @@ public class RpcRemotesManager {
 	private final RpcClient rpcClient;
 	private final MediaFactory mediaFactory;
 	private final Config config;
+	private final LocalHostServer localHttpServer;
+	private final TransientContentIds transientContentIds;
 
 	public RpcRemotesManager(final Args args, final MediaFactory mediaFactory, final Config config) throws ArgsException {
 		this(RemoteInstance.fromArgs(args), mediaFactory, config);
@@ -24,6 +27,8 @@ public class RpcRemotesManager {
 		this.mediaFactory = mediaFactory;
 		this.rpcClient = new RpcClient(instances);
 		this.config = config;
+		this.transientContentIds = new TransientContentIds();
+		this.localHttpServer = new LocalHostServer(new RpcContentServlet(this.transientContentIds, this.rpcClient));
 	}
 
 	public void start() throws ArgsException, MorriganException {
@@ -34,15 +39,16 @@ public class RpcRemotesManager {
 			}
 		});
 		this.rpcClient.start();
+		this.localHttpServer.start();
 
 		for (final RemoteInstance ri : this.rpcClient.getRemoteInstances()) {
+			final Function<String, String> itemRemoteLocation = (itemId) -> {
+				String id = this.transientContentIds.makeId(ri.getLocalIdentifier(), itemId);
+				return this.localHttpServer.uriFor(id);
+			};
 			final IMediaItemStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
-			this.mediaFactory.addExternalList(new RpcMediaList(ri, this.rpcClient, storage));
+			this.mediaFactory.addExternalList(new RpcMediaList(ri, this.rpcClient, itemRemoteLocation, storage));
 		}
-	}
-
-	public RpcClient getRpcClient() {
-		return this.rpcClient;
 	}
 
 	private static final String METADATA_DB_DIR = "rpcmetadata";  // TODO move to Config class.

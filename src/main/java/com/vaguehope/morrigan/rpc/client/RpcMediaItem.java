@@ -2,45 +2,42 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
-import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralItem;
 import com.vaguehope.morrigan.dlna.extcd.Metadata;
 
 public class RpcMediaItem extends EphemeralItem {
 
-	private final String identifer;
-	private final HasMediaReply hasMedia;
+	private final MediaItem rpcItem;
+	private Function<String, String> remoteLocation;
 	private final Metadata metadata;
 
-	public RpcMediaItem(final String identifer, final HasMediaReply hasMedia, final Metadata metadata) {
-		this.identifer = identifer;
-		this.hasMedia = hasMedia;
+	public RpcMediaItem(final MediaItem rpcItem, Function<String, String> remoteLocation, final Metadata metadata) {
+		this.rpcItem = rpcItem;
+		this.remoteLocation = remoteLocation;
 		this.metadata = metadata;
 	}
 
 	@Override
 	public String getRemoteId() {
-		return this.identifer;
+		return this.rpcItem.getId();
 	}
 
 	@Override
 	public long getFileSize() {
-		return this.hasMedia.getItem().getFileLength();
+		return this.rpcItem.getFileLength();
 	}
 
 	@Override
 	public String getMimeType() {
-		return this.hasMedia.getItem().getMimeType();
+		return this.rpcItem.getMimeType();
 	}
 
 	@Override
 	public String getRemoteLocation() {
-		throw new UnsupportedOperationException();  // TODO figure out how to pass media to player???
-
-		// basic idea:
-		// set up entry in localhost webserver
-		// return that temporary URL
+		return this.remoteLocation.apply(this.rpcItem.getId());
 	}
 
 	@Override
@@ -50,11 +47,11 @@ public class RpcMediaItem extends EphemeralItem {
 
 	@Override
 	public String getTitle() {
-		return this.hasMedia.getItem().getTitle();
+		return this.rpcItem.getTitle();
 	}
 	@Override
 	public int getDuration() {
-		return (int) TimeUnit.MILLISECONDS.toSeconds(this.hasMedia.getItem().getDurationMillis());
+		return (int) TimeUnit.MILLISECONDS.toSeconds(this.rpcItem.getDurationMillis());
 	}
 
 	@Override

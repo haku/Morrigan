@@ -123,10 +123,10 @@ public class LibraryServletTest {
 		final String responseFixture = cssFixture.replace("{url}", fontUrl.toString());
 		final String expectedResponse = cssFixture.replace("{url}", fontRewrittenPath);
 
-		this.req.requestURI = "/lib/" + LibraryServlet.withoutScheme(lib);
+		this.req.setRequestURI("/lib/" + LibraryServlet.withoutScheme(lib));
 		this.server.getFixtureServlet().addGetFixture(lib, "text/css; charset=utf-8", responseFixture);
 
-		this.req2.requestURI = fontRewrittenPath;
+		this.req2.setRequestURI(fontRewrittenPath);
 		this.server.getFixtureServlet().addGetFixture(fontUrl, "font/woff2", "mock-font");
 
 		this.undertest.service(this.req, this.resp);
@@ -145,11 +145,11 @@ public class LibraryServletTest {
 		startUndertest();
 		this.server.getFixtureServlet().addGetFixture(lib, "text/css; charset=utf-8", "@font-face {}");
 
-		this.req.requestURI = "/mn/lib/" + LibraryServlet.withoutScheme(lib);
+		this.req.setRequestURI("/mn/lib/" + LibraryServlet.withoutScheme(lib));
 		this.undertest.service(this.req, this.resp);
 		assertEquals(200, this.resp.getStatus());
 
-		this.req.requestURI = "/lib/" + LibraryServlet.withoutScheme(lib);
+		this.req.setRequestURI("/lib/" + LibraryServlet.withoutScheme(lib));
 		this.undertest.service(this.req, this.resp);
 		assertEquals(200, this.resp.getStatus());
 	}

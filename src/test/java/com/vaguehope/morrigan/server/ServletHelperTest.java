@@ -69,9 +69,9 @@ public class ServletHelperTest {
 	public void itHandlesNoRangeHeader () throws Exception {
 		ServletHelper.returnFile(this.inputFile, null, null, "", this.resp);
 		assertEquals(FILE_CONTENT, this.resp.getOutputAsString());
-		assertEquals(String.valueOf(FILE_CONTENT.length()), this.resp.headers.get("Content-Length"));
-		assertNull(this.resp.headers.get("Content-Range"));
-		assertEquals(200, this.resp.status);
+		assertEquals(String.valueOf(FILE_CONTENT.length()), this.resp.getHeader("Content-Length"));
+		assertNull(this.resp.getHeader("Content-Range"));
+		assertEquals(200, this.resp.getStatus());
 	}
 
 	@Test
@@ -86,30 +86,30 @@ public class ServletHelperTest {
 		for (final String[] input : inputs) {
 			ServletHelper.returnFile(this.inputFile, null, null, input[0], this.resp);
 			assertEquals(input[1], this.resp.getOutputAsString());
-			assertEquals(400, this.resp.status);
+			assertEquals(400, this.resp.getStatus());
 		}
 	}
 
 	@Test
 	public void itHandlesZeroRangeHeader () throws Exception {
 		ServletHelper.returnFile(this.inputFile, null, null, "bytes=0-", this.resp);
-		assertEquals(String.valueOf(FILE_CONTENT.length()), this.resp.headers.get("Content-Length"));
+		assertEquals(String.valueOf(FILE_CONTENT.length()), this.resp.getHeader("Content-Length"));
 		assertEquals(String.format("bytes 0-%s/%s",
 				String.valueOf(FILE_CONTENT.length() - 1),
 				String.valueOf(FILE_CONTENT.length())),
-				this.resp.headers.get("Content-Range"));
-		assertEquals(206, this.resp.status);
+				this.resp.getHeader("Content-Range"));
+		assertEquals(206, this.resp.getStatus());
 	}
 
 	@Test
 	public void itHandlesOffsetRangeHeader () throws Exception {
 		ServletHelper.returnFile(this.inputFile, null, null, "bytes=13-", this.resp);
-		assertEquals(String.valueOf(FILE_CONTENT.length() - 13), this.resp.headers.get("Content-Length"));
+		assertEquals(String.valueOf(FILE_CONTENT.length() - 13), this.resp.getHeader("Content-Length"));
 		assertEquals(String.format("bytes 13-%s/%s",
 				String.valueOf(FILE_CONTENT.length() - 1),
 				String.valueOf(FILE_CONTENT.length())),
-				this.resp.headers.get("Content-Range"));
-		assertEquals(206, this.resp.status);
+				this.resp.getHeader("Content-Range"));
+		assertEquals(206, this.resp.getStatus());
 	}
 
 }
