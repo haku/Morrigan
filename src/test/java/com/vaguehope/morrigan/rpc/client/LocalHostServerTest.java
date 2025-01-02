@@ -18,7 +18,7 @@ public class LocalHostServerTest {
 	@Before
 	public void before() throws Exception {
 		this.servlet = mock(HttpServlet.class);
-		this.undertest = new LocalHostServer(this.servlet);
+		this.undertest = new LocalHostServer(this.servlet, true);
 	}
 
 	@After

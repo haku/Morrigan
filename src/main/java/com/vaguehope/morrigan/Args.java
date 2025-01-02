@@ -24,6 +24,7 @@ public class Args {
 	@Option(name = "--remote", usage = "Local identifier and HTTP(S) address of remote instance.", metaVar = "https://example.com/|my-rpc-remote-name") private List<String> remotes;
 	@Option(name = "--webroot", usage = "Override static file location, useful for UI dev.") private String webRoot;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
+	@Option(name = "--accesslog", usage = "Print access log line at end of each request.") private boolean printAccessLog;
 
 	@Option(name = "--player", metaVar = "--player=name", usage = "Add named server player instance.")
 	private void addServerPlayer(final String name) {
@@ -91,6 +92,10 @@ public class Args {
 
 	public boolean isVerboseLog() {
 		return this.verboseLog;
+	}
+
+	public boolean isPrintAccessLog() {
+		return this.printAccessLog;
 	}
 
 	public List<String> getRemotes() {

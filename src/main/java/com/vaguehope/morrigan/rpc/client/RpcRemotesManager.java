@@ -20,15 +20,15 @@ public class RpcRemotesManager {
 	private final TransientContentIds transientContentIds;
 
 	public RpcRemotesManager(final Args args, final MediaFactory mediaFactory, final Config config) throws ArgsException {
-		this(RemoteInstance.fromArgs(args), mediaFactory, config);
+		this(RemoteInstance.fromArgs(args), mediaFactory, config, args.isPrintAccessLog());
 	}
 
-	public RpcRemotesManager(final List<RemoteInstance> instances, final MediaFactory mediaFactory, final Config config) throws ArgsException {
+	public RpcRemotesManager(final List<RemoteInstance> instances, final MediaFactory mediaFactory, final Config config, boolean printAccessLog) throws ArgsException {
 		this.mediaFactory = mediaFactory;
 		this.rpcClient = new RpcClient(instances);
 		this.config = config;
 		this.transientContentIds = new TransientContentIds();
-		this.localHttpServer = new LocalHostServer(new RpcContentServlet(this.transientContentIds, this.rpcClient));
+		this.localHttpServer = new LocalHostServer(new RpcContentServlet(this.transientContentIds, this.rpcClient), printAccessLog);
 	}
 
 	public void start() throws ArgsException, MorriganException {

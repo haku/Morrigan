@@ -13,6 +13,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.common.servlet.RequestLoggingFilter;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 public class LocalHostServer {
@@ -22,13 +23,13 @@ public class LocalHostServer {
 	private final InetAddress bindAddress;
 	private final Server server;
 
-	public LocalHostServer(HttpServlet servlet) {
+	public LocalHostServer(final HttpServlet servlet, final boolean printAccessLog) {
 		this.bindAddress = InetAddress.getLoopbackAddress();
-		this.server = makeServer(this.bindAddress, servlet);
+		this.server = makeServer(this.bindAddress, servlet, printAccessLog);
 	}
 
 	@SuppressWarnings("resource")
-	private static Server makeServer(final InetAddress bindAddress, HttpServlet servlet) {
+	private static Server makeServer(final InetAddress bindAddress, final HttpServlet servlet, boolean printAccessLog) {
 		final Server server = new Server();
 
 		final ServerConnector connector = new ServerConnector(server);
@@ -39,6 +40,7 @@ public class LocalHostServer {
 		final ServletContextHandler servletHandler = new ServletContextHandler();
 		servletHandler.setContextPath("/");
 		servletHandler.addServlet(new ServletHolder(servlet), "/");
+		if (printAccessLog) RequestLoggingFilter.addTo(servletHandler);
 
 		final HandlerList handler = new HandlerList();
 		handler.setHandlers(new Handler[] { servletHandler });
