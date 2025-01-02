@@ -53,10 +53,10 @@ public class RpcContentServletTest {
 	@Test
 	public void itServesRequest() throws Exception {
 		final String id = this.transientContentIds.makeId(TARGET_ID, "my-item");
-		this.req.setPathInfo("/" + id);
+		this.req.setRequestURI("/" + id);
 
 		when(this.stub.hasMedia(HasMediaRequest.newBuilder().setId("my-item").build())).thenReturn(HasMediaReply.newBuilder()
-				.setExistance(FileExistance.EXISTS)
+				.setExistence(FileExistance.EXISTS)
 				.build());
 		when(this.stub.readMedia(ReadMediaRequest.newBuilder().setId("my-item").build())).thenReturn(List.of(
 				ReadMediaReply.newBuilder()
@@ -69,16 +69,19 @@ public class RpcContentServletTest {
 		this.undertest.service(this.req, this.resp);
 		assertEquals(200, this.resp.getStatus());
 		assertEquals("0123456789", this.resp.getOutputAsString());
+		assertEquals(10, this.resp.getContentLength());
+		assertEquals(null, this.resp.getHeader("Accept-Ranges"));
+		assertEquals(null, this.resp.getHeader("Content-Range"));
 	}
 
 	@Test
 	public void itServesRangeRequest() throws Exception {
 		final String id = this.transientContentIds.makeId(TARGET_ID, "my-item");
-		this.req.setPathInfo("/" + id);
+		this.req.setRequestURI("/" + id);
 		this.req.addHeader("Range", "bytes=3-7");
 
 		when(this.stub.hasMedia(HasMediaRequest.newBuilder().setId("my-item").build())).thenReturn(HasMediaReply.newBuilder()
-				.setExistance(FileExistance.EXISTS)
+				.setExistence(FileExistance.EXISTS)
 				.setItem(MediaItem.newBuilder().setFileLength(10).build())
 				.build());
 		when(this.stub.readMedia(ReadMediaRequest.newBuilder()
@@ -87,14 +90,18 @@ public class RpcContentServletTest {
 				.build())).thenReturn(List.of(
 						ReadMediaReply.newBuilder()
 								.setMimeType("video/whatever")
-								.setTotalFileLength(5)
+								.setTotalFileLength(10)
 								.setContent(ByteString.copyFrom("34567", StandardCharsets.UTF_8))
+								.setRangeIndex(0)
 								.build())
 						.iterator());
 
 		this.undertest.service(this.req, this.resp);
-		assertEquals(200, this.resp.getStatus());
+		assertEquals(206, this.resp.getStatus());
 		assertEquals("34567", this.resp.getOutputAsString());
+		assertEquals(5, this.resp.getContentLength());
+		assertEquals("bytes", this.resp.getHeader("Accept-Ranges"));
+		assertEquals("bytes 3-7/10", this.resp.getHeader("Content-Range"));
 	}
 
 }

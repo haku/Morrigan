@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.InclusiveByteRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
@@ -29,6 +31,7 @@ import com.vaguehope.morrigan.rpc.client.TransientContentIds.TargetAndItemIds;
 
 public class RpcContentServlet extends HttpServlet {
 
+	private static final Logger LOG = LoggerFactory.getLogger(RpcContentServlet.class);
 	private static final long serialVersionUID = 7894980654998189201L;
 
 	private final TransientContentIds transientContentIds;
@@ -41,7 +44,7 @@ public class RpcContentServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		final String pathId = StringUtils.removeStart(req.getPathInfo(), "/");
+		final String pathId = StringUtils.removeStart(req.getRequestURI(), "/");
 		final TargetAndItemIds ids = this.transientContentIds.resolve(pathId);
 		if (ids == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid ID: " + pathId);
@@ -50,25 +53,34 @@ public class RpcContentServlet extends HttpServlet {
 
 		final MediaBlockingStub stub = this.rpcClient.getMediaBlockingStub(ids.targetId);
 		final HasMediaReply hasMedia = stub.hasMedia(HasMediaRequest.newBuilder().setId(ids.itemId).build());
-		if (hasMedia.getExistance() != FileExistance.EXISTS) {
+		if (hasMedia.getExistence() != FileExistance.EXISTS) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Media not found in remote system: " + ids.itemId);
 			return;
 		}
 
+		final List<InclusiveByteRange> httpRanges;
 		final List<MediaToadProto.Range> rpcRanges;
 		final Enumeration<String> rangesHeaders = req.getHeaders(HttpHeader.RANGE.asString());
 		if (rangesHeaders != null && rangesHeaders.hasMoreElements()) {
-			final List<InclusiveByteRange> headerRanges = InclusiveByteRange.satisfiableRanges(rangesHeaders, hasMedia.getItem().getFileLength());
+			httpRanges = InclusiveByteRange.satisfiableRanges(rangesHeaders, hasMedia.getItem().getFileLength());
 
-			if (headerRanges == null || headerRanges.size() == 0) {
+			if (httpRanges == null || httpRanges.size() == 0) {
 				resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 				return;
 			}
 
-			rpcRanges = headerRanges.stream().map((r) -> MediaToadProto.Range.newBuilder().setFirst(r.getFirst()).setLast(r.getLast()).build())
+			if (httpRanges.size() > 1) {
+				// TODO implement https://www.rfc-editor.org/rfc/rfc2616#section-19.2
+				resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Multiple range headers not supported.");
+				LOG.error("Multiple values in Range header not implemented: {}", httpRanges);
+				return;
+			}
+
+			rpcRanges = httpRanges.stream().map((r) -> MediaToadProto.Range.newBuilder().setFirst(r.getFirst()).setLast(r.getLast()).build())
 					.collect(Collectors.toList());
 		}
 		else {
+			httpRanges = null;
 			rpcRanges = null;
 		}
 
@@ -84,7 +96,23 @@ public class RpcContentServlet extends HttpServlet {
 		final ReadMediaReply first = replies.next();
 
 		resp.setContentType(first.getMimeType());
-		resp.setContentLengthLong(first.getTotalFileLength());
+
+		if (httpRanges != null && httpRanges.size() > 0) {
+			if (!first.hasRangeIndex()) {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "range_index missing from ReadMediaReply.");
+				LOG.warn("range_index missing from ReadMediaReply from {} for: {}", ids.targetId, ids.itemId);
+				return;
+			}
+
+			resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+			final InclusiveByteRange range = httpRanges.get(first.getRangeIndex());
+			resp.setContentLengthLong(range.getSize());
+			resp.setHeader(HttpHeader.ACCEPT_RANGES.asString(), "bytes");
+			resp.setHeader(HttpHeader.CONTENT_RANGE.asString(), range.toHeaderRangeString(first.getTotalFileLength()));
+		}
+		else {
+			resp.setContentLengthLong(first.getTotalFileLength());
+		}
 
 		@SuppressWarnings("resource")
 		final ServletOutputStream outputStream = resp.getOutputStream();

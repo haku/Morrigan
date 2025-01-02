@@ -96,13 +96,13 @@ public class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public FileExistance hasFile(final String identifer) throws MorriganException, DbException {
 		final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
-		return convertExistance(ret.getExistance());
+		return convertExistance(ret.getExistence());
 	}
 
 	@Override
 	public IMediaItem getByFile(final String identifer) throws DbException {
 		final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
-		if (ret.getExistance() != com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance.EXISTS) return null;
+		if (ret.getExistence() != com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance.EXISTS) return null;
 		return makeItem(ret.getItem());
 	}
 
