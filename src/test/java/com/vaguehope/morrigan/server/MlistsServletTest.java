@@ -13,6 +13,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.vaguehope.common.servlet.MockHttpServletRequest;
+import com.vaguehope.common.servlet.MockHttpServletResponse;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
@@ -124,7 +126,7 @@ public class MlistsServletTest {
 
 		this.req.setRequestURI("/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags");
 		for (final boolean includeautotags : Arrays.asList(false, true)) {  // TODO this should be 2 tests but its late.
-			this.req.params.put("includeautotags", includeautotags ? "true" : "");
+			this.req.setParameter("includeautotags", includeautotags ? "true" : "");
 			this.resp = new MockHttpServletResponse();  // reset between runs.
 			this.undertest.service(this.req, this.resp);
 

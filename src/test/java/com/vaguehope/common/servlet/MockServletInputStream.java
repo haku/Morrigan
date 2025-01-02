@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.server;
+package com.vaguehope.common.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;

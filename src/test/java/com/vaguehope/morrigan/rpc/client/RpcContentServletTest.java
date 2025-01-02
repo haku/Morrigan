@@ -14,16 +14,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.protobuf.ByteString;
-import com.vaguehope.dlnatoad.rpc.MediaToadProto;
+import com.vaguehope.common.servlet.MockHttpServletRequest;
+import com.vaguehope.common.servlet.MockHttpServletResponse;
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ReadMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ReadMediaRequest;
-import com.vaguehope.morrigan.server.MockHttpServletRequest;
-import com.vaguehope.morrigan.server.MockHttpServletResponse;
 
 public class RpcContentServletTest {
 
