@@ -50,6 +50,7 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 	boolean isMissing();
 	boolean setMissing(boolean missing);
 
+	boolean hasRemoteLocation();
 	String getRemoteLocation();
 	boolean setRemoteLocation(String remoteLocation);
 

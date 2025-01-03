@@ -7,13 +7,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.InclusiveByteRange;
 import org.slf4j.Logger;
@@ -27,34 +24,24 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ReadMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ReadMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ReadMediaRequest.Builder;
-import com.vaguehope.morrigan.rpc.client.TransientContentIds.TargetAndItemIds;
+import com.vaguehope.morrigan.player.contentproxy.ContentServer;
 
-public class RpcContentServlet extends HttpServlet {
+public class RpcContentServlet implements ContentServer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RpcContentServlet.class);
-	private static final long serialVersionUID = 7894980654998189201L;
 
-	private final TransientContentIds transientContentIds;
 	private final RpcClient rpcClient;
 
-	public RpcContentServlet(final TransientContentIds transientContentIds, final RpcClient rpcClient) {
-		this.transientContentIds = transientContentIds;
+	public RpcContentServlet(final RpcClient rpcClient) {
 		this.rpcClient = rpcClient;
 	}
 
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		final String pathId = StringUtils.removeStart(req.getRequestURI(), "/");
-		final TargetAndItemIds ids = this.transientContentIds.resolve(pathId);
-		if (ids == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid ID: " + pathId);
-			return;
-		}
-
-		final MediaBlockingStub stub = this.rpcClient.getMediaBlockingStub(ids.targetId);
-		final HasMediaReply hasMedia = stub.hasMedia(HasMediaRequest.newBuilder().setId(ids.itemId).build());
+	public void doGet(final HttpServletRequest req, final HttpServletResponse resp, final String listId, final String itemId) throws IOException {
+		final MediaBlockingStub stub = this.rpcClient.getMediaBlockingStub(listId);
+		final HasMediaReply hasMedia = stub.hasMedia(HasMediaRequest.newBuilder().setId(itemId).build());
 		if (hasMedia.getExistence() != FileExistance.EXISTS) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Media not found in remote system: " + ids.itemId);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Media not found in remote system: " + itemId);
 			return;
 		}
 
@@ -87,7 +74,7 @@ public class RpcContentServlet extends HttpServlet {
 		// TODO convert StatusRuntimeException to 404, etc.
 		// TODO better timeout / deadline handling.
 
-		final Builder rpcReq = ReadMediaRequest.newBuilder().setId(ids.itemId);
+		final Builder rpcReq = ReadMediaRequest.newBuilder().setId(itemId);
 		if (rpcRanges != null && rpcRanges.size() > 0) rpcReq.addAllRange(rpcRanges);
 
 		final Iterator<ReadMediaReply> replies = stub
@@ -100,7 +87,7 @@ public class RpcContentServlet extends HttpServlet {
 		if (httpRanges != null && httpRanges.size() > 0) {
 			if (!first.hasRangeIndex()) {
 				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "range_index missing from ReadMediaReply.");
-				LOG.warn("range_index missing from ReadMediaReply from {} for: {}", ids.targetId, ids.itemId);
+				LOG.warn("range_index missing from ReadMediaReply from {} for: {}", listId, itemId);
 				return;
 			}
 

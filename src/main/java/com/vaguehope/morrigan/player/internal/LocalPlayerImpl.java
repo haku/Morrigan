@@ -25,8 +25,8 @@ import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
+import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.util.MnLogger;
-import com.vaguehope.morrigan.util.StringHelper;
 
 public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,6 +35,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	final LocalPlayerSupport localPlayerSupport;
 	private final PlaybackEngineFactory playbackEngineFactory;
+	private final ContentProxy contentProxy;
 	private final ExecutorService executorService;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,12 +47,14 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			final LocalPlayerSupport localPlayerSupport,
 			final PlayerRegister register,
 			final PlaybackEngineFactory playbackEngineFactory,
+			final ContentProxy contentProxy,
 			final ExecutorService executorService,
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
 		super(id, name, register, playerStateStorage, config);
 		this.localPlayerSupport = localPlayerSupport;
 		this.playbackEngineFactory = playbackEngineFactory;
+		this.contentProxy = contentProxy;
 		this.executorService = executorService;
 	}
 
@@ -233,8 +236,13 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			mediaLocation = item.getAltFile().getAbsolutePath();
 			if (!Files.isReadable(Paths.get(mediaLocation))) throw new MorriganException("Alt file not found for item " + item + ": " + mediaLocation);
 		}
-		else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
-			mediaLocation = item.getTrack().getRemoteLocation();
+		else if (item.getTrack().hasRemoteLocation()) {
+			if (item.hasList()) {
+				mediaLocation = item.getList().prepairRemoteLocation(item.getTrack(), this.contentProxy);
+			}
+			else {
+				mediaLocation = item.getTrack().getRemoteLocation();
+			}
 		}
 		else {
 			mediaLocation = item.getTrack().getFilepath();

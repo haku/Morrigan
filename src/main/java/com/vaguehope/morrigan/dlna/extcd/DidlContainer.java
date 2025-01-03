@@ -37,6 +37,11 @@ public class DidlContainer extends EphemeralItem {
 	}
 
 	@Override
+	public boolean hasRemoteLocation() {
+		return false;
+	}
+
+	@Override
 	public String getRemoteLocation () {
 		return null;
 	}

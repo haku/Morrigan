@@ -289,7 +289,7 @@ public abstract class AbstractPlayer implements Player {
 				final File file = new File(item.getTrack().getFilepath());
 				if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
 			}
-			else if (StringHelper.blank(item.getTrack().getRemoteLocation())) {
+			else if (!item.getTrack().hasRemoteLocation()) {
 				throw new FileNotFoundException("Track has no filepath or remote location: " + item.getTrack());
 			}
 

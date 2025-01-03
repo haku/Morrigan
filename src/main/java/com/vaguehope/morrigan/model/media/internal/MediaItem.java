@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
 
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.MimeType;
@@ -179,6 +180,11 @@ public abstract class MediaItem implements IMediaItem {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean hasRemoteLocation() {
+		return StringHelper.notBlank(this.remoteLocation);
 	}
 
 	@Override

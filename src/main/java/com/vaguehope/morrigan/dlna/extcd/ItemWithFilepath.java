@@ -63,6 +63,11 @@ public class ItemWithFilepath extends EphemeralItem {
 	}
 
 	@Override
+	public boolean hasRemoteLocation() {
+		return this.item.hasRemoteLocation();
+	}
+
+	@Override
 	public String getRemoteLocation () {
 		return this.item.getRemoteLocation();
 	}

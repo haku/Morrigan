@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.rpc.client;
+package com.vaguehope.morrigan.player.contentproxy;
 
 import java.net.InetAddress;
 
@@ -16,20 +16,22 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.common.servlet.RequestLoggingFilter;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
-public class LocalHostServer {
+public class LocalHostContentServer implements ContentProxy {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LocalHostServer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LocalHostContentServer.class);
 
+	private final TransientContentIds transientContentIds;
 	private final InetAddress bindAddress;
 	private final Server server;
 
-	public LocalHostServer(final HttpServlet servlet, final boolean printAccessLog) {
+	public LocalHostContentServer(final boolean printAccessLog) {
+		this.transientContentIds = new TransientContentIds();
 		this.bindAddress = InetAddress.getLoopbackAddress();
-		this.server = makeServer(this.bindAddress, servlet, printAccessLog);
+		this.server = makeServer(this.bindAddress, new ContentProxyServlet(this.transientContentIds), printAccessLog);
 	}
 
 	@SuppressWarnings("resource")
-	private static Server makeServer(final InetAddress bindAddress, final HttpServlet servlet, boolean printAccessLog) {
+	private static Server makeServer(final InetAddress bindAddress, final HttpServlet servlet, final boolean printAccessLog) {
 		final Server server = new Server();
 
 		final ServerConnector connector = new ServerConnector(server);
@@ -39,7 +41,7 @@ public class LocalHostServer {
 
 		final ServletContextHandler servletHandler = new ServletContextHandler();
 		servletHandler.setContextPath("/");
-		servletHandler.addServlet(new ServletHolder(servlet), "/");
+		servletHandler.addServlet(new ServletHolder(servlet), "/" + ContentProxyServlet.PATH_PREFIX + "*");
 		if (printAccessLog) RequestLoggingFilter.addTo(servletHandler);
 
 		final HandlerList handler = new HandlerList();
@@ -61,6 +63,11 @@ public class LocalHostServer {
 
 	public void shutdown() throws Exception {
 		this.server.stop();
+	}
+
+	@Override
+	public String makeUri(final ContentServer contentServer, final String listId, final String itemId) {
+		return uriFor(ContentProxyServlet.PATH_PREFIX + this.transientContentIds.makeId(listId, itemId, contentServer));
 	}
 
 	public String uriFor (final String path) {

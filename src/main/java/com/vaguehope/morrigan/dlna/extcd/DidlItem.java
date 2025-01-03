@@ -72,6 +72,11 @@ public class DidlItem extends EphemeralItem {
 	}
 
 	@Override
+	public boolean hasRemoteLocation() {
+		return true;
+	}
+
+	@Override
 	public String getRemoteLocation () {
 		return this.primaryRes.getValue();
 	}

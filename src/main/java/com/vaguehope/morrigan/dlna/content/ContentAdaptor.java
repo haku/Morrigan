@@ -322,7 +322,7 @@ public class ContentAdaptor {
 		}
 
 		final String objectId = this.mediaFileLocator.mediaItemId(mlr, mediaItem);
-		final String uri = this.mediaServer.uriForId(objectId);
+		final String uri = this.mediaServer.uriFor(objectId);
 		final Res res = new Res(format.toMimeType(), Long.valueOf(file.length()), uri);
 		res.setSize(file.length());
 
@@ -385,7 +385,7 @@ public class ContentAdaptor {
 		}
 		final MimeType artMimeType = artFormat.toMimeType();
 
-		final String artUri = this.mediaServer.uriForId(id);
+		final String artUri = this.mediaServer.uriFor(id);
 		return new Res(artMimeType, Long.valueOf(artFile.length()), artUri);
 	}
 

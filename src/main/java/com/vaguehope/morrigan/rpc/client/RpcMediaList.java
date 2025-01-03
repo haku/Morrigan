@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
@@ -24,6 +23,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaNode;
+import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class RpcMediaList extends EphemeralMediaList {
@@ -32,13 +32,13 @@ public class RpcMediaList extends EphemeralMediaList {
 
 	private final RemoteInstance ri;
 	private final RpcClient rpcClient;
-	private final Function<String, String> itemRemoteLocation;
 	private final MetadataStorage metadataStorage;
+	private final RpcContentServlet rpcContentServer;
 
-	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final Function<String, String> itemRemoteLocation, final IMediaItemStorageLayer storage) {
+	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final IMediaItemStorageLayer storage) {
 		this.ri = ri;
 		this.rpcClient = rpcClient;
-		this.itemRemoteLocation = itemRemoteLocation;
+		this.rpcContentServer = rpcContentServer;
 		this.metadataStorage = new MetadataStorage(storage);
 	}
 
@@ -107,7 +107,12 @@ public class RpcMediaList extends EphemeralMediaList {
 	}
 
 	private RpcMediaItem makeItem(final MediaItem item) throws DbException {
-		return new RpcMediaItem(item, this.itemRemoteLocation, this.metadataStorage.getMetadataProxy(item.getId()));
+		return new RpcMediaItem(item, this.metadataStorage.getMetadataProxy(item.getId()));
+	}
+
+	@Override
+	public String prepairRemoteLocation(final IMediaItem item, final ContentProxy contentProxy) {
+		return contentProxy.makeUri(this.rpcContentServer, this.ri.getLocalIdentifier(), item.getRemoteId());
 	}
 
 	@Override

@@ -23,7 +23,6 @@ import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
 import com.vaguehope.morrigan.util.Listener;
 import com.vaguehope.morrigan.util.MnLogger;
-import com.vaguehope.morrigan.util.StringHelper;
 
 public class Transcoder {
 
@@ -47,7 +46,7 @@ public class Transcoder {
 		this.es = new ThreadPoolExecutor(
 				0, MAX_IN_PROGRESS_TRANSCODES * 2,
 				60L, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(),
+				new LinkedBlockingQueue<>(),
 				new DaemonThreadFactory(name + "-tr"));
 	}
 
@@ -82,7 +81,7 @@ public class Transcoder {
 
 		final File inFile = tProfile.getItem().getFile();
 		if (!inFile.exists()) {
-			if (StringHelper.notBlank(tProfile.getItem().getRemoteLocation())) {
+			if (tProfile.getItem().hasRemoteLocation()) {
 				throw new UnsupportedOperationException("TODO implement transcode of remote files.");
 			}
 			throw new FileNotFoundException("File not found: " + inFile.getAbsolutePath());

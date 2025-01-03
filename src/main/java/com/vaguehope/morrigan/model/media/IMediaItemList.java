@@ -15,6 +15,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
@@ -73,6 +74,10 @@ public interface IMediaItemList {
 		throw new UnsupportedOperationException();
 	}
 
+	default String prepairRemoteLocation(IMediaItem item, ContentProxy contentProxy) {
+		return item.getRemoteLocation();
+	}
+
 	void addItem (IMediaItem item);
 	void removeItem (IMediaItem item) throws MorriganException;
 
@@ -83,7 +88,7 @@ public interface IMediaItemList {
 	void setItemEnabled (IMediaItem item, boolean value) throws MorriganException;
 	void setItemEnabled (IMediaItem item, boolean value, Date lastModified) throws MorriganException;
 	void setItemMissing (IMediaItem item, boolean value) throws MorriganException;
-	void setRemoteLocation (IMediaItem track, String remoteLocation) throws MorriganException;
+	void setRemoteLocation (IMediaItem track, String remoteLocation) throws MorriganException; // TODO unused?
 	void persistTrackData (IMediaItem track) throws MorriganException;
 
 	/**

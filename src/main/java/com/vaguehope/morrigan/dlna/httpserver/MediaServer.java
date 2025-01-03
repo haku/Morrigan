@@ -14,18 +14,29 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MediaServer {
+import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
+import com.vaguehope.morrigan.player.contentproxy.ContentProxyServlet;
+import com.vaguehope.morrigan.player.contentproxy.ContentServer;
+import com.vaguehope.morrigan.player.contentproxy.TransientContentIds;
+
+public class MediaServer implements ContentProxy {
 
 	private static final int HTTP_START_PORT = 29085;
 	private static final Logger LOG = LoggerFactory.getLogger(MediaServer.class);
 
-	private final Server server;
+	private final ContentProxyServlet contentProxyServlet;
+	private final TransientContentIds transientContentIds;
+
 	private final String bindAddress;
+	private final Server server;
 
 	public MediaServer (final FileLocator fileLocator, final InetAddress bindAddress) {
+		this.transientContentIds = new TransientContentIds();
+		this.contentProxyServlet = new ContentProxyServlet(this.transientContentIds);
+
 		if (bindAddress == null) throw new IllegalArgumentException("bindAddress must not be null.");
 		this.bindAddress = bindAddress.getHostAddress();
-		this.server = makeContentServer(fileLocator, this.bindAddress);
+		this.server = makeContentServer(fileLocator, this.bindAddress, this.contentProxyServlet);
 	}
 
 	public void start () {
@@ -65,18 +76,24 @@ public class MediaServer {
 		}
 	}
 
-	public String uriForId (final String id) {
-		return String.format("%s/%s", getExternalHttpUrl(), id);
+	@Override
+	public String makeUri(final ContentServer contentServer, final String listId, final String itemId) {
+		return uriFor(ContentProxyServlet.PATH_PREFIX + this.transientContentIds.makeId(listId, itemId, contentServer));
+	}
+
+	public String uriFor (final String path) {
+		return String.format("%s/%s", getExternalHttpUrl(), path);
 	}
 
 	private String getExternalHttpUrl () {
 		return "http://" + this.bindAddress + ":" + ((ServerConnector) this.server.getConnectors()[0]).getLocalPort();
 	}
 
-	private static Server makeContentServer (final FileLocator fileLocator, final String bindAddress) {
+	private static Server makeContentServer (final FileLocator fileLocator, final String bindAddress, final ContentProxyServlet contentProxyServlet) {
 		final ServletContextHandler servletHandler = new ServletContextHandler();
 		servletHandler.setContextPath("/");
 		servletHandler.addServlet(new ServletHolder(new ContentServlet(fileLocator)), "/");
+		servletHandler.addServlet(new ServletHolder(contentProxyServlet), "/" + ContentProxyServlet.PATH_PREFIX + "*");
 
 		final HandlerList handler = new HandlerList();
 		handler.setHandlers(new Handler[] { servletHandler });

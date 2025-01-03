@@ -27,9 +27,8 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.ReadMediaRequest;
 
 public class RpcContentServletTest {
 
-	private static final String TARGET_ID = "my-target";
+	private static final String LIST_ID = "my-target";
 
-	private TransientContentIds transientContentIds;
 	private RpcClient rpcClient;
 	private RpcContentServlet undertest;
 	private MockHttpServletRequest req;
@@ -38,23 +37,19 @@ public class RpcContentServletTest {
 
 	@Before
 	public void before() throws Exception {
-		this.transientContentIds = new TransientContentIds();
 		this.rpcClient = mock(RpcClient.class);
 		this.stub = mock(MediaBlockingStub.class);
-		this.undertest = new RpcContentServlet(this.transientContentIds, this.rpcClient);
+		this.undertest = new RpcContentServlet(this.rpcClient);
 
 		this.req = new MockHttpServletRequest();
 		this.resp = new MockHttpServletResponse();
 
-		when(this.rpcClient.getMediaBlockingStub(TARGET_ID)).thenReturn(this.stub);
+		when(this.rpcClient.getMediaBlockingStub(LIST_ID)).thenReturn(this.stub);
 		when(this.stub.withDeadlineAfter(anyLong(), any(TimeUnit.class))).thenReturn(this.stub);
 	}
 
 	@Test
 	public void itServesRequest() throws Exception {
-		final String id = this.transientContentIds.makeId(TARGET_ID, "my-item");
-		this.req.setRequestURI("/" + id);
-
 		when(this.stub.hasMedia(HasMediaRequest.newBuilder().setId("my-item").build())).thenReturn(HasMediaReply.newBuilder()
 				.setExistence(FileExistance.EXISTS)
 				.build());
@@ -66,7 +61,7 @@ public class RpcContentServletTest {
 						.build())
 				.iterator());
 
-		this.undertest.service(this.req, this.resp);
+		this.undertest.doGet(this.req, this.resp, LIST_ID, "my-item");
 		assertEquals(200, this.resp.getStatus());
 		assertEquals("0123456789", this.resp.getOutputAsString());
 		assertEquals(10, this.resp.getContentLength());
@@ -76,8 +71,6 @@ public class RpcContentServletTest {
 
 	@Test
 	public void itServesRangeRequest() throws Exception {
-		final String id = this.transientContentIds.makeId(TARGET_ID, "my-item");
-		this.req.setRequestURI("/" + id);
 		this.req.addHeader("Range", "bytes=3-7");
 
 		when(this.stub.hasMedia(HasMediaRequest.newBuilder().setId("my-item").build())).thenReturn(HasMediaReply.newBuilder()
@@ -96,7 +89,7 @@ public class RpcContentServletTest {
 								.build())
 						.iterator());
 
-		this.undertest.service(this.req, this.resp);
+		this.undertest.doGet(this.req, this.resp, LIST_ID, "my-item");
 		assertEquals(206, this.resp.getStatus());
 		assertEquals("34567", this.resp.getOutputAsString());
 		assertEquals(5, this.resp.getContentLength());

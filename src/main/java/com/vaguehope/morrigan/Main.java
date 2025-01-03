@@ -19,11 +19,13 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.Args.ServerPlayerArgs;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaService;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
+import com.vaguehope.morrigan.player.contentproxy.LocalHostContentServer;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
 import com.vaguehope.morrigan.rpc.client.RpcRemotesManager;
 import com.vaguehope.morrigan.server.AsyncActions;
@@ -83,7 +85,7 @@ public final class Main {
 		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
 		final VlcEngineFactory infoPlaybackEngineFactory = new VlcEngineFactory(args.isVerboseLog(), Collections.emptyList());
 		final MediaFactory mediaFactory = new MediaFactoryImpl(config, infoPlaybackEngineFactory);
-		final PlayerRegister playerRegister = makePlayerRegister(config, mediaFactory);
+		final PlayerRegister playerRegister = makePlayerRegister(config, args, mediaFactory);
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);
 		final Transcoder transcoder = new Transcoder("srv");
 		makeLocalPlayers(args, playerRegister);
@@ -123,13 +125,18 @@ public final class Main {
 		new CountDownLatch(1).await();  // Block forever.
 	}
 
-	private static PlayerRegister makePlayerRegister(final Config config, final MediaFactory mediaFactory) {
+	private static PlayerRegister makePlayerRegister(final Config config, Args args, final MediaFactory mediaFactory) throws MorriganException {
 		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
 		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
 		playerEx.allowCoreThreadTimeOut(true);
+
+		final LocalHostContentServer localHttpServer = new LocalHostContentServer(args.isPrintAccessLog());
+		localHttpServer.start();
+
 		final PlayerRegister playerRegister = new PlayerRegisterImpl(
 				new PlayerStateStorage(mediaFactory, playerEx, config),
 				config,
+				localHttpServer,
 				playerEx);
 		return playerRegister;
 	}

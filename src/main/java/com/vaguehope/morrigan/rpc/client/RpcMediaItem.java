@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralItem;
@@ -11,12 +10,10 @@ import com.vaguehope.morrigan.dlna.extcd.Metadata;
 public class RpcMediaItem extends EphemeralItem {
 
 	private final MediaItem rpcItem;
-	private Function<String, String> remoteLocation;
 	private final Metadata metadata;
 
-	public RpcMediaItem(final MediaItem rpcItem, Function<String, String> remoteLocation, final Metadata metadata) {
+	public RpcMediaItem(final MediaItem rpcItem, final Metadata metadata) {
 		this.rpcItem = rpcItem;
-		this.remoteLocation = remoteLocation;
 		this.metadata = metadata;
 	}
 
@@ -36,8 +33,13 @@ public class RpcMediaItem extends EphemeralItem {
 	}
 
 	@Override
+	public boolean hasRemoteLocation() {
+		return true;
+	}
+
+	@Override
 	public String getRemoteLocation() {
-		return this.remoteLocation.apply(this.rpcItem.getId());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

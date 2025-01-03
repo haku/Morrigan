@@ -58,19 +58,24 @@ public class DlnaPlayingParamsFactory {
 		final long fileSize;
 		final int durationSeconds;
 		if (altFile != null) {
-			uri = this.mediaServer.uriForId(id);
+			uri = this.mediaServer.uriFor(id);
 			mimeType = MediaFormat.identify(altFile).toMimeType();
 			fileSize = altFile.length();
 			durationSeconds = readFileDurationSeconds(altFile);
 		}
-		else if (StringHelper.notBlank(item.getTrack().getRemoteLocation())) {
-			uri = item.getTrack().getRemoteLocation();
+		else if (item.getTrack().hasRemoteLocation()) {
+			if (item.hasList()) {
+				uri = item.getList().prepairRemoteLocation(item.getTrack(), this.mediaServer);
+			}
+			else {
+				uri = item.getTrack().getRemoteLocation();
+			}
 			mimeType = MimeType.valueOf(item.getTrack().getMimeType());
 			fileSize = item.getTrack().getFileSize();
 			durationSeconds = item.getTrack().getDuration(); // TODO what if this is not available?
 		}
 		else {
-			uri = this.mediaServer.uriForId(id);
+			uri = this.mediaServer.uriFor(id);
 			final File file = new File(item.getTrack().getFilepath());
 			mimeType = MediaFormat.identify(file).toMimeType();
 			fileSize = file.length();
@@ -87,7 +92,7 @@ public class DlnaPlayingParamsFactory {
 		}
 		else {
 			final File coverArt = item.getTrack().findCoverArt();
-			coverArtUri = coverArt != null ? this.mediaServer.uriForId(this.mediaFileLocator.fileId(coverArt)) : null;
+			coverArtUri = coverArt != null ? this.mediaServer.uriFor(this.mediaFileLocator.fileId(coverArt)) : null;
 		}
 
 		return new DlnaPlayingParams(id, uri, item.getTrack().getTitle(), mimeType, fileSize, coverArtUri, durationSeconds);
