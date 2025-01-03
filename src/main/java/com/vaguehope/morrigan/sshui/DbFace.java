@@ -41,24 +41,25 @@ import com.vaguehope.morrigan.tasks.MorriganTask;
 public class DbFace extends DefaultFace {
 
 	private static final String HELP_TEXT =
-			"      g\tgo to top of list\n" +
-			"      G\tgo to end of list\n" +
-			"      z\tcentre selection\n" +
-			"      /\tsearch DB\n" +
-			"      o\tsort order\n" +
-			"      e\tenqueue item(s)\n" +
-			"      E\tenqueue DB\n" +
-			"<enter>\tplay item(s)\n" +
-			"      t\ttag editor\n" +
-			"      v\tselect\n" +
-			"      x\tselect\n" +
-			"      X\tempty selection\n" +
-			"      w\tcopy file(s)\n" +
-			"      d\ttoggle item(s) enabled\n" +
-			"      r\trefresh query\n" +
-			"      p\tDB properties\n" +
-			"      q\tback a page\n" +
-			"      h\tthis help text";
+			"        g go to top of list\n" +
+			"        G go to end of list\n" +
+			"        z centre selection\n" +
+			"        / search DB\n" +
+			"        o sort order\n" +
+			"        e enqueue item(s)\n" +
+			"        E enqueue DB\n" +
+			"<enter> play item(s)\n" +
+			"        t tag editor\n" +
+			"   v or x toggle select\n" +
+			"        V start/stop drag select\n" +
+			"ctrl+a  select all\n" +
+			"        X empty selection\n" +
+			"        w copy file(s)\n" +
+			"        d toggle item(s) enabled\n" +
+			"        r refresh query\n" +
+			"        p DB properties\n" +
+			"        q back a page\n" +
+			"        h this help text";
 
 	private static final String PREF_SCROLL_INDEX = "dbscroll";
 	private static final String PREF_SELECTED_INDEX = "dbselected";
@@ -82,6 +83,8 @@ public class DbFace extends DefaultFace {
 	private int scrollTop = 0;
 	private int pageSize = 1;
 	private VDirection lastMoveDirection = VDirection.DOWN;
+	private boolean multiSelectActive = false;
+	private int multiSelectStartIndex = -1;
 	private String itemDetailsBar = "";
 	private IMediaItem itemDetailsBarItem;
 	private boolean saveScrollOnClose = false;
@@ -257,6 +260,15 @@ public class DbFace extends DefaultFace {
 					case 'x':
 						toggleSelection();
 						return true;
+					case 'V':
+						startStopMultiSelect();
+						return true;
+					case 'a':
+						if (k.isCtrlDown()) {
+							askAllSelection(gui);
+							return true;
+						}
+						return true;
 					case 'X':
 						askEmptySelection(gui);
 						return true;
@@ -291,9 +303,30 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	private void menuMove(final VDirection direction, final int distance) {
+	private void menuMove(final VDirection direction, final int distance) throws MorriganException {
 		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.mediaNode));
 		this.lastMoveDirection = direction;
+
+		if (this.multiSelectActive) {
+			if (direction == VDirection.DOWN) {
+				if (this.selectedItemIndex > this.multiSelectStartIndex) {
+					selectItem(getSelectedItem());
+				}
+				else if (this.selectedItemIndex > 0) {
+					this.selectedItems.remove(this.mediaNode.get(this.selectedItemIndex - 1));
+					updateItemDetailsBar();
+				}
+			}
+			else {
+				if (this.selectedItemIndex < this.multiSelectStartIndex) {
+					selectItem(getSelectedItem());
+				}
+				else if (this.selectedItemIndex < this.mediaNode.size() - 1) {
+					this.selectedItems.remove(this.mediaNode.get(this.selectedItemIndex + 1));
+					updateItemDetailsBar();
+				}
+			}
+		}
 	}
 
 	private void menuMoveEnd (final VDirection direction) throws MorriganException {
@@ -307,6 +340,8 @@ public class DbFace extends DefaultFace {
 				break;
 			default:
 		}
+
+		// TODO multiselect!
 	}
 
 	private void centreSelection () {
@@ -380,7 +415,7 @@ public class DbFace extends DefaultFace {
 		this.lastActionMessage.setLastActionMessage(String.format("Enqueued %s in %s.", playItem, player.getName()));
 	}
 
-	private void enqueueSelection (final WindowBasedTextGUI gui) {
+	private void enqueueSelection (final WindowBasedTextGUI gui) throws MorriganException {
 		final List<IMediaItem> items = getSelectedItems();
 		enqueueItems(gui, items);
 		if (items.size() == 1 && items.contains(getSelectedItem())) {
@@ -420,6 +455,31 @@ public class DbFace extends DefaultFace {
 		if (item == null) return;
 		if (!(item instanceof IMediaItem)) return;
 		if (!this.selectedItems.remove(item)) this.selectedItems.add((IMediaItem) item);
+		updateItemDetailsBar();
+	}
+
+	private void selectItem(final AbstractItem item) throws MorriganException {
+		if (item == null) return;
+		if (!(item instanceof IMediaItem)) return;
+		if (!this.selectedItems.contains(item)) this.selectedItems.add((IMediaItem) item);
+		updateItemDetailsBar();
+	}
+
+	private void startStopMultiSelect() throws MorriganException {
+		this.multiSelectActive = ! this.multiSelectActive;
+		if (this.multiSelectActive) {
+			selectItem(getSelectedItem());
+			this.multiSelectStartIndex = this.selectedItemIndex;
+		}
+	}
+
+	private void askAllSelection (final WindowBasedTextGUI gui) throws MorriganException {
+		if (MessageDialog.showMessageDialog(gui, "Selected Items", "Select all items?",
+				MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes) {
+			return;
+		}
+		this.selectedItems.clear();
+		this.selectedItems.addAll(this.mediaNode.getItems());
 		updateItemDetailsBar();
 	}
 
