@@ -304,33 +304,15 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void menuMove(final VDirection direction, final int distance) throws MorriganException {
+		final int prevSelIndex = this.selectedItemIndex;
 		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.mediaNode));
 		this.lastMoveDirection = direction;
-
-		if (this.multiSelectActive) {
-			if (direction == VDirection.DOWN) {
-				if (this.selectedItemIndex > this.multiSelectStartIndex) {
-					selectItem(getSelectedItem());
-				}
-				else if (this.selectedItemIndex > 0) {
-					this.selectedItems.remove(this.mediaNode.get(this.selectedItemIndex - 1));
-					updateItemDetailsBar();
-				}
-			}
-			else {
-				if (this.selectedItemIndex < this.multiSelectStartIndex) {
-					selectItem(getSelectedItem());
-				}
-				else if (this.selectedItemIndex < this.mediaNode.size() - 1) {
-					this.selectedItems.remove(this.mediaNode.get(this.selectedItemIndex + 1));
-					updateItemDetailsBar();
-				}
-			}
-		}
+		updateMultiSelectAfterMove(prevSelIndex);
 	}
 
 	private void menuMoveEnd (final VDirection direction) throws MorriganException {
 		if (this.mediaNode == null || this.mediaNode.size() < 1) return;
+		final int prevSelIndex = this.selectedItemIndex;
 		switch (direction) {
 			case UP:
 				setSelectedItem(0);
@@ -340,8 +322,7 @@ public class DbFace extends DefaultFace {
 				break;
 			default:
 		}
-
-		// TODO multiselect!
+		updateMultiSelectAfterMove(prevSelIndex);
 	}
 
 	private void centreSelection () {
@@ -458,19 +439,38 @@ public class DbFace extends DefaultFace {
 		updateItemDetailsBar();
 	}
 
-	private void selectItem(final AbstractItem item) throws MorriganException {
+	private void selectItem(final AbstractItem item, final boolean updateDetailsBar) throws MorriganException {
 		if (item == null) return;
 		if (!(item instanceof IMediaItem)) return;
 		if (!this.selectedItems.contains(item)) this.selectedItems.add((IMediaItem) item);
-		updateItemDetailsBar();
+		if (updateDetailsBar) updateItemDetailsBar();
 	}
 
 	private void startStopMultiSelect() throws MorriganException {
 		this.multiSelectActive = ! this.multiSelectActive;
 		if (this.multiSelectActive) {
-			selectItem(getSelectedItem());
+			selectItem(getSelectedItem(), true);
 			this.multiSelectStartIndex = this.selectedItemIndex;
 		}
+	}
+
+	private void updateMultiSelectAfterMove(final int prevSelIndex) throws MorriganException {
+		if (!this.multiSelectActive) return;
+		for (int i = Math.min(prevSelIndex, this.selectedItemIndex);
+				i <= Math.max(prevSelIndex, this.selectedItemIndex);
+				i += 1) {
+			if (between(i, this.multiSelectStartIndex, this.selectedItemIndex)) {
+				selectItem(this.mediaNode.get(i), false);
+			}
+			else {
+				this.selectedItems.remove(this.mediaNode.get(i));
+			}
+		}
+		updateItemDetailsBar();
+	}
+
+	private static boolean between(int i, int boundA, int boundB) {
+		return i >= Math.min(boundA, boundB) && i <= Math.max(boundA, boundB);
 	}
 
 	private void askAllSelection (final WindowBasedTextGUI gui) throws MorriganException {
