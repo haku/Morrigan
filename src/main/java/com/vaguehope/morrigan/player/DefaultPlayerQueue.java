@@ -17,7 +17,7 @@ public class DefaultPlayerQueue implements PlayerQueue {
 
 	private final AtomicLong version = new AtomicLong(0L);
 	private final AtomicInteger queueId = new AtomicInteger(0);
-	private final List<PlayItem> queue = new CopyOnWriteArrayList<PlayItem>();
+	private final List<PlayItem> queue = new CopyOnWriteArrayList<>();
 	private final Set<Runnable> queueChangeListeners = Collections.synchronizedSet(new HashSet<Runnable>());
 
 	public DefaultPlayerQueue () {}
@@ -126,7 +126,7 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	public void moveInQueueEnd (final List<PlayItem> items, final boolean toBottom) {
 		// TODO This could probably be done better.
 		synchronized (this.queue) {
-			final List<PlayItem> ret = new ArrayList<PlayItem>(this.queue.size());
+			final List<PlayItem> ret = new ArrayList<>(this.queue.size());
 			if (!toBottom) ret.addAll(items);
 			for (final PlayItem item : this.queue) {
 				if (!items.contains(item)) ret.add(item);
@@ -215,7 +215,7 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	@Override
 	public PlayItem getQueueItemById (final int itemId) {
 		// TODO Is there a better way to do this?
-		final Map<Integer, PlayItem> q = new HashMap<Integer, PlayItem>();
+		final Map<Integer, PlayItem> q = new HashMap<>();
 		synchronized (this.queue) {
 			for (final PlayItem item : this.queue) {
 				q.put(Integer.valueOf(item.getId()), item);

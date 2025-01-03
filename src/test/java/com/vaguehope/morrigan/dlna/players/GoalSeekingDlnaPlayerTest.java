@@ -233,6 +233,7 @@ public class GoalSeekingDlnaPlayerTest {
 		return new PlayItem(this.testDb, track);
 	}
 
+	@SuppressWarnings("unused")
 	private void makeTransportService () throws Exception {
 		final InetAddress addr = InetAddress.getLocalHost();
 

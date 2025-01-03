@@ -22,7 +22,7 @@ public class MnCommandFactory implements ShellFactory {
 		this.mnContext = mnContext;
 		this.es = new ThreadPoolExecutor(0, MAX_CLIENTS,
 				1L, TimeUnit.MINUTES,
-				new SynchronousQueue<Runnable>(),
+				new SynchronousQueue<>(),
 				new DaemonThreadFactory("sshui"));
 		this.es.allowCoreThreadTimeOut(true);
 	}

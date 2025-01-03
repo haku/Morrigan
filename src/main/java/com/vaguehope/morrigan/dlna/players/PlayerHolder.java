@@ -133,7 +133,7 @@ public class PlayerHolder {
 		this.playerRegister.register(player);
 
 		Set<AbstractDlnaPlayer> playersFor = this.players.get(udn);
-		if (playersFor == null) this.players.putIfAbsent(udn, new HashSet<AbstractDlnaPlayer>());
+		if (playersFor == null) this.players.putIfAbsent(udn, new HashSet<>());
 		playersFor = this.players.get(udn);
 		if (playersFor == null) throw new IllegalStateException();
 		playersFor.add(player);

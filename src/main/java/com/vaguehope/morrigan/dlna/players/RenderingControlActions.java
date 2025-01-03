@@ -33,7 +33,7 @@ public class RenderingControlActions extends AbstractActions {
 		this.volumeMaxValue = readVolumeMaxValue(removeService);
 	}
 
-	private Integer readVolumeMaxValue (final RemoteService removeService) {
+	private static Integer readVolumeMaxValue (final RemoteService removeService) {
 		final StateVariable<RemoteService> var = removeService.getStateVariable("Volume");
 		if (var == null) return null;
 
@@ -51,12 +51,12 @@ public class RenderingControlActions extends AbstractActions {
 	}
 
 	public int getVolume () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
-		final AtomicReference<Integer> ref = new AtomicReference<Integer>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
+		final AtomicReference<Integer> ref = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new GetVolume(this.removeService) {
 
 			@Override
-			public void received (final ActionInvocation invocation, final int volume) {
+			public void received (final ActionInvocation<?> invocation, final int volume) {
 				ref.set(volume);
 			}
 
@@ -71,7 +71,7 @@ public class RenderingControlActions extends AbstractActions {
 	}
 
 	public void setVolume (final int newVolume) throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new SetVolume(this.removeService, newVolume) {
 			@Override
 			public void failure (final ActionInvocation invocation, final UpnpResponse response, final String defaultMsg) {

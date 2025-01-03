@@ -17,7 +17,7 @@ public class Cache<K, V> {
 	}
 
 	public void put (final K key, final V value) {
-		this.cache.put(key, new Wrapper<V>(value));
+		this.cache.put(key, new Wrapper<>(value));
 	}
 
 	public V getFresh (final K key, final int maxAge, final TimeUnit ageUnits) {

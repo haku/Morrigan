@@ -12,7 +12,7 @@ public class LimitedRecentSetTest {
 
 	@Before
 	public void before () throws Exception {
-		this.undertest = new LimitedRecentSet<String>(3);
+		this.undertest = new LimitedRecentSet<>(3);
 	}
 
 	@Test

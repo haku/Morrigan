@@ -65,6 +65,7 @@ public class MlistsServletTest {
 		this.mediaFactory.addLocalMixedMediaDb(this.testDb);
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void itServesRootList () throws Exception {
 		this.req.setRequestURI("/mlists");
@@ -81,6 +82,7 @@ public class MlistsServletTest {
 		assertEquals("[]", this.resp.getOutputAsString());
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void itServesSavedViewsFile () throws Exception {
 		this.req.setRequestURI("/mlists/savedviews");

@@ -68,18 +68,18 @@ public class CoverArtHelper {
 
 	public static File findCoverArt (final Collection<? extends IMediaItem> possiblePics) {
 		if (possiblePics instanceof List) return findCoverArt((List<? extends IMediaItem>) possiblePics);
-		return findCoverArt(new ArrayList<IMediaItem>(possiblePics));
+		return findCoverArt(new ArrayList<>(possiblePics));
 	}
 
 	public static File findCoverArt (final List<? extends IMediaItem> possiblePics) {
 		if (possiblePics == null || possiblePics.size() < 1) return null;
 
-		final List<String> paths = new ArrayList<String>(possiblePics.size());
+		final List<String> paths = new ArrayList<>(possiblePics.size());
 		for (final IMediaItem possiblePic : possiblePics) {
 			paths.add(possiblePic.getFilepath());
 		}
 
-		final List<String> lcaseBaseNames = new ArrayList<String>(possiblePics.size());
+		final List<String> lcaseBaseNames = new ArrayList<>(possiblePics.size());
 		for (final String path : paths) {
 			lcaseBaseNames.add(fileBaseName(new File(path).getName()).toLowerCase(Locale.UK));
 		}

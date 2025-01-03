@@ -22,7 +22,7 @@ public enum PlayItemType {
 
 	private static final Map<String, PlayItemType> NAME_TO;
 	static {
-		final Map<String, PlayItemType> m = new HashMap<String, PlayItemType>(values().length);
+		final Map<String, PlayItemType> m = new HashMap<>(values().length);
 		for (final PlayItemType t : values()) {
 			m.put(t.name().toUpperCase(Locale.ENGLISH), t);
 		}

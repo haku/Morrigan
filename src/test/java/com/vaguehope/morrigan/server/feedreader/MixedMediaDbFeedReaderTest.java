@@ -32,6 +32,7 @@ public class MixedMediaDbFeedReaderTest {
 		this.eventListener = new AsyncTaskEventListener();
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void itParsesASingleItemFeed () throws Exception {
 		final File file = this.tmp.newFile("input.xml");

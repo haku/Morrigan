@@ -144,7 +144,7 @@ public class DirDialog extends DialogWindow {
 
 		@Override
 		protected ListItemRenderer<File, DirListBox> createDefaultListItemRenderer () {
-			return new ListItemRenderer<File, DirListBox>() {
+			return new ListItemRenderer<>() {
 				@Override
 				public int getHotSpotPositionOnLine (final int selectedIndex) {
 					return -1;

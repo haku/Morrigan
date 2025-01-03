@@ -68,7 +68,7 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 				} else {
 					ret = makeNewProduct(material, config);
 				}
-				this.cache.put(material, new WeakReference<T>(ret));
+				this.cache.put(material, new WeakReference<>(ret));
 			}
 			else if (!this.allowRecycle) {
 				ret = null;

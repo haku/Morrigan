@@ -98,7 +98,7 @@ public class IoHelper {
 
 	public static List<String> readAsList (final InputStream is) throws IOException {
 		try {
-			final List<String> ret = new ArrayList<String>();
+			final List<String> ret = new ArrayList<>();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
 			String line;
 			while ((line = reader.readLine()) != null) {

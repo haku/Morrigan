@@ -45,7 +45,7 @@ public final class RemoteMixedMediaDbHelper {
 	}
 
 	public static List<MediaListReference> getAllRemoteMmdb (final Config config) {
-		final ArrayList<MediaListReference> ret = new ArrayList<MediaListReference>();
+		final ArrayList<MediaListReference> ret = new ArrayList<>();
 
 		final File dir = config.getMmdbDir();
 		final File [] files = dir.listFiles();

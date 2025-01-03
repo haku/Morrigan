@@ -17,7 +17,7 @@ public class MediaTagImplTest {
 		testIsNewer(null, null);
 	}
 
-	private void testIsNewer(final Long aMod, final Long bMod) {
+	private static void testIsNewer(final Long aMod, final Long bMod) {
 		final MediaTagImpl a = new MediaTagImpl(0, null, null, null, aMod != null ? new Date(aMod) : null, false);
 		final MediaTagImpl b = new MediaTagImpl(0, null, null, null, bMod != null ? new Date(bMod) : null, false);
 

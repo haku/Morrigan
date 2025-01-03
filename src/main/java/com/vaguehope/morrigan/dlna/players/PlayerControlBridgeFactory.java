@@ -66,7 +66,7 @@ public class PlayerControlBridgeFactory {
 				new LastChange(new AVTransportLastChangeParser()),
 				player,
 				dlnaPlayingParamsFactory);
-		avtSrv.setManager(new LastChangeAwareServiceManager<PlayerControlBridgeAVTransportService>(avtSrv, new AVTransportLastChangeParser()) {
+		avtSrv.setManager(new LastChangeAwareServiceManager<>(avtSrv, new AVTransportLastChangeParser()) {
 			@Override
 			protected PlayerControlBridgeAVTransportService createServiceInstance () throws Exception {
 				return avTransportService;

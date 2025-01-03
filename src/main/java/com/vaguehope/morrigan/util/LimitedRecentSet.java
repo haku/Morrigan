@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class LimitedRecentSet<T> implements Iterable<T> {
 
-	private final Deque<T> data = new LinkedList<T>();
-	private final Map<T, AtomicInteger> frequencies = new HashMap<T, AtomicInteger>();
+	private final Deque<T> data = new LinkedList<>();
+	private final Map<T, AtomicInteger> frequencies = new HashMap<>();
 	private final int limit;
 
 	public LimitedRecentSet (final int limit) {
@@ -49,7 +49,7 @@ public class LimitedRecentSet<T> implements Iterable<T> {
 	}
 
 	public synchronized List<T> all () {
-		return new ArrayList<T>(this.data);
+		return new ArrayList<>(this.data);
 	}
 
 	@Override

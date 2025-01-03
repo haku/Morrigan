@@ -103,9 +103,9 @@ public class MultitaskEventListener implements TaskEventListener {
 		}
 
 		@Override
-		public void beginTask (final String name, final int totalWork) {
+		public void beginTask (final String name, final int newTotalWork) {
 			this.parent.subTask(name);
-			this.totalWork = totalWork;
+			this.totalWork = newTotalWork;
 		}
 
 		@Override

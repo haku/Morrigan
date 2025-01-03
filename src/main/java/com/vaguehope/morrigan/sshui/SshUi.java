@@ -65,7 +65,7 @@ public class SshUi {
 
 		this.unreliableEs = new ThreadPoolExecutor(0, 1,
 				1L, TimeUnit.MINUTES,
-				new LinkedBlockingQueue<Runnable>(1),
+				new LinkedBlockingQueue<>(1),
 				new DaemonThreadFactory("sshbg"),
 				new ThreadPoolExecutor.DiscardOldestPolicy());
 

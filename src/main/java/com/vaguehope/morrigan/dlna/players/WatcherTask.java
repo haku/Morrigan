@@ -47,7 +47,7 @@ final class WatcherTask implements Runnable {
 	private final Runnable onStartOfTrack;
 	private final Runnable onEndOfTrack;
 
-	private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<ScheduledFuture<?>>();
+	private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>();
 	private volatile long restorePositionAfterPlaybackStarts;
 
 	private final AtomicBoolean trackStarted = new AtomicBoolean(false);

@@ -383,6 +383,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@SuppressWarnings("resource")
 	private void printPlayersList (final HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
@@ -400,6 +401,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
+	@SuppressWarnings("resource")
 	private void printPlayer (final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "player");
@@ -409,6 +411,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "player");
 	}
 
+	@SuppressWarnings("resource")
 	private static void printPlayerQueue (final HttpServletResponse resp, final Player player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "queue");

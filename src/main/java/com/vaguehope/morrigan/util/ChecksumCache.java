@@ -9,7 +9,7 @@ public class ChecksumCache {
 
 	private static final LruCache<String, BigInteger> CACHE = new LruCache<>(10000);
 
-	private static final ThreadLocal<ByteBuffer> BUFFER_FACTRY = new ThreadLocal<ByteBuffer>(){
+	private static final ThreadLocal<ByteBuffer> BUFFER_FACTRY = new ThreadLocal<>(){
 		@Override
 		protected ByteBuffer initialValue () {
 			final ByteBuffer b = ChecksumHelper.createByteBuffer();

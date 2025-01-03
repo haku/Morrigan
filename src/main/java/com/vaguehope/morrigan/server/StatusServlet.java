@@ -70,6 +70,7 @@ public class StatusServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@SuppressWarnings("resource")
 	private void printTaskStatusList (final HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
@@ -83,14 +84,15 @@ public class StatusServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
-	private void printTask (final HttpServletResponse resp, final AsyncTask task) throws SAXException, IOException {
+	@SuppressWarnings("resource")
+	private static void printTask (final HttpServletResponse resp, final AsyncTask task) throws SAXException, IOException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "task");
 		printTask(dw, task);
 		FeedHelper.endDocument(dw, "task");
 	}
 
-	private void printTask (final DataWriter dw, final AsyncTask t) throws SAXException {
+	private static void printTask (final DataWriter dw, final AsyncTask t) throws SAXException {
 		FeedHelper.addElement(dw, "id", t.id());
 		FeedHelper.addElement(dw, "title", t.title());
 		FeedHelper.addElement(dw, "state", t.state().toString());

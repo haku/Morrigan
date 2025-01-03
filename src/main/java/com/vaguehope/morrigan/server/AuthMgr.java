@@ -22,8 +22,8 @@ public class AuthMgr {
 	private final File sessionDir;
 
 	private final Map<String, Long> cache = Collections.synchronizedMap(new LruCache<String, Long>(100));
-	private final ConcurrentMap<String, Long> eden = new ConcurrentHashMap<String, Long>();
-	private final ConcurrentMap<String, Long> refreshed = new ConcurrentHashMap<String, Long>();
+	private final ConcurrentMap<String, Long> eden = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Long> refreshed = new ConcurrentHashMap<>();
 
 	enum TokenValidity {
 		INVALID(false), FRESH(true), REFRESH_REQUEST(true);

@@ -43,6 +43,7 @@ public class HostInfoServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private void printHostInfo (final HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "hostinfo");

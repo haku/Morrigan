@@ -1,6 +1,5 @@
 package com.vaguehope.morrigan.server.boot;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,16 +20,13 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 	private static final Logger logger = Logger.getLogger(ServerPlayerEventHandler.class.getName());
 
 	private final ServerPlayerContainer playerContainer;
-	private final ExecutorService executorService;
 
-	private final AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
+	private final AtomicReference<PlayState> prevPlayState = new AtomicReference<>();
 
 
-	public ServerPlayerEventHandler (final ServerPlayerContainer playerContainer, final ExecutorService executorService) {
+	public ServerPlayerEventHandler (final ServerPlayerContainer playerContainer) {
 		if (playerContainer == null) throw new IllegalArgumentException();
-		if (executorService == null) throw new IllegalArgumentException();
 		this.playerContainer = playerContainer;
-		this.executorService = executorService;
 	}
 
 	public synchronized void dispose() {

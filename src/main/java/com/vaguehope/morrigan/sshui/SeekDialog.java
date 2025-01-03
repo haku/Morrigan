@@ -97,7 +97,7 @@ public class SeekDialog extends DialogWindow {
 
 		@Override
 		protected ListItemRenderer<SeekHop, HopListBox> createDefaultListItemRenderer () {
-			return new ListItemRenderer<SeekHop, HopListBox>() {
+			return new ListItemRenderer<>() {
 				@Override
 				public int getHotSpotPositionOnLine (final int selectedIndex) {
 					return -1;

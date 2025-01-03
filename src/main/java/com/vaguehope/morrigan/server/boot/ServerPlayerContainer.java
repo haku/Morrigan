@@ -1,7 +1,5 @@
 package com.vaguehope.morrigan.server.boot;
 
-import java.util.concurrent.ExecutorService;
-
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.Player;
@@ -9,16 +7,13 @@ import com.vaguehope.morrigan.player.PlayerContainer;
 
 public class ServerPlayerContainer implements PlayerContainer {
 
-	private final ExecutorService executorService;
 	private final String name;
 
 	private LocalPlayer player;
 	private ServerPlayerEventHandler localPlayerSupport;
 
-	public ServerPlayerContainer (final String name, final ExecutorService executorService) {
+	public ServerPlayerContainer (final String name) {
 		this.name = name;
-		if (executorService == null) throw new IllegalArgumentException();
-		this.executorService = executorService;
 	}
 
 	public void dispose () {
@@ -40,7 +35,7 @@ public class ServerPlayerContainer implements PlayerContainer {
 	@Override
 	public LocalPlayerSupport getLocalPlayerSupport () {
 		if (this.localPlayerSupport == null) {
-			this.localPlayerSupport = new ServerPlayerEventHandler(this, this.executorService);
+			this.localPlayerSupport = new ServerPlayerEventHandler(this);
 		}
 		return this.localPlayerSupport;
 	}

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 public class FixtureServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1164486017828356643L;
-	private final Map<String, Fixture> getFixtures = new ConcurrentHashMap<String, Fixture>();
+	private final Map<String, Fixture> getFixtures = new ConcurrentHashMap<>();
 
 	public void addGetFixture (final URI uri, final String contentType, final String body) {
 		String path = uri.getPath();
@@ -26,6 +26,7 @@ public class FixtureServlet extends HttpServlet {
 		System.out.println("Fxiture added: " + path);
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		String url = req.getRequestURI();

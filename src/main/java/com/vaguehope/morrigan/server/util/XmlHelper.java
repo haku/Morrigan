@@ -10,7 +10,7 @@ public final class XmlHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static ThreadLocal<SimpleDateFormat> Iso8601Utc = new ThreadLocal<SimpleDateFormat>() {
+	private static ThreadLocal<SimpleDateFormat> Iso8601Utc = new ThreadLocal<>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
 			SimpleDateFormat a = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

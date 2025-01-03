@@ -3,12 +3,9 @@ package com.vaguehope.morrigan;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.args4j.CmdLineException;
@@ -142,11 +139,9 @@ public final class Main {
 	}
 
 	private static void makeLocalPlayers(final Args args, final PlayerRegister playerRegister) {
-		final ExecutorService ex = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new DaemonThreadFactory("lplayer"));
-
 		for (final ServerPlayerArgs a : args.getServerPlayers()) {
 			LOG.info("Making local player '{}' with vlc args: {}", a.getName(), a.getVlcArgs());
-			final ServerPlayerContainer pc = new ServerPlayerContainer(a.getName(), ex);
+			final ServerPlayerContainer pc = new ServerPlayerContainer(a.getName());
 			final VlcEngineFactory engineFactory = new VlcEngineFactory(args.isVerboseLog(), a.getVlcArgs());
 			pc.setPlayer(playerRegister.makeLocal(pc.getPrefix(), pc.getName(), engineFactory, pc.getLocalPlayerSupport()));
 		}

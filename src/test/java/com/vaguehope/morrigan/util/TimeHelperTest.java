@@ -27,7 +27,7 @@ public class TimeHelperTest {
 		assertEquals(null, TimeHelper.parseDuration("a:1"));
 	}
 
-	private void testParseDuration (final long expected, final String actual) {
+	private static void testParseDuration (final long expected, final String actual) {
 		assertEquals(Long.valueOf(expected), TimeHelper.parseDuration(actual));
 	}
 

@@ -97,12 +97,8 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		}
 		if (!file.exists()) throw new MorriganException("File not found: " + file.getAbsolutePath());
 
-		final InputStream is = new FileInputStream(file);
-		try {
-			feedReader.handleStream(new BufferedInputStream(is));
-		}
-		finally {
-			is.close();
+		try (final InputStream is = new BufferedInputStream(new FileInputStream(file))) {
+			feedReader.handleStream(is);
 		}
 	}
 

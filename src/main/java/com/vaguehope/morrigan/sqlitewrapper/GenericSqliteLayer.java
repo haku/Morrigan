@@ -36,6 +36,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void finalize() throws Throwable {
 		dispose();
@@ -117,6 +118,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public void commitOrRollBack () throws DbException {
 		if (this.autoCommit) throw new IllegalStateException("Can not commit auto-commit connection.");
@@ -129,6 +131,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public void rollback () throws DbException {
 		if (this.autoCommit) throw new IllegalStateException("Can not rollback auto-commit connection.");
@@ -143,6 +146,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	Initialise.
 
 	private void initDatabaseTables () throws SQLException, ClassNotFoundException {
+		@SuppressWarnings("resource")
 		Statement stmt = getDbCon().createStatement();
 		try {
 			for (SqlCreateCmd sqlCreateCmd : getTblCreateCmds()) {

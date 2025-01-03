@@ -54,7 +54,7 @@ public class RemoteDbMetadataFetcher {
 	}
 
 	private void readHttp (final XmlParser parser) throws MalformedURLException, IOException, HttpStreamHandlerException {
-		final Map<String, String> headers = new HashMap<String, String>();
+		final Map<String, String> headers = new HashMap<>();
 		Auth.addTo(headers, this.remoteUri);
 		final HttpResponse response = HttpClient.doHttpRequest(this.remoteUri.toURL(), headers, parser);
 		if (response.getCode() != 200) throw new IOException("HTTP " + response.getCode() + " fetching DB metadata.");
@@ -70,12 +70,8 @@ public class RemoteDbMetadataFetcher {
 		}
 		if (!file.exists()) throw new MorriganException("File not found: " + file.getAbsolutePath());
 
-		final InputStream is = new FileInputStream(file);
-		try {
-			parser.handleStream(new BufferedInputStream(is));
-		}
-		finally {
-			is.close();
+		try (final InputStream is = new BufferedInputStream(new FileInputStream(file))) {
+			parser.handleStream(is);
 		}
 	}
 
@@ -90,10 +86,10 @@ public class RemoteDbMetadataFetcher {
 
 	private final class XmlParser implements HttpStreamHandler {
 
-		private Document doc;
+		private Document document;
 
 		public Document getDoc () {
-			return this.doc;
+			return this.document;
 		}
 
 		@Override
@@ -101,7 +97,7 @@ public class RemoteDbMetadataFetcher {
 			try {
 				final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 				final DocumentBuilder builder = factory.newDocumentBuilder();
-				this.doc = builder.parse(new InputSource(is));
+				this.document = builder.parse(new InputSource(is));
 			}
 			catch (final ParserConfigurationException e) {
 				throw new IllegalStateException(e);

@@ -38,7 +38,7 @@ public final class UpnpHelper {
 		return String.format("%s/%s", rs.getDevice().getIdentity().getUdn(), rs.getServiceId().getId());
 	}
 
-	public static ThreadLocal<SimpleDateFormat> DC_DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+	public static ThreadLocal<SimpleDateFormat> DC_DATE_FORMAT = new ThreadLocal<>() {
 		@Override
 		protected SimpleDateFormat initialValue () {
 			final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");

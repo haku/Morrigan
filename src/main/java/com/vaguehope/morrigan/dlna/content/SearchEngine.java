@@ -132,7 +132,7 @@ public class SearchEngine {
 			}
 		}
 
-		private void relExpDerivedfrom (final String propertyName, final String value) {
+		private static void relExpDerivedfrom (final String propertyName, final String value) {
 			/*
 			 * TODO
 			 * value may be:

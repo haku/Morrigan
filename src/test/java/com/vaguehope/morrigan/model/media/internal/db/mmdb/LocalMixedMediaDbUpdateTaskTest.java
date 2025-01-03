@@ -184,7 +184,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		final File mediaDir2 = mockDir(sourceDir, "media2");
 		final File d2 = mockDir(mediaDir2, "album");
 		final File f2 = mockFileInDir(d2, "foo.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
-		final File a2 = mockFileInDir(d2, ".album", new Md5AndSha1(BigInteger.valueOf(1), BigInteger.valueOf(11)));
+		mockFileInDir(d2, ".album", new Md5AndSha1(BigInteger.valueOf(1), BigInteger.valueOf(11)));
 		runUpdateTask();
 		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
 		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
@@ -216,7 +216,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		assertEquals(1, rmCount);
 
 		when(f1.exists()).thenReturn(false);
-		final File f2 = mockFileInDir(sourceDir, "bar.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
+		mockFileInDir(sourceDir, "bar.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
 		runUpdateTask();
 		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
 	}

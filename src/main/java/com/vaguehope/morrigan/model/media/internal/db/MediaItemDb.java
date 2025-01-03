@@ -87,6 +87,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void finalize () throws Throwable {
 		dispose();

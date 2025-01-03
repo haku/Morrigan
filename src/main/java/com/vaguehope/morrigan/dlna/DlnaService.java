@@ -203,7 +203,7 @@ public class DlnaService {
 		@Override
 		protected ExecutorService createDefaultExecutorService() {
 			return new ThreadPoolExecutor(0, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS,
-					new SynchronousQueue<Runnable>(), new DaemonThreadFactory("upnp"));
+					new SynchronousQueue<>(), new DaemonThreadFactory("upnp"));
 		}
 
 	}

@@ -7,11 +7,11 @@ public class Timestamped<T> {
 	private static final long AGE_OF_OLD_NANOS = TimeUnit.HOURS.toNanos(1);
 
 	public static <T> Timestamped<T> of(final T v) {
-		return new Timestamped<T>(System.nanoTime(), v);
+		return new Timestamped<>(System.nanoTime(), v);
 	}
 
 	public static <T> Timestamped<T> old(final T v) {
-		return new Timestamped<T>(System.nanoTime() - AGE_OF_OLD_NANOS, v);
+		return new Timestamped<>(System.nanoTime() - AGE_OF_OLD_NANOS, v);
 	}
 
 	private final long nanos;

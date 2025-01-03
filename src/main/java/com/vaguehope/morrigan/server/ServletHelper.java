@@ -21,6 +21,7 @@ public final class ServletHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@SuppressWarnings("resource")
 	public static void error (final HttpServletResponse resp, final int status, final String msg) throws IOException {
 		resp.reset();
 		resp.setStatus(status);

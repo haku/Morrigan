@@ -48,7 +48,7 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public void play () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new Play(this.removeService) {
 			@Override
 			public void failure (final ActionInvocation invocation, final UpnpResponse response, final String defaultMsg) {
@@ -60,7 +60,7 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public void pause () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new Pause(this.removeService) {
 			@Override
 			public void failure (final ActionInvocation invocation, final UpnpResponse response, final String defaultMsg) {
@@ -82,7 +82,7 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public void stop () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new Stop(this.removeService) {
 			@Override
 			public void failure (final ActionInvocation invocation, final UpnpResponse response, final String defaultMsg) {
@@ -94,11 +94,11 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public TransportInfo getTransportInfo () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
-		final AtomicReference<TransportInfo> ref = new AtomicReference<TransportInfo>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
+		final AtomicReference<TransportInfo> ref = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new GetTransportInfo(this.removeService) {
 			@Override
-			public void received (final ActionInvocation invocation, final TransportInfo transportInfo) {
+			public void received (final ActionInvocation<?> invocation, final TransportInfo transportInfo) {
 				ref.set(transportInfo);
 			}
 
@@ -113,11 +113,11 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public PositionInfo getPositionInfo () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
-		final AtomicReference<PositionInfo> ref = new AtomicReference<PositionInfo>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
+		final AtomicReference<PositionInfo> ref = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new GetPositionInfo(this.removeService) {
 			@Override
-			public void received (final ActionInvocation invocation, final PositionInfo positionInfo) {
+			public void received (final ActionInvocation<?> invocation, final PositionInfo positionInfo) {
 				ref.set(positionInfo);
 			}
 
@@ -132,11 +132,11 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public MediaInfo getMediaInfo () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
-		final AtomicReference<MediaInfo> ref = new AtomicReference<MediaInfo>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
+		final AtomicReference<MediaInfo> ref = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new GetMediaInfo(this.removeService) {
 			@Override
-			public void received (final ActionInvocation invocation, final MediaInfo mi) {
+			public void received (final ActionInvocation<?> invocation, final MediaInfo mi) {
 				ref.set(mi);
 			}
 
@@ -151,11 +151,11 @@ public class AvTransportActions extends AbstractActions {
 	}
 
 	public TransportAction[] getTransportActions () throws DlnaException {
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
-		final AtomicReference<TransportAction[]> ref = new AtomicReference<TransportAction[]>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
+		final AtomicReference<TransportAction[]> ref = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new GetCurrentTransportActions(this.removeService) {
 			@Override
-			public void received (final ActionInvocation invocation, final TransportAction[] actions) {
+			public void received (final ActionInvocation<?> invocation, final TransportAction[] actions) {
 				ref.set(actions);
 			}
 
@@ -171,7 +171,7 @@ public class AvTransportActions extends AbstractActions {
 
 	public void seek (final long seconds) throws DlnaException {
 		final String time = ModelUtil.toTimeString(seconds);
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
+		final AtomicReference<Failure> err = new AtomicReference<>();
 		final Future<?> f = this.controlPoint.execute(new Seek(this.removeService, time) {
 			@Override
 			public void failure (final ActionInvocation invocation, final UpnpResponse response, final String defaultMsg) {

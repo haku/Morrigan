@@ -214,7 +214,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void logAndWrap (final Exception e, final HttpServletResponse resp) throws ServletException {
+	private static void logAndWrap (final Exception e, final HttpServletResponse resp) throws ServletException {
 		if (resp.isCommitted()) {
 			LOG.e("Error while writing committed response.", e);
 		}
@@ -310,6 +310,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
@@ -366,6 +367,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb, final IMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
@@ -450,6 +452,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private void postToMmdbAlbum (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMediaItemList mmdb, final MediaAlbum album) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
@@ -496,6 +499,7 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@SuppressWarnings("resource")
 	private void printMlistList (final HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
@@ -525,6 +529,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
+	@SuppressWarnings("resource")
 	private void printSavedViews (final HttpServletResponse resp) throws IOException {
 		final File file = this.config.getSavedViewsFile();
 		if (!file.exists()) {
@@ -535,6 +540,7 @@ public class MlistsServlet extends HttpServlet {
 		ServletHelper.returnFile(file, CONTENT_TYPE_JSON, null, null, resp);
 	}
 
+	@SuppressWarnings("resource")
 	private void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMediaItemList mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.NO, IncludeTags.NO);
@@ -762,6 +768,7 @@ public class MlistsServlet extends HttpServlet {
 		printMlistLong(resp, ml, includeSrcs, includeItems, includeTags, null, 0, null, null, false, null);
 	}
 
+	@SuppressWarnings("resource")
 	private void printMlistLong (final HttpServletResponse resp, final IMediaItemList ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags,
 			final String queryString, final int maxQueryResults,
@@ -929,6 +936,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private static void printAlbums (final HttpServletResponse resp, final IMediaItemList ml) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
@@ -941,6 +949,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "albums");
 	}
 
+	@SuppressWarnings("resource")
 	private static void printAlbum (final HttpServletResponse resp, final IMediaItemList ml, final MediaAlbum album) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");

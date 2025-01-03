@@ -123,6 +123,7 @@ public class MorriganServer {
 		this.context.addServlet(new ServletHolder(new DlnaCtlServlet(dlnaSvs)), DlnaCtlServlet.CONTEXTPATH + "/*");
 	}
 
+	@SuppressWarnings("resource")
 	private static ServletContextHandler getWuiContext(final File overrideWebRoot) {
 		final Resource rootRes;
 		if (overrideWebRoot != null) {

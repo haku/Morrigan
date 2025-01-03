@@ -1,9 +1,9 @@
 package com.vaguehope.morrigan.server.feedreader;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
-
-import org.eclipse.jetty.util.B64Code;
 
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.httpclient.Http;
@@ -35,7 +35,9 @@ public class Auth {
 	}
 
 	private static void addAuthHeader (final Map<String, String> headers, final String user, final String pass) {
-		headers.put(Http.HEADER_AUTHORISATION, Http.HEADER_AUTHORISATION_PREFIX + B64Code.encode(user + ":" + pass));
+		final String auth = user + ":" + pass;
+		final String enc = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+		headers.put(Http.HEADER_AUTHORISATION, Http.HEADER_AUTHORISATION_PREFIX + enc);
 	}
 
 }

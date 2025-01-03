@@ -68,8 +68,8 @@ public class ContentDirectoryService extends AbstractContentDirectoryService {
 			final List<Container> containers;
 			final List<Item> items;
 			synchronized (contentContainer) {
-				containers = new ArrayList<Container>(contentContainer.getContainers());
-				items = new ArrayList<Item>(contentContainer.getItems());
+				containers = new ArrayList<>(contentContainer.getContainers());
+				items = new ArrayList<>(contentContainer.getItems());
 			}
 			return toRangedResult(containers, items, firstResult, maxResults);
 		}

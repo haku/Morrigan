@@ -58,7 +58,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	private class SelfBackground extends AbstractComponent<SelfBackground> {
 
 		private final Screen scr;
-		private final ComponentRenderer<SelfBackground> renderer = new ComponentRenderer<SelfBackground>() {
+		private final ComponentRenderer<SelfBackground> renderer = new ComponentRenderer<>() {
 			@Override
 			public TerminalSize getPreferredSize (final SelfBackground component) {
 				return TerminalSize.ONE;

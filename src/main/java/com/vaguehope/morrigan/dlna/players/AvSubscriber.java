@@ -20,7 +20,7 @@ public class AvSubscriber extends SubscriptionCallback {
 	private final AbstractDlnaPlayer dlnaPlayer;
 	private final AvEventListener listener;
 
-	protected AvSubscriber (final AbstractDlnaPlayer dlnaPlayer, final AvEventListener listener, final Service service, final int requestedDurationSeconds) {
+	protected AvSubscriber (final AbstractDlnaPlayer dlnaPlayer, final AvEventListener listener, final Service<?, ?> service, final int requestedDurationSeconds) {
 		super(service, requestedDurationSeconds);
 		this.dlnaPlayer = dlnaPlayer;
 		this.listener = listener;
@@ -88,7 +88,7 @@ public class AvSubscriber extends SubscriptionCallback {
 		}
 	}
 
-	private String fixLastChange (final String raw) {
+	private static String fixLastChange (final String raw) {
 		return raw.replace(
 				"xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT_RCS\"",
 				"xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\""); // AVTransportLastChangeParser.NAMESPACE_URI

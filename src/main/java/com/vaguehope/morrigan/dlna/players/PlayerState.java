@@ -29,7 +29,7 @@ public class PlayerState {
 		this.currentItem = currentItem;
 		this.position = position;
 		this.isPlaying = isPlaying;
-		this.queueItems = new ArrayList<PlayItem>(queue.getQueueList());
+		this.queueItems = new ArrayList<>(queue.getQueueList());
 	}
 
 	public PlaybackOrder getPlaybackOrder () {
