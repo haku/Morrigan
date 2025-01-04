@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
@@ -12,6 +14,10 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortBy;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralMediaList;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.db.IDbColumn;
@@ -21,6 +27,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
@@ -123,8 +130,54 @@ public class RpcMediaList extends EphemeralMediaList {
 			final IDbColumn[] sortColumns,
 			final SortDirection[] sortDirections,
 			final boolean includeDisabled) throws DbException {
-		// TODO Auto-generated method stub
-		return null;
+		if (sortColumns == null ^ sortDirections == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
+		if (sortColumns != null && sortDirections != null && sortColumns.length != sortDirections.length) throw new IllegalArgumentException("Sorts and directions must be same length.");
+
+		String modTerm = "(type=audio OR type=video)";
+		if (StringUtils.isNotBlank(term)) modTerm += String.format(" AND ( %s )", term);
+
+		final SearchRequest.Builder req = SearchRequest.newBuilder()
+				.setQuery(modTerm)
+				.setMaxResults(maxResults);
+
+		if (sortColumns != null) {
+			for (int i = 0; i < sortColumns.length; i++) {
+				final IDbColumn col = sortColumns[i];
+				final MediaToadProto.SortDirection dir = direction(sortDirections[i]);
+
+				if (IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE.getName().equals(col.getName())) {
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.FILE_PATH).setDirection(dir).build());
+				}
+				else if (IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DADDED.getName().equals(col.getName())) {
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.DATE_ADDED).setDirection(dir).build());
+				}
+				else if (IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DURATION.getName().equals(col.getName())) {
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.DURATION).setDirection(dir).build());
+				}
+				else {
+					throw new DbException("Unsupported sort column: " + col.getName());
+				}
+			}
+		}
+
+		final SearchReply resp = blockingStub().search(req.build());
+
+		final List<IMediaItem> items = new ArrayList<>(resp.getResultList().size());
+		for (final MediaItem i : resp.getResultList()) {
+			items.add(makeItem(i));
+		}
+		return items;
+	}
+
+	private static MediaToadProto.SortDirection direction(final SortDirection dir) {
+		switch (dir) {
+		case ASC:
+			return MediaToadProto.SortDirection.ASC;
+		case DESC:
+			return MediaToadProto.SortDirection.DESC;
+		default:
+			throw new IllegalArgumentException();
+		}
 	}
 
 	private static FileExistance convertExistance(final com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance existance) {

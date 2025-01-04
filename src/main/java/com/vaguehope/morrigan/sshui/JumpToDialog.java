@@ -486,6 +486,9 @@ public class JumpToDialog extends DialogWindow {
 				public int getHotSpotPositionOnLine(final int selectedIndex) {
 					return -1;
 				}
+				public String getLabel(final MediaItemListBox listBox, final int index, final IMediaItem item) {
+					return item != null ? item.getTitle() : "<null>";
+				}
 				@Override
 				public void drawItem(final TextGUIGraphics graphics, final MediaItemListBox listBox, final int index, final IMediaItem item, final boolean selected, final boolean focused) {
 					super.drawItem(graphics, listBox, index, item, selected, true);

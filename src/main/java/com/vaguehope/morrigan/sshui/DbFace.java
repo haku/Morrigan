@@ -37,6 +37,7 @@ import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.tasks.MorriganTask;
+import com.vaguehope.morrigan.util.ExceptionHelper;
 
 public class DbFace extends DefaultFace {
 
@@ -79,6 +80,7 @@ public class DbFace extends DefaultFace {
 	private final Set<IMediaItem> selectedItems = new HashSet<>();
 
 	private MediaNode mediaNode;
+	private String lastRefreshError = null;
 	private int selectedItemIndex = -1;
 	private int scrollTop = 0;
 	private int pageSize = 1;
@@ -160,26 +162,33 @@ public class DbFace extends DefaultFace {
 	private void refreshData (final boolean force) throws MorriganException {
 		if (this.list == null) return;
 
-		if (this.list.hasNodes()) {
-			// TODO nicer error handling when RPC fails!
-			if (this.mediaNode == null || force) {
-				if (this.nodeId == null) {
-					this.mediaNode = this.list.getRootNode();
+		try {
+			if (this.list.hasNodes()) {
+				// TODO nicer error handling when RPC fails!
+				if (this.mediaNode == null || force) {
+					if (this.nodeId == null) {
+						this.mediaNode = this.list.getRootNode();
+					}
+					else {
+						this.mediaNode = this.list.getNode(this.nodeId);
+					}
 				}
-				else {
-					this.mediaNode = this.list.getNode(this.nodeId);
-				}
+				return;
 			}
-			return;
-		}
 
-		if (force) {
-			this.list.forceRead();
+			if (force) {
+				this.list.forceRead();
+			}
+			else {
+				this.list.read();
+			}
+			this.mediaNode = new MediaNode(null, null, null, Collections.emptyList(), this.list.getMediaItems());
+			this.lastRefreshError = null;
 		}
-		else {
-			this.list.read();
+		catch (final Exception e) {
+			this.lastRefreshError = "Load failed, press 'r' to retry: " + ExceptionHelper.causeTrace(e);
+			if (this.mediaNode == null) this.mediaNode = new MediaNode(null, null, null, Collections.emptyList(), Collections.emptyList());
 		}
-		this.mediaNode = new MediaNode(null, null, null, Collections.emptyList(), this.list.getMediaItems());
 	}
 
 	private void updateItemDetailsBar () {
@@ -551,7 +560,10 @@ public class DbFace extends DefaultFace {
 		int l = top;
 
 		String summary = String.format("DB %s", this.list.getListName());
-		if (this.list instanceof IMediaItemDb) {
+		if (this.lastRefreshError != null) {
+			summary += ": " + this.lastRefreshError;
+		}
+		else if (this.list instanceof IMediaItemDb) {
 			final IMediaItemDb db = (IMediaItemDb) this.list;
 			summary += ": " + PrintingThingsHelper.dbSummary(db);
 			summary += "   " + PrintingThingsHelper.sortSummary(db);
