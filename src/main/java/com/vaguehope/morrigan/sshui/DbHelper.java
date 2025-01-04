@@ -81,9 +81,8 @@ public class DbHelper {
 	}
 
 	private void openFilter (final IMediaItemList db, final String searchTerm) throws MorriganException, DbException {
-		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState,
-				this.mnContext.getMediaFactory().getMediaListView(db, searchTerm), null,
-				this.defaultPlayer));
+		final IMediaItemList view = db.makeView(searchTerm);
+		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState, view, null, this.defaultPlayer));
 	}
 
 	private Player getPlayer (final WindowBasedTextGUI gui, final String title) {

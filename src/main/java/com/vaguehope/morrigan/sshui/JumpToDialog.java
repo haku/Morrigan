@@ -108,12 +108,14 @@ public class JumpToDialog extends DialogWindow {
 			}
 		}));
 		btnPanel.addComponent(new EmptySpace(new TerminalSize(WIDTH - 58, 1))); // FIXME magic numbers.
-		btnPanel.addComponent(new Button("Open View", new Runnable() {
-			@Override
-			public void run () {
-				acceptOpenResult();
-			}
-		}));
+		if (this.db.canMakeView()) {
+			btnPanel.addComponent(new Button("Open View", new Runnable() {
+				@Override
+				public void run () {
+					acceptOpenResult();
+				}
+			}));
+		}
 		btnPanel.addComponent(new Button("Close", new Runnable() {
 			@Override
 			public void run () {

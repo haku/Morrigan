@@ -117,25 +117,19 @@ public class MediaFactoryImpl implements MediaFactory {
 			return RemoteMixedMediaDbFactory.getExisting(f, filter);
 		}
 		else if (type.equals(MediaListType.EXTMMDB.toString())) {
-			return getExternalList(name);
+			return getExternalList(name, filter);
 		}
 		throw new IllegalArgumentException("Invalid MID: " + mid);
 	}
 
 	@Override
-	public IMediaItemList getMediaListByRef(MediaListReference ref) throws DbException, MorriganException {
+	public IMediaItemList getMediaListByRef(final MediaListReference ref) throws DbException, MorriganException {
 		return getMediaListByMid(ref.getMid(), null);
 	}
 
 	@Override
-	public IMediaItemList getMediaListByRef(MediaListReference ref, String filter) throws DbException, MorriganException {
+	public IMediaItemList getMediaListByRef(final MediaListReference ref, final String filter) throws DbException, MorriganException {
 		return getMediaListByMid(ref.getMid(), filter);
-	}
-
-	@Override
-	public IMediaItemList getMediaListView(IMediaItemList list, String filter) throws DbException, MorriganException {
-		final MediaListReference ref = new MediaListReferenceImpl(list.getType(), list.getListId(), list.getListName());
-		return getMediaListByRef(ref, filter);
 	}
 
 	/**
@@ -192,30 +186,43 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<String, IMediaItemList> externalLists = new ConcurrentSkipListMap<>();
+	private final Map<String, IMediaItemList> externalListsByListId = new ConcurrentSkipListMap<>();
 
 	@Override
-	public Collection<MediaListReference> getExternalList () {
+	public Collection<MediaListReference> getExternalLists () {
 		final List<MediaListReference> ret = new ArrayList<>();
-		for (IMediaItemList list : this.externalLists.values()) {
+		for (final IMediaItemList list : this.externalListsByListId.values()) {
 			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, list.getListId(), list.getListName()));
 		}
 		return ret;
 	}
 
 	@Override
-	public IMediaItemList getExternalList (final String id) {
-		return this.externalLists.get(id);
+	public IMediaItemList getExternalListBySerial(final String serial) {
+		// FIXME this is slow and brittle, eg if json serials are formatted differently.
+		for (final IMediaItemList list : this.externalListsByListId.values()) {
+			if (serial.equals(list.getSerial())) return list;
+		}
+		return null;
+	}
+
+	@Override
+	public IMediaItemList getExternalList (final String id, final String filter) throws MorriganException {
+		IMediaItemList list = this.externalListsByListId.get(id);
+		if (list == null) return null;
+
+		if (StringUtils.isBlank(filter)) return list;
+		return list.makeView(filter);
 	}
 
 	@Override
 	public void addExternalList (final IMediaItemList db) {
-		this.externalLists.put(db.getListId(), db);
+		this.externalListsByListId.put(db.getListId(), db);
 	}
 
 	@Override
 	public IMediaItemList removeExternalList (final String id) {
-		return this.externalLists.remove(id);
+		return this.externalListsByListId.remove(id);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -260,13 +267,13 @@ public class MediaFactoryImpl implements MediaFactory {
 		try {
 			TrackTagHelper.readTrackTags(itemDb, mt, file);
 		}
-		catch (TagException e) {
+		catch (final TagException e) {
 			throw new MorriganException(e);
 		}
-		catch (ReadOnlyFileException e) {
+		catch (final ReadOnlyFileException e) {
 			throw new MorriganException(e);
 		}
-		catch (InvalidAudioFrameException e) {
+		catch (final InvalidAudioFrameException e) {
 			throw new MorriganException(e);
 		}
 	}

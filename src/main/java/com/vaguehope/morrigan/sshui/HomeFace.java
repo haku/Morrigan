@@ -109,7 +109,7 @@ public class HomeFace extends MenuFace {
 	@Override
 	public void onFocus() throws Exception {
 		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
-		this.externalLibs = asList(this.mnContext.getMediaFactory().getExternalList());
+		this.externalLibs = asList(this.mnContext.getMediaFactory().getExternalLists());
 		this.savedViews = this.mnContext.getConfig().getSavedViews();
 	}
 

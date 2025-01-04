@@ -39,7 +39,7 @@ public class RpcRemotesManager {
 
 		for (final RemoteInstance ri : this.rpcClient.getRemoteInstances()) {
 			final IMediaItemStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
-			this.mediaFactory.addExternalList(new RpcMediaList(ri, this.rpcClient, this.rpcContentServer, storage));
+			this.mediaFactory.addExternalList(new RpcMediaNodeList(ri, this.rpcClient, this.rpcContentServer, storage));
 		}
 	}
 

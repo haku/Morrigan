@@ -11,8 +11,6 @@ import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
-import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeReply;
-import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
@@ -25,28 +23,32 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
-import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class RpcMediaList extends EphemeralMediaList {
+public abstract class RpcMediaList extends EphemeralMediaList {
 
-	private static final String ROOT_NODE_ID = "0";
+	protected static final String ROOT_NODE_ID = "0";
 
-	private final RemoteInstance ri;
+	protected final RemoteInstance ri;
 	private final RpcClient rpcClient;
 	private final MetadataStorage metadataStorage;
 	private final RpcContentServlet rpcContentServer;
 
 	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final IMediaItemStorageLayer storage) {
+		this(ri, rpcClient, rpcContentServer, new MetadataStorage(storage));
+	}
+
+	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage metadataStorage) {
 		this.ri = ri;
 		this.rpcClient = rpcClient;
 		this.rpcContentServer = rpcContentServer;
-		this.metadataStorage = new MetadataStorage(storage);
+		this.metadataStorage = metadataStorage;
 	}
 
 	@Override
@@ -69,35 +71,18 @@ public class RpcMediaList extends EphemeralMediaList {
 		return MediaListType.EXTMMDB;
 	}
 
-	private MediaBlockingStub blockingStub() {
-		return this.rpcClient.getMediaBlockingStub(this.ri.getLocalIdentifier());
-	}
-
 	@Override
-	public boolean hasNodes() {
+	public boolean canMakeView() {
 		return true;
 	}
 
 	@Override
-	public MediaNode getRootNode() throws MorriganException {
-		return getNode(ROOT_NODE_ID);
+	public IMediaItemList makeView(String filter) throws MorriganException {
+		return new RpcMediaSearchList(filter, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
 	}
 
-	@Override
-	public MediaNode getNode(final String id) throws MorriganException {
-		final ListNodeReply resp = blockingStub().listNode(ListNodeRequest.newBuilder().setNodeId(id).build());
-
-		final List<MediaNode> nodes = new ArrayList<>(resp.getChildCount());
-		for (final MediaToadProto.MediaNode n : resp.getChildList()) {
-			nodes.add(new MediaNode(n.getId(), n.getTitle(), id, null, null));
-		}
-
-		final List<IMediaItem> items = new ArrayList<>(resp.getItemCount());
-		for (final MediaItem i : resp.getItemList()) {
-			items.add(makeItem(i));
-		}
-
-		return new MediaNode(id, resp.getNode().getTitle(), resp.getNode().getParentId(), nodes, items);
+	protected MediaBlockingStub blockingStub() {
+		return this.rpcClient.getMediaBlockingStub(this.ri.getLocalIdentifier());
 	}
 
 	@Override
@@ -113,7 +98,7 @@ public class RpcMediaList extends EphemeralMediaList {
 		return makeItem(ret.getItem());
 	}
 
-	private RpcMediaItem makeItem(final MediaItem item) throws DbException {
+	protected RpcMediaItem makeItem(final MediaItem item) throws DbException {
 		return new RpcMediaItem(item, this.metadataStorage.getMetadataProxy(item.getId()));
 	}
 
@@ -133,6 +118,7 @@ public class RpcMediaList extends EphemeralMediaList {
 		if (sortColumns == null ^ sortDirections == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
 		if (sortColumns != null && sortDirections != null && sortColumns.length != sortDirections.length) throw new IllegalArgumentException("Sorts and directions must be same length.");
 
+		// TODO do this based on mediaType ?
 		String modTerm = "(type=audio OR type=video)";
 		if (StringUtils.isNotBlank(term)) modTerm += String.format(" AND ( %s )", term);
 

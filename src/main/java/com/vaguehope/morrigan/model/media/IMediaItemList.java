@@ -78,6 +78,13 @@ public interface IMediaItemList {
 		return item.getRemoteLocation();
 	}
 
+	default boolean canMakeView() {
+		return false;
+	}
+	default IMediaItemList makeView(String filter) throws MorriganException {
+		throw new UnsupportedOperationException();
+	}
+
 	void addItem (IMediaItem item);
 	void removeItem (IMediaItem item) throws MorriganException;
 

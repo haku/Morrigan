@@ -520,7 +520,7 @@ public class MlistsServlet extends HttpServlet {
 //			dw.endElement("entry");
 //		}
 
-		for (final MediaListReference listRef : this.mediaFactory.getExternalList()) {
+		for (final MediaListReference listRef : this.mediaFactory.getExternalLists()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "ext" } });
 			printMlistShort(dw, listRef);
 			dw.endElement("entry");

@@ -519,6 +519,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askSortColumn (final WindowBasedTextGUI gui) {
+		// TODO add isSortable() to IMediaItemList
 		if (!(this.list instanceof IMediaItemDb)) {
 			this.lastActionMessage.setLastActionMessage("Can not sort non-local DBs.");
 			return;

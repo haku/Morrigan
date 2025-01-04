@@ -241,7 +241,7 @@ public class PlayerStateStorage {
 					this.listCache.put(listSerial, list);
 					break;
 				case EXTMMDB:
-					list = this.mf.getExternalList(listSerial);
+					list = this.mf.getExternalListBySerial(listSerial);
 					if (list == null) {
 						LOG.warning("Unknown list: " + listSerial);
 						return null;

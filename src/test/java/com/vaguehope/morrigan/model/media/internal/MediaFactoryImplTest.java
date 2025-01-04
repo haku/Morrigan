@@ -48,7 +48,7 @@ public class MediaFactoryImplTest {
 		when(external.getListName()).thenReturn("name for " + id);
 		this.undertest.addExternalList(external);
 
-		final MediaListReference ref = this.undertest.getExternalList().iterator().next();
+		final MediaListReference ref = this.undertest.getExternalLists().iterator().next();
 		assertEquals(external, this.undertest.getMediaListByMid(ref.getMid(), null));
 		assertEquals(external, this.undertest.getMediaListByRef(ref));
 	}
