@@ -39,6 +39,11 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
+	public String getListName() {
+		return super.getListName() + "{" + this.searchTerm + "}";
+	}
+
+	@Override
 	public int getCount() {
 		return this.mediaItems.size();
 	}
