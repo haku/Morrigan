@@ -8,7 +8,7 @@ import java.util.Map;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
@@ -49,12 +49,6 @@ public interface IMediaItemDb extends IMediaItemList {
 	List<IMediaItem> addFiles (MediaType mediaType, List<File> files) throws MorriganException, DbException;
 
 	void setHideMissing(final boolean v) throws MorriganException;
-
-	IDbColumn getSort ();
-	SortDirection getSortDirection ();
-	void setSort (IDbColumn sort, SortDirection direction) throws MorriganException;
-	void registerSortChangeListener (SortChangeListener scl);
-	void unregisterSortChangeListener (SortChangeListener scl);
 
 	boolean isMarkedAsUnreadable (IMediaItem mi) throws MorriganException;
 	void markAsUnreadabled (IMediaItem mi) throws MorriganException;

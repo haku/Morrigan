@@ -8,13 +8,13 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
@@ -145,11 +145,11 @@ public final class PrintingThingsHelper {
 		return msg.toString();
 	}
 
-	public static String sortSummary (final IMediaItemDb db) {
-		final IDbColumn col = db.getSort();
+	public static String sortSummary (final IMediaItemList list) {
+		final SortColumn col = list.getSortColumn();
 		return String.format("%s %s.",
-				col != null ? col.getHumanName() : "(unknown)",
-				db.getSortDirection());
+				col != null ? col.getUiName() : "(unknown)",
+				list.getSortDirection());
 	}
 
 	public static String scrollSummary (final int count, final int pageSize, final int scrollTop) {

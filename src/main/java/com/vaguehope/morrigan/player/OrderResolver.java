@@ -9,16 +9,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.LimitedRecentSet;
 import com.vaguehope.morrigan.util.MnLogger;
@@ -284,9 +283,7 @@ public class OrderResolver {
 					MediaType.TRACK,
 					String.format("t=\"%s\"", tag),
 					FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH,
-					new IDbColumn[] {
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
-					},
+					new SortColumn[] { SortColumn.DATE_LAST_PLAYED },
 					new SortDirection[] { SortDirection.ASC },
 					false);
 

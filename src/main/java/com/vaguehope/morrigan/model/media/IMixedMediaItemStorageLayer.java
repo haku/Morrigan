@@ -4,7 +4,6 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.basicimpl.DbColumn;
 
 public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	IDbColumn SQL_TBL_MEDIAFILES_COL_ID        = new DbColumn("id",        "id",            "INTEGER PRIMARY KEY AUTOINCREMENT", null);
 	IDbColumn SQL_TBL_MEDIAFILES_COL_TYPE      = new DbColumn("type",      "type",          "INT",      "?");
@@ -27,5 +26,34 @@ public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer {
 	IDbColumn SQL_TBL_MEDIAFILES_COL_WIDTH =  new DbColumn("width",  "width",  "INT(6)",   "0");
 	IDbColumn SQL_TBL_MEDIAFILES_COL_HEIGHT = new DbColumn("height", "height", "INT(6)",   "0");
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// short term for migrations.
+	public static SortColumn parseOldColName(String sortcol) {
+		if ("file".equals(sortcol)) return SortColumn.FILE_PATH;
+		else if ("added".equals(sortcol)) return SortColumn.DATE_ADDED;
+		else if ("duration".equals(sortcol)) return SortColumn.DURATION;
+		else if ("lastplay".equals(sortcol)) return SortColumn.DATE_LAST_PLAYED;
+		else if ("startcnt".equals(sortcol)) return SortColumn.START_COUNT;
+		else if ("endcnt".equals(sortcol)) return SortColumn.END_COUNT;
+		else return null;
+	}
+
+	public static IDbColumn columnFromEnum(final SortColumn col) {
+		switch (col) {
+		case FILE_PATH:
+			return SQL_TBL_MEDIAFILES_COL_FILE;
+		case DATE_ADDED:
+			return SQL_TBL_MEDIAFILES_COL_DADDED;
+		case DATE_LAST_PLAYED:
+			return SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
+		case START_COUNT:
+			return SQL_TBL_MEDIAFILES_COL_STARTCNT;
+		case END_COUNT:
+			return SQL_TBL_MEDIAFILES_COL_ENDCNT;
+		case DURATION:
+			return SQL_TBL_MEDIAFILES_COL_DURATION;
+		default:
+			throw new IllegalArgumentException("No column for: " + col);
+		}
+	}
+
 }

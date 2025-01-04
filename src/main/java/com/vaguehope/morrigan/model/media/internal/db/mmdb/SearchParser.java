@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.util.QuerySplitter;
 import com.vaguehope.morrigan.util.QuoteRemover;
@@ -66,18 +68,18 @@ class SearchParser {
 	}
 
 	public static Search parseSearch (final MediaType mediaType, final String allTerms,
-			final IDbColumn[] sort, final SortDirection[] direction) {
+			final SortColumn[] sort, final SortDirection[] direction) {
 		return parseSearch(mediaType, sort, direction, true, true, allTerms);
 	}
 
 	public static Search parseSearch (final MediaType mediaType,
-			final IDbColumn[] sort, final SortDirection[] direction,
+			final SortColumn[] sort, final SortDirection[] direction,
 			final boolean excludeMissing, final boolean excludeDisabled) {
 		return parseSearch(mediaType, sort, direction, excludeMissing, excludeDisabled, null);
 	}
 
 	public static Search parseSearch (final MediaType mediaType,
-			final IDbColumn[] sorts, final SortDirection[] directions,
+			final SortColumn[] sorts, final SortDirection[] directions,
 			final boolean excludeMissing, final boolean excludeDisabled,
 			final String allTerms) {
 		if (sorts == null ^ directions == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
@@ -90,7 +92,8 @@ class SearchParser {
 			sql.append(" ORDER BY ");
 			for (int i = 0; i < sorts.length; i++) {
 				if (i > 0) sql.append(",");
-				sql.append(sorts[i].getName()).append(directions[i].getSql());
+				final IDbColumn dbCol = IMixedMediaItemStorageLayer.columnFromEnum(sorts[i]);
+				sql.append(dbCol.getName()).append(directions[i].getSql());
 			}
 		}
 		else {

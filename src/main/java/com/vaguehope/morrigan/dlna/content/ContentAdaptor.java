@@ -30,18 +30,17 @@ import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.dlna.util.Cache;
 import com.vaguehope.morrigan.dlna.util.HashHelper;
 import com.vaguehope.morrigan.dlna.util.LruMap;
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class ContentAdaptor {
@@ -215,10 +214,10 @@ public class ContentAdaptor {
 	private ContentNode makeDbTagNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db, final MediaTag tag) throws DbException, MorriganException {
 		return queryToContentNode(dbSubNodeObjectId(mlr, DbSubNodeType.TAGS), objectId, mlr, db,
 				String.format("t=\"%s\"", tag.getTag()),
-				new IDbColumn[] {
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_ENDCNT,
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DADDED,
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE
+				new SortColumn[] {
+						SortColumn.END_COUNT,
+						SortColumn.DATE_ADDED,
+						SortColumn.FILE_PATH
 				},
 				new SortDirection[] { SortDirection.DESC, SortDirection.ASC, SortDirection.ASC });
 	}
@@ -257,9 +256,9 @@ public class ContentAdaptor {
 	private ContentNode makeDbRecentlyAddedNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db) throws DbException, MorriganException {
 		return queryToContentNode(localMmdbObjectId(mlr), objectId, mlr, db,
 				"*",
-				new IDbColumn[] {
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DADDED,
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE
+				new SortColumn[] {
+						SortColumn.DATE_ADDED,
+						SortColumn.FILE_PATH
 				},
 				new SortDirection[] { SortDirection.DESC, SortDirection.ASC });
 	}
@@ -267,15 +266,15 @@ public class ContentAdaptor {
 	private ContentNode makeDbMostPlayedNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db) throws DbException, MorriganException {
 		return queryToContentNode(localMmdbObjectId(mlr), objectId, mlr, db,
 				"*",
-				new IDbColumn[] {
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_ENDCNT,
-						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE
+				new SortColumn[] {
+						SortColumn.END_COUNT,
+						SortColumn.FILE_PATH
 				},
 				new SortDirection[] { SortDirection.DESC, SortDirection.ASC });
 	}
 
 	private ContentNode queryToContentNode (final String parentObjectId, final String objectId, final MediaListReference mlr,
-			final IMediaItemDb db, final String term, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException, MorriganException {
+			final IMediaItemDb db, final String term, final SortColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException, MorriganException {
 		final Container c = makeContainer(parentObjectId, objectId, mlr.getTitle());
 		addItemsToContainer(mlr, c, db, db.search(MediaType.TRACK, term, MAX_ITEMS, sortColumns, sortDirections, false));
 		return new ContentNode(c);

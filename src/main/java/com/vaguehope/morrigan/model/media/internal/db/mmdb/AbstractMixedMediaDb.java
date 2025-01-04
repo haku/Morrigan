@@ -5,15 +5,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
@@ -36,7 +36,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb {
 	}
 
 	@Override
-	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return getDbLayer().search(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
@@ -185,13 +185,6 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb {
 	@Override
 	public DurationData getTotalDuration () {
 		return MediaTrackListHelper.getTotalDuration(this.getMediaItems());
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	@Override
-	protected IDbColumn parseColumnFromName (final String name) {
-		return MixedMediaSqliteLayerInner.parseColumnFromName(name);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -32,15 +32,12 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -49,6 +46,8 @@ import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -633,7 +632,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
 			final String query = URLDecoder.decode(afterPath, "UTF-8");
-			final IDbColumn[] sortColumns = parseSortColumns(req);
+			final SortColumn[] sortColumns = parseSortColumns(req);
 			final SortDirection[] sortDirections = parseSortOrder(req);
 			final int maxResults = ServletHelper.readParamInteger(req, PARAM_MAXRESULTS, DEFAULT_MAX_QUERY_RESULTS);
 			final boolean includeDisabled = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DISABLED, false);
@@ -696,37 +695,11 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private enum SortColumn {
-		PATH(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE),
-		DATE_ADDED(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DADDED),
-		DATE_LAST_PLAYED(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY),
-		START_COUNT(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_STARTCNT),
-		END_COUNT(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_ENDCNT),
-		DURATION(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DURATION),
-		;
-
-		private final String apiName;
-		private final IDbColumn column;
-
-		private SortColumn (final IDbColumn column) {
-			this.apiName = StringHelper.downcase(this.name());
-			this.column = column;
-		}
-
-		public String getApiName () {
-			return this.apiName;
-		}
-
-		public IDbColumn getColumn () {
-			return this.column;
-		}
-	}
-
-	private static IDbColumn[] parseSortColumns (final HttpServletRequest req) {
+	private static SortColumn[] parseSortColumns (final HttpServletRequest req) {
 		final String raw = StringHelper.downcase(StringHelper.trimToNull(req.getParameter(PARAM_COLUMN)));
 		for (final SortColumn sortColumn : SortColumn.values()) {
-			if (sortColumn.getApiName().equals(raw)) {
-				return new IDbColumn[] { sortColumn.getColumn() }; // TODO append additional.
+			if (sortColumn.name().equalsIgnoreCase(raw)) {
+				return new SortColumn[] { sortColumn }; // TODO append additional.
 			}
 		}
 		return null;
@@ -772,7 +745,7 @@ public class MlistsServlet extends HttpServlet {
 	private void printMlistLong (final HttpServletResponse resp, final IMediaItemList ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags,
 			final String queryString, final int maxQueryResults,
-			final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled,
+			final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled,
 			final String transcode)
 					throws SAXException, MorriganException, DbException, IOException {
 		ml.read();
@@ -808,7 +781,7 @@ public class MlistsServlet extends HttpServlet {
 
 			if (ml instanceof IMediaItemDb) {
 				final IMediaItemDb db = (IMediaItemDb) ml;
-				dw.dataElement("sortcolumn", db.getSort().getHumanName());
+				dw.dataElement("sortcolumn", db.getSortColumn().getUiName());
 				dw.dataElement("sortdirection", db.getSortDirection().toString());
 			}
 		}

@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
@@ -24,8 +22,8 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -33,6 +31,8 @@ import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
@@ -43,13 +43,15 @@ import com.vaguehope.morrigan.util.StringHelper;
 public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private static final SortColumn DEFAULT_SORT_COLUMN = SortColumn.FILE_PATH;
+
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private final MediaItemDbConfig config;
 	private final String searchTerm;
 
 	private final IMediaItemStorageLayer dbLayer;
-	private IDbColumn librarySort;
+	private SortColumn librarySort;
 	private SortDirection librarySortDirection;
 	private boolean hideMissing;
 
@@ -67,7 +69,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		this.config = config;
 		this.dbLayer = dbLayer;
 
-		this.librarySort = dbLayer.getDefaultSortColumn();
+		this.librarySort = DEFAULT_SORT_COLUMN;
 		this.librarySortDirection = SortDirection.ASC;
 		this.hideMissing = true;
 
@@ -97,7 +99,6 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	@Override
 	public void dispose () {
 		super.dispose();
-		this._sortChangeListeners.clear();
 		this.dbLayer.dispose(); // TODO FIXME what if this layer is shared???  Count attached change listeners?
 	}
 
@@ -240,14 +241,14 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		if (this.searchTerm != null) {
 			allMedia = this.dbLayer.getMedia(
 					MediaType.TRACK,
-					new IDbColumn[] { this.librarySort },
+					new SortColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
 					this.hideMissing, this.searchTerm);
 		}
 		else {
 			allMedia = this.dbLayer.getMedia(
 					MediaType.TRACK,
-					new IDbColumn[] { this.librarySort },
+					new SortColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
 					this.hideMissing);
 		}
@@ -311,7 +312,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.
 		List<IMediaItem> copyOfMainList = new ArrayList<>(getMediaItems());
 		List<IMediaItem> allList = this.dbLayer.getAllMedia(
-				new IDbColumn[] { this.dbLayer.getDefaultSortColumn() },
+				new SortColumn[] { DEFAULT_SORT_COLUMN },
 				new SortDirection[] { SortDirection.ASC },
 				false);
 		updateList(copyOfMainList, allList, true);
@@ -330,7 +331,12 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 //	Sorting.
 
 	@Override
-	public IDbColumn getSort () {
+	public boolean canSort() {
+		return true;
+	}
+
+	@Override
+	public SortColumn getSortColumn() {
 		return this.librarySort;
 	}
 
@@ -340,32 +346,13 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setSort (final IDbColumn sort, final SortDirection direction) throws MorriganException {
-		this.librarySort = sort;
+	public void setSort(final SortColumn column, final SortDirection direction) throws MorriganException {
+		this.librarySort = column;
 		this.librarySortDirection = direction;
 
 		updateRead();
-		callSortChangedListeners(this.librarySort, this.librarySortDirection);
 
 		saveSortToDbInNewThread();
-	}
-
-	private final List<SortChangeListener> _sortChangeListeners = Collections.synchronizedList(new ArrayList<SortChangeListener>());
-
-	private void callSortChangedListeners (final IDbColumn sort, final SortDirection direction) {
-		for (SortChangeListener l : this._sortChangeListeners) {
-			l.sortChanged(sort, direction);
-		}
-	}
-
-	@Override
-	public void registerSortChangeListener (final SortChangeListener scl) {
-		this._sortChangeListeners.add(scl);
-	}
-
-	@Override
-	public void unregisterSortChangeListener (final SortChangeListener scl) {
-		this._sortChangeListeners.remove(scl);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -391,7 +378,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	void saveSortToDb () throws DbException {
 		long t1 = System.currentTimeMillis();
 
-		getDbLayer().setProp(KEY_SORTCOL, getSort().getName());
+		getDbLayer().setProp(KEY_SORTCOL, getSortColumn().name());
 		getDbLayer().setProp(KEY_SORTDIR, String.valueOf(getSortDirection().getN()));
 
 		long l1 = System.currentTimeMillis() - t1;
@@ -402,14 +389,13 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		String sortcol = getDbLayer().getProp(KEY_SORTCOL);
 		String sortdir = getDbLayer().getProp(KEY_SORTDIR);
 		if (sortcol != null && sortdir != null) {
-			IDbColumn col = parseColumnFromName(sortcol);
+			SortColumn col = IMixedMediaItemStorageLayer.parseOldColName(sortcol);
+			if (col == null) col = SortColumn.valueOf(sortcol);
 			SortDirection dir = SortDirection.parseN(Integer.parseInt(sortdir));
 			this.librarySort = col;
 			this.librarySortDirection = dir;
 		}
 	}
-
-	protected abstract IDbColumn parseColumnFromName (String name);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queries.

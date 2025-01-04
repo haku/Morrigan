@@ -14,6 +14,8 @@ import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -39,21 +41,16 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 		return generateSqlTblMediaFilesColumns();
 	}
 
-	@Override
-	public IDbColumn getDefaultSortColumn () {
-		return SQL_TBL_MEDIAFILES_COL_FILE;
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods for IMediaMixedItem.
 
 	@Override
-	public List<IMediaItem> getAllMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<IMediaItem> getAllMedia (final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		return getMedia(MediaType.UNKNOWN, sorts, directions, hideMissing);
 	}
 
 	@Override
-	public List<IMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<IMediaItem> getMedia (final MediaType mediaType, final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false).execute(getDbCon(), this.itemFactory);
 		}
@@ -63,7 +60,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 	}
 
 	@Override
-	public List<IMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
+	public List<IMediaItem> getMedia (final MediaType mediaType, final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false, search).execute(getDbCon(), this.itemFactory);
 		}
@@ -86,7 +83,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 	}
 
 	@Override
-	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sortColumn, sortDirection, true, !includeDisabled, term).execute(getDbCon(), this.itemFactory, maxResults);
 		}

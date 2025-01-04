@@ -22,14 +22,14 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaNode;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -519,24 +519,19 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askSortColumn (final WindowBasedTextGUI gui) {
-		// TODO add isSortable() to IMediaItemList
-		if (!(this.list instanceof IMediaItemDb)) {
-			this.lastActionMessage.setLastActionMessage("Can not sort non-local DBs.");
+		if (!this.list.canSort()) {
+			this.lastActionMessage.setLastActionMessage("Can not sort this type of list.");
 			return;
 		}
-		final IMediaItemDb db = (IMediaItemDb) this.list;
 
-		final List<IDbColumn> cols = db.getDbLayer().getMediaTblColumns();
 		final List<Runnable> actions = new ArrayList<>();
-		for (final IDbColumn col : cols) {
-			if (col.getHumanName() != null) {
-				actions.add(new SortColumnAction(db, col, SortDirection.ASC));
-				actions.add(new SortColumnAction(db, col, SortDirection.DESC));
-			}
+		for (final SortColumn col : SortColumn.values()) {
+			actions.add(new SortColumnAction(col, SortDirection.ASC));
+			actions.add(new SortColumnAction(col, SortDirection.DESC));
 		}
 		final ActionListDialog dlg = new ActionListDialogBuilder()
 				.setTitle("Sort Order")
-				.setDescription("Current: " + PrintingThingsHelper.sortSummary(db))
+				.setDescription("Current: " + PrintingThingsHelper.sortSummary(this.list))
 				.addActions(actions.toArray(new Runnable[actions.size()]))
 				.build();
 		dlg.setCloseWindowWithEscape(true);
@@ -690,27 +685,26 @@ public class DbFace extends DefaultFace {
 		return String.format(" %4d:%02d", (seconds % 3600) / 60, (seconds % 60));
 	}
 
-	private static class SortColumnAction implements Runnable {
+	private class SortColumnAction implements Runnable {
 
-		private final IMediaItemDb db;
-		private final IDbColumn col;
+		private final SortColumn col;
 		private final SortDirection direction;
 
-		public SortColumnAction (final IMediaItemDb db, final IDbColumn col, final SortDirection direction) {
-			this.db = db;
+		public SortColumnAction (final SortColumn col, final SortDirection direction) {
 			this.col = col;
 			this.direction = direction;
 		}
 
 		@Override
 		public String toString () {
-			return String.format("%s %s", this.col.getHumanName(), this.direction);
+			return String.format("%s %s", this.col.getUiName(), this.direction);
 		}
 
 		@Override
 		public void run () {
 			try {
-				this.db.setSort(this.col, this.direction);
+				DbFace.this.list.setSort(this.col, this.direction);
+				refreshData(false);
 			}
 			catch (final MorriganException e) {
 				throw new IllegalStateException(e);

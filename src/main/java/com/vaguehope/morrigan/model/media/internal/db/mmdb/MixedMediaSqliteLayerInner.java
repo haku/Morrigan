@@ -70,15 +70,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		SQL_TBL_MEDIAFILES_COL_HEIGHT,
 		};
 
-	public static IDbColumn parseColumnFromName (final String name) {
-		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
-			if (c.getName().equals(name)) {
-				return c;
-			}
-		}
-		throw new IllegalArgumentException("Failed to find column from name '"+name+"'.");
-	}
-
 	static protected List<IDbColumn> generateSqlTblMediaFilesColumns () {
 		List<IDbColumn> l = new ArrayList<>();
 		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {

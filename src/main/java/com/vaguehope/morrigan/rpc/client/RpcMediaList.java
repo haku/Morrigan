@@ -18,16 +18,15 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortBy;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralMediaList;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -112,7 +111,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 			final MediaType mediaType,
 			final String term,
 			final int maxResults,
-			final IDbColumn[] sortColumns,
+			final SortColumn[] sortColumns,
 			final SortDirection[] sortDirections,
 			final boolean includeDisabled) throws DbException {
 		if (sortColumns == null ^ sortDirections == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
@@ -128,20 +127,19 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 		if (sortColumns != null) {
 			for (int i = 0; i < sortColumns.length; i++) {
-				final IDbColumn col = sortColumns[i];
 				final MediaToadProto.SortDirection dir = direction(sortDirections[i]);
-
-				if (IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE.getName().equals(col.getName())) {
+				switch (sortColumns[i]) {
+				case FILE_PATH:
 					req.addSortBy(SortBy.newBuilder().setSortField(SortField.FILE_PATH).setDirection(dir).build());
-				}
-				else if (IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DADDED.getName().equals(col.getName())) {
+					break;
+				case DATE_ADDED:
 					req.addSortBy(SortBy.newBuilder().setSortField(SortField.DATE_ADDED).setDirection(dir).build());
-				}
-				else if (IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DURATION.getName().equals(col.getName())) {
+					break;
+				case DURATION:
 					req.addSortBy(SortBy.newBuilder().setSortField(SortField.DURATION).setDirection(dir).build());
-				}
-				else {
-					throw new DbException("Unsupported sort column: " + col.getName());
+					break;
+				default:
+					throw new DbException("Unsupported sort column: " + sortColumns[i]);
 				}
 			}
 		}

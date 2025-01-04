@@ -9,12 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -82,6 +81,19 @@ public interface IMediaItemList {
 		return false;
 	}
 	default IMediaItemList makeView(String filter) throws MorriganException {
+		throw new UnsupportedOperationException();
+	}
+
+	default boolean canSort() {
+		return false;
+	}
+	default SortColumn getSortColumn() {
+		throw new UnsupportedOperationException();
+	}
+	default SortDirection getSortDirection() {
+		throw new UnsupportedOperationException();
+	}
+	default void setSort(SortColumn column, SortDirection direction) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -156,7 +168,7 @@ public interface IMediaItemList {
 	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
 	List<IMediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMediaItem> search (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	List<IMediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 
 	/**
 	 * filepath is anything the list identifies entries by, eg could also be an ID.

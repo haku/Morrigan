@@ -8,6 +8,8 @@ import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 
 public class RpcMediaSearchList extends RpcMediaList {
 
@@ -17,6 +19,8 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 	private volatile List<IMediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
+	private volatile SortColumn sortColumn = SortColumn.FILE_PATH;
+	private volatile SortDirection sortDirection = SortDirection.ASC;
 
 	public RpcMediaSearchList(
 			final String searchTerm,
@@ -54,6 +58,24 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
+	public boolean canSort() {
+		return true;
+	}
+	@Override
+	public void setSort(final SortColumn column, final SortDirection direction) throws MorriganException {
+		this.sortColumn = column;
+		this.sortDirection = direction;
+	}
+	@Override
+	public SortColumn getSortColumn() {
+		return this.sortColumn;
+	}
+	@Override
+	public SortDirection getSortDirection() {
+		return this.sortDirection;
+	}
+
+	@Override
 	public void read() throws MorriganException {
 		forceRead();  // TODO check if this needs optimising.
 	}
@@ -61,7 +83,10 @@ public class RpcMediaSearchList extends RpcMediaList {
 	@Override
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
-		this.mediaItems = search(MediaType.TRACK, this.searchTerm, MAX_VIEW_SIZE);  // TODO make sortable
+		this.mediaItems = search(MediaType.TRACK, this.searchTerm, MAX_VIEW_SIZE,
+				new SortColumn[] { this.sortColumn },
+				new SortDirection[] { this.sortDirection },
+				false);
 		this.durationOfLastRead = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 	}
 

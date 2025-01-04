@@ -10,44 +10,11 @@ import java.util.Map;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sqlitewrapper.IGenericDbLayer;
 
 public interface IMediaItemStorageLayer extends IGenericDbLayer {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public enum SortDirection {
-		ASC(0, " ASC"), DESC(1, " DESC");
-
-		private final int n;
-		private final String sql;
-
-		SortDirection (final int n, final String sql) {
-			this.n = n;
-			this.sql = sql;
-		}
-
-		public int getN () {
-			return this.n;
-		}
-
-		/**
-		 * Includes leading space.
-		 */
-		public String getSql () {
-			return this.sql;
-		}
-
-		public static SortDirection parseN (final int n) {
-			switch (n) {
-				case 0: return ASC;
-				case 1: return DESC;
-				default: throw new IllegalArgumentException();
-			}
-		}
-
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void addChangeListener (IMediaItemStorageLayerChangeListener listener);
@@ -101,14 +68,9 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 
 	List<IDbColumn> getMediaTblColumns ();
 
-	/**
-	 * Will always return the same value; i.e. it returns a constant.
-	 */
-	IDbColumn getDefaultSortColumn ();
-
-	List<IMediaItem> getAllMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
+	List<IMediaItem> getAllMedia (SortColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<IMediaItem> getMedia (MediaType mediaType, SortColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<IMediaItem> getMedia (MediaType mediaType, SortColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
 
 	FileExistance hasFile (File file) throws DbException;
 	FileExistance hasFile (String filePath) throws DbException;
@@ -116,7 +78,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	IMediaItem getByFile (String filePath) throws DbException;
 	IMediaItem getByMd5 (BigInteger md5) throws DbException;
 	List<IMediaItem> search(MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMediaItem> search(MediaType mediaType, String term, int maxResults, IDbColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
+	List<IMediaItem> search(MediaType mediaType, String term, int maxResults, SortColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
 	boolean[] addFiles (MediaType mediaType, List<File> files) throws DbException;
 
