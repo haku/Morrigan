@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.dlna.players;
 
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,14 +22,13 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.DlnaResponseException;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
-import com.vaguehope.morrigan.dlna.util.Quietly;
-import com.vaguehope.morrigan.dlna.util.Timestamped;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.util.ErrorHelper;
-import com.vaguehope.morrigan.util.Objs;
+import com.vaguehope.morrigan.util.Quietly;
+import com.vaguehope.morrigan.util.Timestamped;
 
 public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
@@ -271,7 +271,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		final TransportState renState = renTi.getCurrentTransportState();
 		final String renUri = renMi != null ? renMi.getCurrentURI() : null;
 
-		if (renState != this.prevRenState || !Objs.equals(renUri, this.prevRenUri)) {
+		if (renState != this.prevRenState || !Objects.equals(renUri, this.prevRenUri)) {
 			LOG.info("Renderer: {} {}", renState, renUri);
 			this.prevRenState = renState;
 			this.prevRenUri = renUri;
@@ -345,7 +345,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		}
 
 		// Renderer got the right URI?  If not, start playing right URL.
-		if (!Objs.equals(renUri, goToPlay.getUri())) {
+		if (!Objects.equals(renUri, goToPlay.getUri())) {
 			if (goState == PlayState.PAUSED) return PlayState.PAUSED; // We would load, but will wait until not paused before doing so.
 
 			// If age of last observed position is too young, wait a bit in case end event turns up.
@@ -548,7 +548,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		// Only restore position if for same item.
 		final PlayerState rps = getRestorePositionState();
 		if (rps != null && rps.getCurrentItem() != null && rps.getCurrentItem().hasTrack()) {
-			if (Objs.equals(item.getTrack(), rps.getCurrentItem().getTrack())) {
+			if (Objects.equals(item.getTrack(), rps.getCurrentItem().getTrack())) {
 				this.eventQueue.add(Long.valueOf(rps.getPosition()));
 				LOG.info("Play scheduled restore position: {}s", rps.getPosition());
 			}

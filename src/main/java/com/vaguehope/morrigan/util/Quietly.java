@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.sshui.util;
+package com.vaguehope.morrigan.util;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -23,6 +23,13 @@ public final class Quietly {
 	public static void sleep (final long millis) {
 		try {
 			Thread.sleep(millis);
+		}
+		catch (final InterruptedException e) {}
+	}
+
+	public static void sleep (final long duration, final TimeUnit unit) {
+		try {
+			Thread.sleep(unit.convert(duration, TimeUnit.MILLISECONDS));
 		}
 		catch (final InterruptedException e) {}
 	}

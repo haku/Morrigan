@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.dlna.httpserver.FileLocator;
-import com.vaguehope.morrigan.dlna.util.Cache;
-import com.vaguehope.morrigan.dlna.util.HashHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -20,6 +18,8 @@ import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.Cache;
+import com.vaguehope.morrigan.util.HashHelper;
 
 public class MediaFileLocator implements FileLocator {
 

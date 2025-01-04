@@ -1,10 +1,10 @@
 package com.vaguehope.morrigan.player;
 
 import java.io.File;
+import java.util.Objects;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.util.Objs;
 
 /**
  * Will always have at least a list or an track.
@@ -135,15 +135,15 @@ public class PlayItem {
 		if (!(obj instanceof PlayItem)) return false;
 		PlayItem that = (PlayItem) obj;
 
-		return Objs.equals(this.type, that.type)
+		return Objects.equals(this.type, that.type)
 				&& this.id == that.id
-				&& Objs.equals(this.list, that.list)
-				&& Objs.equals(this.track, that.track);
+				&& Objects.equals(this.list, that.list)
+				&& Objects.equals(this.track, that.track);
 	}
 
 	@Override
 	public int hashCode () {
-		return Objs.hash(this.type, this.list, this.track, this.id);
+		return Objects.hash(this.type, this.list, this.track, this.id);
 	}
 
 }

@@ -14,7 +14,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.vaguehope.morrigan.sshui.util.Quietly;
+import com.vaguehope.morrigan.util.Quietly;
 
 public abstract class SshScreen implements Runnable {
 

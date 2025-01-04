@@ -11,7 +11,7 @@ import java.io.Writer;
 import java.util.Properties;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.dlna.util.Quietly;
+import com.vaguehope.morrigan.util.Quietly;
 
 public class UserPrefs {
 

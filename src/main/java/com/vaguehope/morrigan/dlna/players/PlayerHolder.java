@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class PlayerHolder {
 

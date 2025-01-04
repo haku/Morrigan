@@ -1,9 +1,8 @@
 package com.vaguehope.morrigan.sshui;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.vaguehope.morrigan.util.Objs;
 
 public class Autocomplete {
 
@@ -73,7 +72,7 @@ public class Autocomplete {
 
 		@Override
 		public int hashCode() {
-			return Objs.hash(this.fullText, this.activeTerm, this.termStart);
+			return Objects.hash(this.fullText, this.activeTerm, this.termStart);
 		}
 
 		@Override
@@ -83,9 +82,9 @@ public class Autocomplete {
 			if (!(obj instanceof PartialQuery)) return false;
 			final PartialQuery that = (PartialQuery) obj;
 
-			return Objs.equals(this.fullText, that.fullText)
-					&& Objs.equals(this.activeTerm, that.activeTerm)
-					&& Objs.equals(this.termStart, that.termStart);
+			return Objects.equals(this.fullText, that.fullText)
+					&& Objects.equals(this.activeTerm, that.activeTerm)
+					&& Objects.equals(this.termStart, that.termStart);
 		}
 
 		@Override
@@ -105,7 +104,7 @@ public class Autocomplete {
 
 		@Override
 		public int hashCode() {
-			return Objs.hash(this.result, this.caretPos);
+			return Objects.hash(this.result, this.caretPos);
 		}
 
 		@Override
@@ -115,8 +114,8 @@ public class Autocomplete {
 			if (!(obj instanceof MergedResult)) return false;
 			final MergedResult that = (MergedResult) obj;
 
-			return Objs.equals(this.result, that.result)
-					&& Objs.equals(this.caretPos, that.caretPos);
+			return Objects.equals(this.result, that.result)
+					&& Objects.equals(this.caretPos, that.caretPos);
 		}
 
 		@Override

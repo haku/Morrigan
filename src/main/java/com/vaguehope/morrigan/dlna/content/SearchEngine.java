@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -24,14 +25,13 @@ import com.vaguehope.cdsc.CDSCBaseListener;
 import com.vaguehope.cdsc.CDSCLexer;
 import com.vaguehope.cdsc.CDSCParser;
 import com.vaguehope.cdsc.CDSCParser.RelExpContext;
-import com.vaguehope.morrigan.dlna.util.Cache;
-import com.vaguehope.morrigan.dlna.util.Objects;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.Cache;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class SearchEngine {
 

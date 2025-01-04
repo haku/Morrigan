@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.dlna.UpnpHelper;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class DidlItem extends EphemeralItem {
 

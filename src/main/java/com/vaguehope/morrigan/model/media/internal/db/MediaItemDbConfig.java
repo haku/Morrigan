@@ -1,8 +1,7 @@
 package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.io.File;
-
-import com.vaguehope.morrigan.model.helper.EqualHelper;
+import java.util.Objects;
 
 public final class MediaItemDbConfig {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,8 +57,8 @@ public final class MediaItemDbConfig {
 		if (!(aThat instanceof MediaItemDbConfig)) return false;
 		MediaItemDbConfig that = (MediaItemDbConfig) aThat;
 
-		return EqualHelper.areEqual(getFilePath(), that.getFilePath())
-				&& EqualHelper.areEqual(getFilter(), that.getFilter());
+		return Objects.equals(getFilePath(), that.getFilePath())
+				&& Objects.equals(getFilter(), that.getFilter());
 	}
 
 	@Override

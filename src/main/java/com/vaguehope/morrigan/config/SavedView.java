@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.config;
 
-import com.vaguehope.morrigan.util.Objs;
+import java.util.Objects;
 
 public class SavedView {
 
@@ -28,7 +28,7 @@ public class SavedView {
 
 	@Override
 	public int hashCode() {
-		return Objs.hash(this.name, this.dbmid, this.query);
+		return Objects.hash(this.name, this.dbmid, this.query);
 	}
 
 	@Override
@@ -38,9 +38,9 @@ public class SavedView {
 		if (!(obj instanceof SavedView)) return false;
 		final SavedView that = (SavedView) obj;
 
-		return Objs.equals(this.name, that.name)
-				&& Objs.equals(this.dbmid, that.dbmid)
-				&& Objs.equals(this.query, that.query);
+		return Objects.equals(this.name, that.name)
+				&& Objects.equals(this.dbmid, that.dbmid)
+				&& Objects.equals(this.query, that.query);
 	}
 
 }

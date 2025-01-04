@@ -189,7 +189,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 			return local_addFiles(mediaType, files);
 		}
 		catch (Exception e) {
-			this.logger.log(Level.SEVERE, "Exception while adding files: \n" + StringHelper.joinCollection(files, "\n"), e);
+			this.logger.log(Level.SEVERE, "Exception while adding files: \n" + StringHelper.join(files, "\n"), e);
 			throw new DbException(e);
 		}
 	}

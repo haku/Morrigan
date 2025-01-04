@@ -3,12 +3,11 @@ package com.vaguehope.morrigan.model.media.internal;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Objects;
 
-import com.vaguehope.morrigan.util.StringHelper;
-import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.MimeType;
-import com.vaguehope.morrigan.util.Objs;
+import com.vaguehope.morrigan.util.StringHelper;
 
 
 /**
@@ -49,7 +48,7 @@ public abstract class MediaItem implements IMediaItem {
 		if (this.filepath == null && filepath != null) {
 			return setFilepathIfNotSet(filepath);
 		}
-		else if (EqualHelper.areEqual(this.filepath, filepath)) {
+		else if (Objects.equals(this.filepath, filepath)) {
 			return false;
 		}
 		else {
@@ -61,7 +60,7 @@ public abstract class MediaItem implements IMediaItem {
 	 * This will silently fail if filepath is already set.
 	 */
 	private boolean setFilepathIfNotSet (final String filepath) {
-		if (this.filepath == null && !EqualHelper.areEqual(this.filepath, filepath)) {
+		if (this.filepath == null && !Objects.equals(this.filepath, filepath)) {
 			this.filepath = filepath;
 			updateFilepathBasedThings();
 			return true;
@@ -75,7 +74,7 @@ public abstract class MediaItem implements IMediaItem {
 	}
 	@Override
 	public boolean setDateAdded(final Date dateAdded) {
-		if (!EqualHelper.areEqual(this.dateAdded, dateAdded)) {
+		if (!Objects.equals(this.dateAdded, dateAdded)) {
 			this.dateAdded = dateAdded;
 			return true;
 		}
@@ -88,7 +87,7 @@ public abstract class MediaItem implements IMediaItem {
 	}
 	@Override
 	public boolean setMd5(final BigInteger newMd5) {
-		if (!EqualHelper.areEqual(this.md5, newMd5)) {
+		if (!Objects.equals(this.md5, newMd5)) {
 			this.md5 = newMd5;
 			return true;
 		}
@@ -101,7 +100,7 @@ public abstract class MediaItem implements IMediaItem {
 	}
 	@Override
 	public boolean setSha1(final BigInteger newSha1) {
-		if (!EqualHelper.areEqual(this.sha1, newSha1)) {
+		if (!Objects.equals(this.sha1, newSha1)) {
 			this.sha1 = newSha1;
 			return true;
 		}
@@ -114,7 +113,7 @@ public abstract class MediaItem implements IMediaItem {
 	}
 	@Override
 	public boolean setDateLastModified(final Date lastModified) {
-		if (!EqualHelper.areEqual(this.dateLastModified, lastModified)) {
+		if (!Objects.equals(this.dateLastModified, lastModified)) {
 			this.dateLastModified = lastModified;
 			return true;
 		}
@@ -139,7 +138,7 @@ public abstract class MediaItem implements IMediaItem {
 	}
 	@Override
 	public boolean setEnabled (final boolean enabled, final Date lastModified) {
-		if (this.enabled != enabled || !Objs.equals(this.enabledLastModified, lastModified)) {
+		if (this.enabled != enabled || !Objects.equals(this.enabledLastModified, lastModified)) {
 			this.enabled = enabled;
 			this.enabledLastModified = lastModified;
 			return true;
@@ -193,7 +192,7 @@ public abstract class MediaItem implements IMediaItem {
 	}
 	@Override
 	public boolean setRemoteLocation(final String remoteLocation) {
-		if (!EqualHelper.areEqual(this.remoteLocation, remoteLocation)) {
+		if (!Objects.equals(this.remoteLocation, remoteLocation)) {
 			this.remoteLocation = remoteLocation;
 			return true;
 		}
@@ -301,7 +300,7 @@ public abstract class MediaItem implements IMediaItem {
 		if (!(aThat instanceof MediaItem)) return false;
 		final MediaItem that = (MediaItem) aThat;
 
-		return Objs.equals(getFilepath(), that.getFilepath());  // FIXME what if filepath is null?
+		return Objects.equals(getFilepath(), that.getFilepath());  // FIXME what if filepath is null?
 	}
 
 	@Override

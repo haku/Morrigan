@@ -2,8 +2,8 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import java.io.File;
 import java.util.Date;
+import java.util.Objects;
 
-import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaItem;
@@ -100,7 +100,7 @@ public class MixedMediaItem extends MediaItem implements IMediaItem {
 
 	@Override
 	public boolean setDateLastPlayed (final Date dateLastPlayed) {
-		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
+		if (!Objects.equals(this.dateLastPlayed, dateLastPlayed)) {
 			this.dateLastPlayed = dateLastPlayed;
 			return true;
 		}

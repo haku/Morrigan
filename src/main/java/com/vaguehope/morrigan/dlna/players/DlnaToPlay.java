@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jupnp.util.MimeType;
 
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.util.StringHelper;
 
 class DlnaToPlay {
 

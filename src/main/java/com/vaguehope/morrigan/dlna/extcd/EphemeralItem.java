@@ -3,9 +3,9 @@ package com.vaguehope.morrigan.dlna.extcd;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Objects;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.util.Objs;
 
 public abstract class EphemeralItem implements IMediaItem {
 
@@ -15,7 +15,7 @@ public abstract class EphemeralItem implements IMediaItem {
 
 	@Override
 	public int hashCode () {
-		return Objs.hash(getRemoteId());
+		return Objects.hash(getRemoteId());
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public abstract class EphemeralItem implements IMediaItem {
 		if (obj == null) return false;
 		if (!(obj instanceof EphemeralItem)) return false;
 		final EphemeralItem that = (EphemeralItem) obj;
-		return Objs.equals(getRemoteId(), that.getRemoteId());
+		return Objects.equals(getRemoteId(), that.getRemoteId());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

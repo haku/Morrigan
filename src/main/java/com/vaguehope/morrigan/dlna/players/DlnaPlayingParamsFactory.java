@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.content.ContentGroup;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.transcode.FfprobeCache;
 

@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -17,7 +18,6 @@ import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.util.Objs;
 
 public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -192,7 +192,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 
 		@Override
 		public int hashCode () {
-			return Objs.hash(this.tag, this.type, this.cls);
+			return Objects.hash(this.tag, this.type, this.cls);
 		}
 
 		@Override
@@ -201,9 +201,9 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 			if (obj == null) return false;
 			if (getClass() != obj.getClass()) return false;
 			final TagKey that = (TagKey) obj;
-			return Objs.equals(this.tag, that.tag)
-					&& Objs.equals(this.type, that.type)
-					&& Objs.equals(this.cls, that.cls);
+			return Objects.equals(this.tag, that.tag)
+					&& Objects.equals(this.type, that.type)
+					&& Objects.equals(this.cls, that.cls);
 		}
 
 	}

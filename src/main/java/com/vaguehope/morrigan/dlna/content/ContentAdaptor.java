@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
-import com.vaguehope.morrigan.dlna.util.Cache;
-import com.vaguehope.morrigan.dlna.util.HashHelper;
-import com.vaguehope.morrigan.dlna.util.LruMap;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
@@ -42,6 +39,9 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.Cache;
+import com.vaguehope.morrigan.util.HashHelper;
+import com.vaguehope.morrigan.util.LruMap;
 
 public class ContentAdaptor {
 

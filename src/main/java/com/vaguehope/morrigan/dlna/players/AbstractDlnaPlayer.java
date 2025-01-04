@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.dlna.players;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -24,7 +25,6 @@ import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
-import com.vaguehope.morrigan.util.Objs;
 
 public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 
@@ -120,7 +120,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	@Override
 	public void setCurrentItem (final PlayItem item) {
 		final PlayItem old = this.currentItem.getAndSet(item);
-		if (!Objs.equals(old, item)) {
+		if (!Objects.equals(old, item)) {
 			this.currentItemDurationSeconds.set(-1);
 		}
 		getListeners().currentItemChanged(item);

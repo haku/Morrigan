@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -37,7 +38,6 @@ import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
-import com.vaguehope.morrigan.util.Objs;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb {
@@ -109,7 +109,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		if (!(obj instanceof MediaItemDb)) return false;
 		final MediaItemDb that = (MediaItemDb) obj;
 
-		return Objs.equals(this.config, that.config);
+		return Objects.equals(this.config, that.config);
 	}
 
 	@Override

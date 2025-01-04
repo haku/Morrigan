@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.model.media.internal;
 
-import com.vaguehope.morrigan.model.helper.EqualHelper;
+import java.util.Objects;
+
 import com.vaguehope.morrigan.model.media.MediaListReference;
 
 public class MediaListReferenceImpl implements MediaListReference {
@@ -65,7 +66,7 @@ public class MediaListReferenceImpl implements MediaListReference {
 		if (this == aThat) return true;
 		if (!(aThat instanceof MediaListReference)) return false;
 		MediaListReference that = (MediaListReference) aThat;
-		return EqualHelper.areEqual(this.identifier, that.getIdentifier());
+		return Objects.equals(this.identifier, that.getIdentifier());
 	}
 
 	@Override

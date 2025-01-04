@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LimitedRecentSet<T> implements Iterable<T> {
@@ -23,7 +24,7 @@ public class LimitedRecentSet<T> implements Iterable<T> {
 	public synchronized void push (final T o) {
 		incrementFrequency(o);
 
-		if (this.data.size() > 0 && Objs.equals(o, this.data.getFirst())) return;
+		if (this.data.size() > 0 && Objects.equals(o, this.data.getFirst())) return;
 
 		this.data.remove(o);
 		this.data.push(o);

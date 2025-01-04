@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.dlna.players;
 
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -15,7 +16,6 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
-import com.vaguehope.morrigan.util.Objs;
 
 public class DlnaPlayer extends AbstractDlnaPlayer {
 
@@ -62,7 +62,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		// Only restore position if for same item.
 		final PlayerState rps = getRestorePositionState();
 		if (rps != null && rps.getCurrentItem() != null && rps.getCurrentItem().hasTrack()) {
-			if (Objs.equals(item.getTrack(), rps.getCurrentItem().getTrack())) {
+			if (Objects.equals(item.getTrack(), rps.getCurrentItem().getTrack())) {
 				final WatcherTask w = this.watcher.get();
 				if (w != null) {
 					w.requestSeekAfterPlaybackStarts(rps.getPosition());

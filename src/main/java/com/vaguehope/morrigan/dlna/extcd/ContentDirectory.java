@@ -20,14 +20,14 @@ import org.jupnp.support.model.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.dlna.util.Cache;
-import com.vaguehope.morrigan.dlna.util.Quietly;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.Cache;
+import com.vaguehope.morrigan.util.Quietly;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class ContentDirectory {
 

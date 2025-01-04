@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
-import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
@@ -708,7 +708,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer implements IMe
 		}
 		else {
 			for (final MediaTag t : existing) {
-				if (!EqualHelper.areEqual(t.getModified(), modified) || !t.isDeleted() == deleted) {
+				if (!Objects.equals(t.getModified(), modified) || !t.isDeleted() == deleted) {
 					local_setTagDeleted(item, t, deleted, modified);
 				}
 				return true;

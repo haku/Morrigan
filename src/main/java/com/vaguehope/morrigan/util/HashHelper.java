@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.dlna.util;
+package com.vaguehope.morrigan.util;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
