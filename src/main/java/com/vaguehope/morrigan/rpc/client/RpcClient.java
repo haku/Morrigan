@@ -62,7 +62,7 @@ public class RpcClient {
 	}
 
 	private void startChannel(final RemoteInstance ri) {
-		final ManagedChannel channel = ri.getTarget().makeChannelBuilder().build();
+		final ManagedChannel channel = ri.getTarget().buildChannel();
 		this.managedChannels.put(ri, channel);
 		this.mediaFutureStubs.put(ri.getLocalIdentifier(), MediaGrpc.newFutureStub(channel));
 		this.mediaBlockingStubs.put(ri.getLocalIdentifier(), MediaGrpc.newBlockingStub(channel));

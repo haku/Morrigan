@@ -34,6 +34,7 @@ import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
+import com.vaguehope.morrigan.rpc.RpcStatusServlet;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.transcode.Transcoder;
 
@@ -115,6 +116,7 @@ public class MorriganServer {
 		context.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new LogServlet()), LogServlet.CONTEXTPATH + "/*");
+		context.addServlet(new ServletHolder(new RpcStatusServlet()), RpcStatusServlet.CONTEXTPATH + "/*");
 
 		return context;
 	}

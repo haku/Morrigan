@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.Args.ArgsException;
 import io.grpc.ChannelCredentials;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.ManagedChannel;
 import io.grpc.TlsChannelCredentials;
 
 public class RpcTarget {
@@ -25,7 +25,7 @@ public class RpcTarget {
 		this.plainText = plainText;
 	}
 
-	public ManagedChannelBuilder<?> makeChannelBuilder() {
+	public ManagedChannel buildChannel() {
 		final ChannelCredentials channelCredentials;
 		if (this.plainText) {
 			channelCredentials = InsecureChannelCredentials.create();
@@ -33,7 +33,11 @@ public class RpcTarget {
 		else {
 			channelCredentials = TlsChannelCredentials.create();
 		}
-		return Grpc.newChannelBuilder(this.target, channelCredentials);
+		final ManagedChannel chan = Grpc.newChannelBuilder(this.target, channelCredentials)
+				.intercept(RpcMetrics.clientInterceptor(this.target))
+				.build();
+		RpcMetrics.monitorChannel(chan, this.target);
+		return chan;
 	}
 
 	@Override
@@ -84,6 +88,7 @@ public class RpcTarget {
 		}
 		if (uri.getPort() > 0) port = uri.getPort();
 
+		// 3 /// because https://grpc.io/docs/guides/custom-name-resolution/
 		final String target = String.format("dns:///%s:%s/", uri.getHost(), port);
 		return new RpcTarget(target, plainText);
 	}
