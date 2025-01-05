@@ -173,6 +173,7 @@ public class DbFace extends DefaultFace {
 						this.mediaNode = this.list.getNode(this.nodeId);
 					}
 				}
+				this.lastRefreshError = null;
 				return;
 			}
 
@@ -346,6 +347,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	private AbstractItem getSelectedItem () {
+		if (this.mediaNode.size() < 1) return null;
 		if (this.selectedItemIndex < 0) return null;
 		if (this.selectedItemIndex >= this.mediaNode.size()) return null;
 		return this.mediaNode.get(this.selectedItemIndex);
@@ -360,7 +362,7 @@ public class DbFace extends DefaultFace {
 			return ret;
 		}
 
-		if (this.selectedItemIndex >= 0) {
+		if (this.selectedItemIndex >= 0 && this.mediaNode.size() > 0) {
 			final AbstractItem item = this.mediaNode.get(this.selectedItemIndex);
 			if (item instanceof IMediaItem) return Collections.singletonList((IMediaItem) item);
 		}
