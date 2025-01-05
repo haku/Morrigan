@@ -9,9 +9,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.vaguehope.common.rpc.RpcTarget;
+import com.vaguehope.common.rpc.RpcTarget.RpcConfigException;
 import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.Args.ArgsException;
-import com.vaguehope.morrigan.rpc.RpcTarget;
 
 public class RemoteInstance {
 
@@ -65,7 +66,13 @@ public class RemoteInstance {
 			if (StringUtils.isBlank(identifier)) throw new ArgsException("Invalid identifier: " + rawArg);
 			if (!IDENTIFIER_PATTERN.matcher(identifier).find()) throw new ArgsException("Invalid identifier: " + rawArg);
 
-			final RpcTarget target = RpcTarget.fromHttpUrl(url);
+			RpcTarget target;
+			try {
+				target = RpcTarget.fromHttpUrl(url);
+			}
+			catch (final RpcConfigException e) {
+				throw new ArgsException(e.getMessage());
+			}
 			if (ret.put(identifier, new RemoteInstance(identifier, target)) != null) throw new ArgsException("Duplicate identifier: " + identifier);
 		}
 		return new ArrayList<>(ret.values());

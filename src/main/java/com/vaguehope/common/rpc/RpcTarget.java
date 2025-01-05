@@ -1,13 +1,10 @@
-package com.vaguehope.morrigan.rpc;
+package com.vaguehope.common.rpc;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.vaguehope.morrigan.Args;
-import com.vaguehope.morrigan.Args.ArgsException;
 
 import io.grpc.ChannelCredentials;
 import io.grpc.Grpc;
@@ -60,17 +57,17 @@ public class RpcTarget {
 				&& Objects.equals(this.plainText, that.plainText);
 	}
 
-	public static RpcTarget fromHttpUrl(final String http) throws ArgsException {
+	public static RpcTarget fromHttpUrl(final String http) throws RpcConfigException {
 		final URI uri;
 		try {
 			uri = new URI(http);
 		}
 		catch (final URISyntaxException e) {
-			throw new Args.ArgsException("Invalid URI: " + http);
+			throw new RpcConfigException("Invalid URI: " + http);
 		}
 
 		if (StringUtils.isAllBlank(uri.getHost())) {
-			throw new Args.ArgsException("Invalid host: " + http);
+			throw new RpcConfigException("Invalid host: " + http);
 		}
 
 		int port;
@@ -84,13 +81,20 @@ public class RpcTarget {
 			plainText = true;
 		}
 		else {
-			throw new Args.ArgsException("Invalid scheme: " + uri.getScheme());
+			throw new RpcConfigException("Invalid scheme: " + uri.getScheme());
 		}
 		if (uri.getPort() > 0) port = uri.getPort();
 
 		// 3 /// because https://grpc.io/docs/guides/custom-name-resolution/
 		final String target = String.format("dns:///%s:%s/", uri.getHost(), port);
 		return new RpcTarget(target, plainText);
+	}
+
+	public static class RpcConfigException extends Exception {
+		private static final long serialVersionUID = -517208743045230535L;
+		public RpcConfigException(final String msg) {
+			super(msg);
+		}
 	}
 
 }

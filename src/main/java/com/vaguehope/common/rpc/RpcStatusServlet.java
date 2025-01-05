@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.rpc;
+package com.vaguehope.common.rpc;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.ImmutableTable.Builder;
 import com.google.common.collect.Table;
-import com.vaguehope.morrigan.rpc.RpcMetrics.ChannelState;
-import com.vaguehope.morrigan.rpc.RpcMetrics.ClientRecorder;
-import com.vaguehope.morrigan.rpc.RpcMetrics.MethodMetrics;
+import com.vaguehope.common.rpc.RpcMetrics.ChannelState;
+import com.vaguehope.common.rpc.RpcMetrics.ClientRecorder;
+import com.vaguehope.common.rpc.RpcMetrics.MethodMetrics;
 
 import io.grpc.Status;
 

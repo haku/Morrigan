@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.rpc;
+package com.vaguehope.common.rpc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
