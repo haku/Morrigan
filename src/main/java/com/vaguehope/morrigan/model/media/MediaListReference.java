@@ -19,6 +19,10 @@ public interface MediaListReference extends Comparable<MediaListReference> {
 	}
 
 	MediaListType getType ();
+
+	/**
+	 * same as IMediaItemList.getListId()
+	 */
 	String getIdentifier ();
 	String getTitle ();
 	String getMid();

@@ -47,6 +47,11 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 		read();
 	}
 
+	@Override
+	public String getListId() {
+		return "test:" + getListName();
+	}
+
 	public IMediaItem addTestTrack() throws MorriganException, DbException {
 		return addTestTrack(MimeType.MP3);
 	}

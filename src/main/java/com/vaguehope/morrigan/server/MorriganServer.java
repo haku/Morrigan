@@ -113,6 +113,7 @@ public class MorriganServer {
 		context.addServlet(new ServletHolder(
 				new MlistsServlet(playerListener, mediaFactory, asyncActions, transcoder, config)),
 				MlistsServlet.CONTEXTPATH + "/*");
+		context.addServlet(new ServletHolder(new MediaServlet(mediaFactory)), MediaServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new LogServlet()), LogServlet.CONTEXTPATH + "/*");
