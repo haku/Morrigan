@@ -20,7 +20,6 @@ import org.jupnp.support.model.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaNode;
@@ -32,7 +31,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 public class ContentDirectory {
 
 	static final String SEARCH_BY_ID_PREFIX = "id=";
-	private static final String ROOT_CONTENT_ID = "0"; // Root id of '0' is in the spec.
+	static final String ROOT_CONTENT_ID = "0"; // Root id of '0' is in the spec.
 	private static final String TYPE_CRITERIA = "(upnp:class derivedfrom \"object.item.videoItem\" or upnp:class derivedfrom \"object.item.audioItem\")";
 
 	private static final long SLEEP_BEFORE_RETRY_MILLIS = 500L;
@@ -114,35 +113,6 @@ public class ContentDirectory {
 		return dlnaSearch(term, maxResults);
 	}
 
-	public MediaNode fetchRootContainer (final int maxResults) throws MorriganException {
-		return fetchContainer(ROOT_CONTENT_ID, maxResults);
-	}
-
-	public MediaNode fetchContainer (final String containerId, final int maxResults) throws MorriganException {
-		final CountDownLatch cdl = new CountDownLatch(2);
-		final SyncBrowse mdReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L);
-		final SyncBrowse dcReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) maxResults);
-		this.controlPoint.execute(mdReq);
-		this.controlPoint.execute(dcReq);
-
-		await(cdl, "Browse '%s' on content directory '%s'.", containerId, this.contentDirectory);
-		if (mdReq.getRef() == null) throw new MorriganException(mdReq.getErr());
-		if (dcReq.getRef() == null) throw new MorriganException(dcReq.getErr());
-
-		if (mdReq.getRef().getContainers().size() < 1) {
-			throw new MorriganException("Container not found: " + containerId);
-		}
-
-		final Container cont = mdReq.getRef().getContainers().get(0);
-		final String nodeTitle = cont.getTitle();
-		final String parentId = "-1".equals(cont.getParentID()) ? null : cont.getParentID();
-
-		final List<MediaNode> nodes = didlContainersToNodes(dcReq.getRef().getContainers());
-		final List<IMediaItem> items = didlItemsToMnItems(dcReq.getRef().getItems());
-
-		return new MediaNode(containerId, nodeTitle, parentId, nodes, items);
-	}
-
 	private List<IMediaItem> oldDlnaBrowseRoot (final int maxResults) throws DbException {
 		return oldDlnaBrowse(ROOT_CONTENT_ID, maxResults);
 	}
@@ -201,10 +171,10 @@ public class ContentDirectory {
 		return didlItemsToMnItems(ref.get().getItems());
 	}
 
-	private static List<MediaNode> didlContainersToNodes (final List<Container> containers) {
+	public static List<MediaNode> didlContainersToNodes (final List<Container> containers) {
 		final List<MediaNode> ret = new ArrayList<>();
 		for (final Container c : containers) {
-			ret.add(new MediaNode(c.getId(), c.getTitle(), c.getParentID(), null, null));
+			ret.add(new MediaNode(c.getId(), c.getTitle(), c.getParentID()));
 		}
 		return ret;
 	}
@@ -217,7 +187,7 @@ public class ContentDirectory {
 		return ret;
 	}
 
-	private List<IMediaItem> didlItemsToMnItems (final List<Item> items) throws DbException {
+	public List<IMediaItem> didlItemsToMnItems (final List<Item> items) throws DbException {
 		final List<IMediaItem> ret = new ArrayList<>();
 		for (final Item item : items) {
 			ret.add(didlItemToMnItem(item));
@@ -267,7 +237,7 @@ public class ContentDirectory {
 		return new DidlItem(item, primaryRes, mediaType, artRes, metadata);
 	}
 
-	private static void await (final CountDownLatch cdl, final String msgFormat, final Object... msgArgs) {
+	public static void await (final CountDownLatch cdl, final String msgFormat, final Object... msgArgs) {
 		try {
 			if (cdl.await(ACTION_TIMEOUT_SECONDS, TimeUnit.SECONDS)) return;
 			throw new IllegalStateException("Timed out while trying to " + String.format(msgFormat, msgArgs));

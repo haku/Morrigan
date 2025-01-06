@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.transcode.Transcode;
@@ -42,7 +43,6 @@ public abstract class AbstractPlayer implements Player {
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 
-	private final OrderResolver orderHelper = new OrderResolver();
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<>(PlaybackOrder.MANUAL);
 
 	private final AtomicReference<Transcode> transcode = new AtomicReference<>(Transcode.NONE);
@@ -185,10 +185,6 @@ public abstract class AbstractPlayer implements Player {
 		if (order != old) saveState();
 	}
 
-	protected OrderResolver getOrderResolver () {
-		return this.orderHelper;
-	}
-
 	@Override
 	public PlaybackOrder getPlaybackOrder () {
 		return this.playbackOrder.get();
@@ -255,9 +251,15 @@ public abstract class AbstractPlayer implements Player {
 				order = PlaybackOrder.RANDOM;
 			}
 
-			final IMediaItem track = this.orderHelper.getNextTrack(pi.getList(), null, order);
+			final IMediaItem track;
+			try {
+				track = pi.getList().chooseItem(order, null);
+			}
+			catch (final MorriganException e) {
+				this.listeners.onException(e);
+				return;
+			}
 			if (track == null) {
-				System.err.println("Failed to fill in track: " + pi);
 				return;
 			}
 			pi = pi.withTrack(track);
@@ -343,7 +345,7 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	protected abstract void loadAndPlay (PlayItem item) throws Exception;
 
-	protected PlayItem findNextItemToPlay () {
+	protected PlayItem findNextItemToPlay () throws MorriganException {
 		final PlayItem queueItem = this.getQueue().takeFromQueue();
 		if (queueItem != null) return queueItem;
 
@@ -351,20 +353,20 @@ public abstract class AbstractPlayer implements Player {
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
 		if (currentItem != null && currentItem.isComplete()) {
-			final IMediaItem nextTrack = getOrderResolver().getNextTrack(currentItem.getList(), currentItem.getTrack(), pbOrder);
+			final IMediaItem nextTrack = currentItem.getList().chooseItem(pbOrder, currentItem.getTrack());
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
-			LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
+			LOG.i("chooseItem({},{},{}) == null.",
 					currentItem.getList(), currentItem.getTrack(), pbOrder);
 		}
 
 		final IMediaItemList currentList = getCurrentList();
-		final IMediaItem nextTrack = getOrderResolver().getNextTrack(currentList, null, pbOrder);
+		final IMediaItem nextTrack = currentList.chooseItem(pbOrder, null);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}
-		LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
+		LOG.i("chooseItem({},{},{}) == null.",
 				currentList, null, pbOrder);
 
 		return null;

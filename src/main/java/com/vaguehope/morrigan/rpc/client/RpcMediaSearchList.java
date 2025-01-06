@@ -7,13 +7,18 @@ import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.AboutReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.AboutRequest;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.ChooseMediaReply;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.ChooseMediaRequest;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.ChooseMethod;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 
 public class RpcMediaSearchList extends RpcMediaList {
 
@@ -26,6 +31,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 	private volatile SortColumn sortColumn = null;
 	private volatile SortDirection sortDirection = SortDirection.ASC;
 	private volatile List<SortColumn> supportSortColumns = null;
+	private volatile List<PlaybackOrder> supportChooseMethods = null;
 
 	public RpcMediaSearchList(
 			final String searchTerm,
@@ -53,11 +59,6 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
-	public int getCount() {
-		return this.mediaItems.size();
-	}
-
-	@Override
 	public List<IMediaItem> getMediaItems() {
 		return this.mediaItems;
 	}
@@ -72,7 +73,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 		final AboutReply about = blockingStub().about(AboutRequest.newBuilder().build());
 		final List<SortColumn> ret = new ArrayList<>();
-		for (SortField sf : about.getSupportedSortFieldList()) {
+		for (final SortField sf : about.getSupportedSortFieldList()) {
 			switch (sf) {
 			case FILE_PATH:
 				ret.add(SortColumn.FILE_PATH);
@@ -109,11 +110,6 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
-	public void read() throws MorriganException {
-		forceRead();  // TODO check if this needs optimising.
-	}
-
-	@Override
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
 		this.mediaItems = search(MediaType.TRACK, this.searchTerm, MAX_VIEW_SIZE,
@@ -126,6 +122,64 @@ public class RpcMediaSearchList extends RpcMediaList {
 	@Override
 	public long getDurationOfLastRead() {
 		return this.durationOfLastRead;
+	}
+
+	@Override
+	public int size() {
+		return this.mediaItems.size();
+	}
+
+	@Override
+	public AbstractItem get(final int index) {
+		return this.mediaItems.get(index);
+	}
+
+	@Override
+	public int indexOf(final Object o) {
+		return this.mediaItems.indexOf(o);
+	}
+
+	@Override
+	public List<PlaybackOrder> getSupportedChooseMethods() {
+		if (this.supportChooseMethods != null) return this.supportChooseMethods;
+
+		final AboutReply about = blockingStub().about(AboutRequest.newBuilder().build());
+		final List<PlaybackOrder> ret = new ArrayList<>();
+		for (final ChooseMethod cm : about.getSupportedChooseMethodList()) {
+			switch (cm) {
+			case RANDOM:
+				ret.add(PlaybackOrder.RANDOM);
+				break;
+			case LESS_RECENT:
+				ret.add(PlaybackOrder.BYLASTPLAYED);
+				break;
+			default:
+			}
+		}
+		if (ret.size() < 1) ret.add(PlaybackOrder.UNSPECIFIED);
+		this.supportChooseMethods = ret;
+		return ret;
+	}
+
+	@Override
+	public IMediaItem chooseItem(final PlaybackOrder order, final IMediaItem previousItem) throws MorriganException {
+		final ChooseMediaRequest.Builder req = ChooseMediaRequest.newBuilder()
+				.setQuery(this.searchTerm)
+				.setCount(1);
+		switch (order) {
+		case RANDOM:
+			req.setMethod(ChooseMethod.RANDOM);
+			break;
+		case BYLASTPLAYED:
+			req.setMethod(ChooseMethod.LESS_RECENT);
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported method: " + order);
+		}
+
+		final ChooseMediaReply resp = blockingStub().chooseMedia(req.build());
+		if (resp.getItemCount() < 1) return null;
+		return makeItem(resp.getItem(0));
 	}
 
 }

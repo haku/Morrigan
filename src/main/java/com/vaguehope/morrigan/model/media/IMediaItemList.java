@@ -14,11 +14,12 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
-public interface IMediaItemList {
+public interface IMediaItemList extends List<AbstractItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void dispose ();
@@ -46,10 +47,6 @@ public interface IMediaItemList {
 	void removeChangeEventListener (MediaItemListChangeListener listener);
 	MediaItemListChangeListener getChangeEventCaller ();
 
-	/**
-	 * May returns -1 if no data is available.
-	 */
-	int getCount ();
 	List<IMediaItem> getMediaItems();
 
 	/**
@@ -66,10 +63,10 @@ public interface IMediaItemList {
 	default boolean hasNodes() {
 		return false;
 	}
-	default MediaNode getRootNode() throws MorriganException {
+	default IMediaItemList makeNode(String id, String title) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
-	default MediaNode getNode(String id) throws MorriganException {
+	default List<MediaNode> getSubNodes() throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -99,6 +96,9 @@ public interface IMediaItemList {
 	default void setSort(SortColumn column, SortDirection direction) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
+
+	List<PlaybackOrder> getSupportedChooseMethods();
+	IMediaItem chooseItem(PlaybackOrder order, IMediaItem previousItem) throws MorriganException;
 
 	void addItem (IMediaItem item);
 	void removeItem (IMediaItem item) throws MorriganException;

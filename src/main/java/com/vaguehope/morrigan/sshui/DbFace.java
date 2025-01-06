@@ -69,7 +69,6 @@ public class DbFace extends DefaultFace {
 	private final MnContext mnContext;
 	private final SessionState sessionState;
 	private final IMediaItemList list;
-	private final String nodeId;
 	private final Player defaultPlayer;
 	private final DbHelper dbHelper;
 
@@ -79,7 +78,6 @@ public class DbFace extends DefaultFace {
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
 	private final Set<IMediaItem> selectedItems = new HashSet<>();
 
-	private MediaNode mediaNode;
 	private String lastRefreshError = null;
 	private int selectedItemIndex = -1;
 	private int scrollTop = 0;
@@ -97,14 +95,12 @@ public class DbFace extends DefaultFace {
 			final MnContext mnContext,
 			final SessionState sessionState,
 			final IMediaItemList list,
-			final String nodeId,
 			final Player defaultPlayer) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
 		this.sessionState = sessionState;
 		this.list = list;
-		this.nodeId = nodeId;
 		this.defaultPlayer = defaultPlayer;
 		this.dbHelper = new DbHelper(navigation, mnContext, sessionState, this.defaultPlayer, this.lastActionMessage, this);
 		refreshData(false);
@@ -123,7 +119,7 @@ public class DbFace extends DefaultFace {
 
 	public void restoreSavedScroll () throws MorriganException {
 		try {
-			final int limit = Math.max(this.list.getCount() - 1, 0);
+			final int limit = Math.max(this.list.size() - 1, 0);
 			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.list.getSerial(), this.scrollTop);
 			this.scrollTop = Math.max(Math.min(limit, scrollTopToRestore), 0);
 
@@ -150,7 +146,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	public void revealItem (final IMediaItem track) throws MorriganException {
-		final int i = this.mediaNode.indexOf(track);
+		final int i = this.list.indexOf(track);
 		if (i >= 0) {
 			setSelectedItem(i);
 		}
@@ -163,32 +159,16 @@ public class DbFace extends DefaultFace {
 		if (this.list == null) return;
 
 		try {
-			if (this.list.hasNodes()) {
-				// TODO nicer error handling when RPC fails!
-				if (this.mediaNode == null || force) {
-					if (this.nodeId == null) {
-						this.mediaNode = this.list.getRootNode();
-					}
-					else {
-						this.mediaNode = this.list.getNode(this.nodeId);
-					}
-				}
-				this.lastRefreshError = null;
-				return;
-			}
-
 			if (force) {
 				this.list.forceRead();
 			}
 			else {
 				this.list.read();
 			}
-			this.mediaNode = new MediaNode(null, null, null, Collections.emptyList(), this.list.getMediaItems());
 			this.lastRefreshError = null;
 		}
 		catch (final Exception e) {
 			this.lastRefreshError = "Load failed, press 'r' to retry: " + ExceptionHelper.causeTrace(e);
-			if (this.mediaNode == null) this.mediaNode = new MediaNode(null, null, null, Collections.emptyList(), Collections.emptyList());
 		}
 	}
 
@@ -315,20 +295,20 @@ public class DbFace extends DefaultFace {
 
 	private void menuMove(final VDirection direction, final int distance) throws MorriganException {
 		final int prevSelIndex = this.selectedItemIndex;
-		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.mediaNode));
+		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.list));
 		this.lastMoveDirection = direction;
 		updateMultiSelectAfterMove(prevSelIndex);
 	}
 
 	private void menuMoveEnd (final VDirection direction) throws MorriganException {
-		if (this.mediaNode == null || this.mediaNode.size() < 1) return;
+		if (this.list == null || this.list.size() < 1) return;
 		final int prevSelIndex = this.selectedItemIndex;
 		switch (direction) {
 			case UP:
 				setSelectedItem(0);
 				break;
 			case DOWN:
-				setSelectedItem(this.mediaNode.size() - 1);
+				setSelectedItem(this.list.size() - 1);
 				break;
 			default:
 		}
@@ -341,29 +321,29 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void setSelectedItem (final int index) {
-		this.selectedItemIndex = Math.min(index, this.mediaNode.size() - 1);
+		this.selectedItemIndex = Math.min(index, this.list.size() - 1);
 		this.selectedItemIndex = Math.max(this.selectedItemIndex, 0);
 		updateItemDetailsBar();
 	}
 
 	private AbstractItem getSelectedItem () {
-		if (this.mediaNode.size() < 1) return null;
+		if (this.list.size() < 1) return null;
 		if (this.selectedItemIndex < 0) return null;
-		if (this.selectedItemIndex >= this.mediaNode.size()) return null;
-		return this.mediaNode.get(this.selectedItemIndex);
+		if (this.selectedItemIndex >= this.list.size()) return null;
+		return this.list.get(this.selectedItemIndex);
 	}
 
 	private List<IMediaItem> getSelectedItems () {
 		if (this.selectedItems.size() > 0) {
 			final List<IMediaItem> ret = new ArrayList<>();
-			for (final AbstractItem item : this.mediaNode) {
+			for (final AbstractItem item : this.list) {
 				if (this.selectedItems.contains(item)) ret.add((IMediaItem) item);
 			}
 			return ret;
 		}
 
-		if (this.selectedItemIndex >= 0 && this.mediaNode.size() > 0) {
-			final AbstractItem item = this.mediaNode.get(this.selectedItemIndex);
+		if (this.selectedItemIndex >= 0 && this.list.size() > 0) {
+			final AbstractItem item = this.list.get(this.selectedItemIndex);
 			if (item instanceof IMediaItem) return Collections.singletonList((IMediaItem) item);
 		}
 
@@ -373,16 +353,18 @@ public class DbFace extends DefaultFace {
 	private void itemClicked(final WindowBasedTextGUI gui) {
 		final AbstractItem item = getSelectedItem();
 		if (item instanceof MediaNode) {
-			navToNode(((MediaNode) item).getId());
+			final MediaNode node = (MediaNode) item;
+			navToNode(node.getId(), node.getTitle());
 			return;
 		}
 
 		playSelection(gui);
 	}
 
-	private void navToNode(final String id) {
+	private void navToNode(final String id, String title) {
 		try {
-			final DbFace face = new DbFace(this.navigation, this.mnContext, this.sessionState, this.list, id, this.defaultPlayer);
+			final IMediaItemList newList = this.list.makeNode(id, title);
+			final DbFace face = new DbFace(this.navigation, this.mnContext, this.sessionState, newList, this.defaultPlayer);
 			face.restoreSavedScroll();
 			this.navigation.startFace(face);
 		}
@@ -471,10 +453,10 @@ public class DbFace extends DefaultFace {
 				i <= Math.max(prevSelIndex, this.selectedItemIndex);
 				i += 1) {
 			if (between(i, this.multiSelectStartIndex, this.selectedItemIndex)) {
-				selectItem(this.mediaNode.get(i), false);
+				selectItem(this.list.get(i), false);
 			}
 			else {
-				this.selectedItems.remove(this.mediaNode.get(i));
+				this.selectedItems.remove(this.list.get(i));
 			}
 		}
 		updateItemDetailsBar();
@@ -490,7 +472,7 @@ public class DbFace extends DefaultFace {
 			return;
 		}
 		this.selectedItems.clear();
-		this.selectedItems.addAll(this.mediaNode.getItems());
+		this.selectedItems.addAll(this.list.getMediaItems());
 		updateItemDetailsBar();
 	}
 
@@ -577,12 +559,12 @@ public class DbFace extends DefaultFace {
 		final int colRightPlayCount = colRightDuration - 8;
 		final int colRightLastPlayed = colRightPlayCount - 8;
 
-		for (int i = this.scrollTop; i < this.mediaNode.size(); i++) {
+		for (int i = this.scrollTop; i < this.list.size(); i++) {
 			if (i < 0) break;
 			if (i >= this.scrollTop + this.pageSize) break;
-			if (i >= this.mediaNode.size()) break;
+			if (i >= this.list.size()) break;
 
-			final AbstractItem item = this.mediaNode.get(i);
+			final AbstractItem item = this.list.get(i);
 			final String name = item.getTitle();
 			final boolean invert = i == this.selectedItemIndex;
 
@@ -606,7 +588,7 @@ public class DbFace extends DefaultFace {
 		tg.disableModifiers(SGR.REVERSE);
 
 		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
-		final String scroll = " " + PrintingThingsHelper.scrollSummary(this.mediaNode.size(), this.pageSize, this.scrollTop);
+		final String scroll = " " + PrintingThingsHelper.scrollSummary(this.list.size(), this.pageSize, this.scrollTop);
 		int left = columns - scroll.length();
 		this.textGuiUtils.drawTextWithBg(tg, left, bottom, scroll, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 		if (this.selectedItems.size() > 0) {

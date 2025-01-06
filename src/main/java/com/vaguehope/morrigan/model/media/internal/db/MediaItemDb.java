@@ -38,6 +38,8 @@ import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
+import com.vaguehope.morrigan.player.OrderResolver;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -46,6 +48,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 
 	private static final SortColumn DEFAULT_SORT_COLUMN = SortColumn.FILE_PATH;
 
+	private final OrderResolver orderResolver = new OrderResolver();
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private final MediaItemDbConfig config;
@@ -174,9 +177,9 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public int getCount () {
+	public int size() {
 		if (!isRead()) return -1;
-		return super.getCount();
+		return super.size();
 	}
 
 	@Override
@@ -404,6 +407,21 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 			this.librarySort = col;
 			this.librarySortDirection = dir;
 		}
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	@Override
+	public List<PlaybackOrder> getSupportedChooseMethods() {
+		final List<PlaybackOrder> ret = new ArrayList<>();
+		ret.addAll(Arrays.asList(PlaybackOrder.values()));
+		ret.remove(PlaybackOrder.UNSPECIFIED);
+		return ret;
+	}
+
+	@Override
+	public IMediaItem chooseItem(final PlaybackOrder order, final IMediaItem previousItem) {
+		return this.orderResolver.getNextTrack(this, previousItem, order);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

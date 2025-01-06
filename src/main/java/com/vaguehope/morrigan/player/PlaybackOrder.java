@@ -2,6 +2,13 @@ package com.vaguehope.morrigan.player;
 
 public enum PlaybackOrder {
 
+	UNSPECIFIED() {
+		@Override
+		public String toString () {
+			return "unspecified";
+		}
+	},
+
 	SEQUENTIAL() {
 		@Override
 		public String toString () {

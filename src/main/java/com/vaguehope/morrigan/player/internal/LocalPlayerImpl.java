@@ -312,10 +312,14 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	@Override
 	public void nextTrack () {
-		final PlayItem nextItemToPlay = findNextItemToPlay();
-		if (nextItemToPlay != null) {
-//			stopPlaying(); // Is this really needed?
-			loadAndStartPlaying(nextItemToPlay);
+		try {
+			final PlayItem nextItemToPlay = findNextItemToPlay();
+			if (nextItemToPlay != null) {
+				loadAndStartPlaying(nextItemToPlay);
+			}
+		}
+		catch (final MorriganException e) {
+			getListeners().onException(e);
 		}
 	}
 
@@ -443,13 +447,18 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			}
 
 			// Play next track?
-			final PlayItem nextItemToPlay = findNextItemToPlay();
-			if (nextItemToPlay != null) {
-				loadAndStartPlaying(nextItemToPlay);
+			try {
+				final PlayItem nextItemToPlay = findNextItemToPlay();
+				if (nextItemToPlay != null) {
+					loadAndStartPlaying(nextItemToPlay);
+				}
+				else {
+					LOG.i("No more tracks to play.");
+					getListeners().currentItemChanged(null);
+				}
 			}
-			else {
-				LOG.i("No more tracks to play.");
-				getListeners().currentItemChanged(null);
+			catch (final MorriganException e) {
+				getListeners().onException(e);
 			}
 		}
 

@@ -32,7 +32,7 @@ public class OrderResolver {
 	private final LimitedRecentSet<String> recentlyFollowedTags = new LimitedRecentSet<>(FOLLOWTAGS_MAX_TAG_HISTORY);
 
 	public IMediaItem getNextTrack (final IMediaItemList list, final IMediaItem track, final PlaybackOrder mode) {
-		if (list == null || list.getCount() <= 0) return null;
+		if (list == null || list.size() <= 0) return null;
 
 		switch (mode) {
 			case SEQUENTIAL:
@@ -82,7 +82,7 @@ public class OrderResolver {
 			}
 
 			tracksTried++;
-			if (tracksTried >= list.getCount()) {
+			if (tracksTried >= list.size()) {
 				i = -1;
 				break;
 			}

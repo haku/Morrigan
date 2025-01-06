@@ -6,11 +6,14 @@ import java.util.List;
 import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.Args.ArgsException;
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 
 public class RpcRemotesManager {
+
+	protected static final String ROOT_NODE_ID = "0";
 
 	private final RpcClient rpcClient;
 	private final MediaFactory mediaFactory;
@@ -38,8 +41,9 @@ public class RpcRemotesManager {
 		this.rpcClient.start();
 
 		for (final RemoteInstance ri : this.rpcClient.getRemoteInstances()) {
-			final IMediaItemStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
-			this.mediaFactory.addExternalList(new RpcMediaNodeList(ri, this.rpcClient, this.rpcContentServer, storage));
+			final IMediaItemStorageLayer storageLayer = this.mediaFactory.getStorageLayer(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
+			final MetadataStorage storage = new MetadataStorage(storageLayer);
+			this.mediaFactory.addExternalList(new RpcMediaNodeList(ROOT_NODE_ID, "", ri, this.rpcClient, this.rpcContentServer, storage));
 		}
 	}
 

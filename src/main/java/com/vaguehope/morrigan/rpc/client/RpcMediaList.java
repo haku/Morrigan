@@ -23,7 +23,6 @@ import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -32,16 +31,10 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public abstract class RpcMediaList extends EphemeralMediaList {
 
-	protected static final String ROOT_NODE_ID = "0";
-
 	protected final RemoteInstance ri;
 	private final RpcClient rpcClient;
 	private final MetadataStorage metadataStorage;
 	private final RpcContentServlet rpcContentServer;
-
-	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final IMediaItemStorageLayer storage) {
-		this(ri, rpcClient, rpcContentServer, new MetadataStorage(storage));
-	}
 
 	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage metadataStorage) {
 		this.ri = ri;
@@ -61,6 +54,11 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
+	public String toString() {
+		return String.format("%s{%s, %s}", getClass().getSimpleName(), getListId(), getListName());
+	}
+
+	@Override
 	public UUID getUuid() {
 		return UUID.nameUUIDFromBytes(this.ri.getLocalIdentifier().getBytes(StandardCharsets.UTF_8));
 	}
@@ -71,17 +69,27 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
+	public IMediaItemList makeNode(final String id, final String title) throws MorriganException {
+		return new RpcMediaNodeList(id, title, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
+	}
+
+	@Override
 	public boolean canMakeView() {
 		return true;
 	}
 
 	@Override
-	public IMediaItemList makeView(String filter) throws MorriganException {
+	public IMediaItemList makeView(final String filter) throws MorriganException {
 		return new RpcMediaSearchList(filter, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
 	}
 
 	protected MediaBlockingStub blockingStub() {
 		return this.rpcClient.getMediaBlockingStub(this.ri.getLocalIdentifier());
+	}
+
+	@Override
+	public void read() throws MorriganException {
+		forceRead();  // TODO check if this needs optimising.
 	}
 
 	@Override

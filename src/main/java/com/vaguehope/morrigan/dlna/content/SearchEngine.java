@@ -57,7 +57,7 @@ public class SearchEngine {
 		final List<Item> ret = new ArrayList<>();
 		for (final MediaListReference mlr : this.mediaFactory.getAllLocalMixedMediaDbs()) {
 			final IMediaItemDb db = this.mediaFactory.getLocalMixedMediaDb(mlr.getIdentifier());
-			if (db.getCount() > 0) { // Only search loaded DBs.
+			if (db.size() > 0) { // Only search loaded DBs.
 				final String cacheKey = String.format("%s|%s|%s", term, contentNode.getContainer().getId(), mlr.getIdentifier());
 				List<Item> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
 				if (results == null) {

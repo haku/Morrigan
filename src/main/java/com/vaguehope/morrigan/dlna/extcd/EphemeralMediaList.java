@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.dlna.extcd;
 import java.io.File;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -11,10 +12,12 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
@@ -25,7 +28,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public abstract class EphemeralMediaList implements IMediaItemList {
+public abstract class EphemeralMediaList extends AbstractList<AbstractItem> implements IMediaItemList {
 
 	@Override
 	public void dispose () {}
@@ -65,16 +68,6 @@ public abstract class EphemeralMediaList implements IMediaItemList {
 	}
 
 	@Override
-	public int getCount () {
-		return 0;
-	}
-
-	@Override
-	public List<IMediaItem> getMediaItems () {
-		return Collections.emptyList();
-	}
-
-	@Override
 	public long getDurationOfLastRead () {
 		return 0L;
 	}
@@ -96,6 +89,16 @@ public abstract class EphemeralMediaList implements IMediaItemList {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Not supported - but possible to implement.
+
+	@Override
+	public List<PlaybackOrder> getSupportedChooseMethods() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public IMediaItem chooseItem(final PlaybackOrder order, final IMediaItem previousItem) throws MorriganException {
+		return null;
+	}
 
 	@Override
 	public void copyItemFile (final IMediaItem item, final OutputStream os) throws MorriganException {
@@ -213,12 +216,6 @@ public abstract class EphemeralMediaList implements IMediaItemList {
 
 	@Override
 	public void setTrackDateLastPlayed (final IMediaItem item, final Date date) throws MorriganException {}
-
-	@Override
-	public void read () throws MorriganException {}
-
-	@Override
-	public void forceRead () throws MorriganException {}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Not supported - throw.

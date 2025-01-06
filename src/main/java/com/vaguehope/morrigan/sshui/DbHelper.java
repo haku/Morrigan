@@ -69,7 +69,7 @@ public class DbHelper {
 			this.defaultDbFace.revealItem(track);
 		}
 		else {
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null, this.defaultPlayer);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, this.defaultPlayer);
 			dbFace.revealItem(track);
 			this.navigation.startFace(dbFace);
 		}
@@ -82,7 +82,7 @@ public class DbHelper {
 
 	private void openFilter (final IMediaItemList db, final String searchTerm) throws MorriganException, DbException {
 		final IMediaItemList view = db.makeView(searchTerm);
-		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState, view, null, this.defaultPlayer));
+		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState, view, this.defaultPlayer));
 	}
 
 	private Player getPlayer (final WindowBasedTextGUI gui, final String title) {

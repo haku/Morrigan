@@ -48,13 +48,16 @@ public class ContentDirectoryHolder {
 		}
 	}
 
-	public void addContentDirectory (final RemoteDevice device, final RemoteService contentDirectory) {
+	public void addContentDirectory (final RemoteDevice device, final RemoteService remoteService) {
 		checkAlive();
 		final String id = idForDevice(device);
-		this.contentDirectories.put(id, contentDirectory);
+		this.contentDirectories.put(id, remoteService);
 		try {
-			final IMediaItemStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
-			this.mediaFactory.addExternalList(new ContentDirectoryDb(id, this.upnpService.getControlPoint(), device, contentDirectory, storage));
+			final IMediaItemStorageLayer storageLayer = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
+			final MetadataStorage storage = new MetadataStorage(storageLayer);
+			final ContentDirectory cd = new ContentDirectory(this.upnpService.getControlPoint(), remoteService, storage);
+			this.mediaFactory.addExternalList(new ContentDirectoryDb(id, ContentDirectory.ROOT_CONTENT_ID, "",
+					this.upnpService.getControlPoint(), device, remoteService, storage, cd));
 		}
 		catch (final DbException e) {
 			LOG.warn("Failed to create storage: {}", ErrorHelper.oneLineCauseTrace(e));

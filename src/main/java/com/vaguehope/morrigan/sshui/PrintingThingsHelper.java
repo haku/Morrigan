@@ -134,7 +134,7 @@ public final class PrintingThingsHelper {
 
 	public static String dbSummary (final IMediaItemDb db) {
 		final StringBuilder msg = new StringBuilder();
-		msg.append(db.getCount());
+		msg.append(db.size());
 		msg.append(" items totaling ");
 		final DurationData d = db.getTotalDuration();
 		if (!d.isComplete()) {

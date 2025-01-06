@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,13 +17,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.util.FileHelper;
 
-public abstract class MediaItemList implements IMediaItemList {
+public abstract class MediaItemList extends AbstractList<AbstractItem> implements IMediaItemList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -178,13 +180,6 @@ public abstract class MediaItemList implements IMediaItemList {
 
 	public abstract boolean allowDuplicateEntries ();
 
-	@Override
-	public int getCount () {
-		synchronized (this.mediaTracks) {
-			return this.mediaTracks.size();
-		}
-	}
-
 	/**
 	 * Returns an unmodifiable list of the playlist items.
 	 */
@@ -330,7 +325,7 @@ public abstract class MediaItemList implements IMediaItemList {
 
 	@Override
 	public String toString () {
-		return this.listName + " (" + getCount() + " items)";
+		return this.listName + " (" + size() + " items)";
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -390,6 +385,29 @@ public abstract class MediaItemList implements IMediaItemList {
 		}
 
 		return removedItems;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	@Override
+	public int size() {
+		synchronized (this.mediaTracks) {
+			return this.mediaTracks.size();
+		}
+	}
+
+	@Override
+	public AbstractItem get(final int index) {
+		synchronized (this.mediaTracks) {
+			return this.mediaTracks.get(index);
+		}
+	}
+
+	@Override
+	public int indexOf(final Object o) {
+		synchronized (this.mediaTracks) {
+			return this.mediaTracks.indexOf(o);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

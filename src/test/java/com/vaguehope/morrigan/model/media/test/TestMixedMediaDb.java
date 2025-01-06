@@ -79,7 +79,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public void printContent(final String prefix) {
-		System.out.println(prefix + ": TestDb " + getListName() + " has " + getCount() + " items:");
+		System.out.println(prefix + ": TestDb " + getListName() + " has " + size() + " items:");
 		final List<IMediaItem> items = getMediaItems();
 		for (final IMediaItem i :  items) {
 			System.out.print(i.isMissing() ? "M" : "-");
