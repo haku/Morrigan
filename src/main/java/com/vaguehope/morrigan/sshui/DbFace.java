@@ -527,7 +527,7 @@ public class DbFace extends DefaultFace {
 		}
 
 		final List<Runnable> actions = new ArrayList<>();
-		for (final SortColumn col : SortColumn.values()) {
+		for (final SortColumn col : this.list.getSuportedSortColumns()) {
 			actions.add(new SortColumnAction(col, SortDirection.ASC));
 			actions.add(new SortColumnAction(col, SortDirection.DESC));
 		}

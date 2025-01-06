@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -333,6 +334,14 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	@Override
 	public boolean canSort() {
 		return true;
+	}
+
+	@Override
+	public List<SortColumn> getSuportedSortColumns() {
+		final List<SortColumn> ret = new ArrayList<>();
+		ret.addAll(Arrays.asList(SortColumn.values()));
+		ret.remove(SortColumn.UNSPECIFIED);
+		return ret;
 	}
 
 	@Override

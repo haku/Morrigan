@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media;
 
 // conversion to actual DB column is at MixedMediaSqliteLayerInner.columnFromEnum()
 public enum SortColumn {
+	UNSPECIFIED("Unspecified"),
 	FILE_PATH("File Path"),
 	DATE_ADDED("Date Added"),
 	DURATION("Duration"),

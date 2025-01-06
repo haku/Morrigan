@@ -1,9 +1,13 @@
 package com.vaguehope.morrigan.rpc.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.AboutReply;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.AboutRequest;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -19,8 +23,9 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 	private volatile List<IMediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
-	private volatile SortColumn sortColumn = SortColumn.FILE_PATH;
+	private volatile SortColumn sortColumn = null;
 	private volatile SortDirection sortDirection = SortDirection.ASC;
+	private volatile List<SortColumn> supportSortColumns = null;
 
 	public RpcMediaSearchList(
 			final String searchTerm,
@@ -62,12 +67,40 @@ public class RpcMediaSearchList extends RpcMediaList {
 		return true;
 	}
 	@Override
+	public List<SortColumn> getSuportedSortColumns() {
+		if (this.supportSortColumns != null) return this.supportSortColumns;
+
+		final AboutReply about = blockingStub().about(AboutRequest.newBuilder().build());
+		final List<SortColumn> ret = new ArrayList<>();
+		for (SortField sf : about.getSupportedSortFieldList()) {
+			switch (sf) {
+			case FILE_PATH:
+				ret.add(SortColumn.FILE_PATH);
+				break;
+			case DATE_ADDED:
+				ret.add(SortColumn.DATE_ADDED);
+				break;
+			case DURATION:
+				ret.add(SortColumn.DURATION);
+				break;
+			default:
+			}
+		}
+		if (ret.size() < 1) ret.add(SortColumn.UNSPECIFIED);
+		this.supportSortColumns = ret;
+		return ret;
+	}
+	@Override
 	public void setSort(final SortColumn column, final SortDirection direction) throws MorriganException {
 		this.sortColumn = column;
 		this.sortDirection = direction;
 	}
 	@Override
 	public SortColumn getSortColumn() {
+		if (this.sortColumn == null) {
+			this.sortColumn = getSuportedSortColumns().get(0);
+		}
+
 		return this.sortColumn;
 	}
 	@Override
@@ -84,7 +117,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
 		this.mediaItems = search(MediaType.TRACK, this.searchTerm, MAX_VIEW_SIZE,
-				new SortColumn[] { this.sortColumn },
+				new SortColumn[] { getSortColumn() },
 				new SortDirection[] { this.sortDirection },
 				false);
 		this.durationOfLastRead = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);

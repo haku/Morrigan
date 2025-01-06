@@ -39,6 +39,7 @@ public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer {
 
 	public static IDbColumn columnFromEnum(final SortColumn col) {
 		switch (col) {
+		case UNSPECIFIED:
 		case FILE_PATH:
 			return SQL_TBL_MEDIAFILES_COL_FILE;
 		case DATE_ADDED:

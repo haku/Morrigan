@@ -87,6 +87,9 @@ public interface IMediaItemList {
 	default boolean canSort() {
 		return false;
 	}
+	default List<SortColumn> getSuportedSortColumns() {
+		throw new UnsupportedOperationException();
+	}
 	default SortColumn getSortColumn() {
 		throw new UnsupportedOperationException();
 	}
