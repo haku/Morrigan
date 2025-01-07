@@ -4,7 +4,9 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDb;
@@ -29,6 +32,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
 	private final List<MediaNode> nodes = new ArrayList<>();
+	private final Map<String, IMediaItemList> childNodes = new HashMap<>();
 
 	public static int getTrackNumber() {
 		return newTrackCounter.getAndIncrement();
@@ -42,7 +46,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 		this(name, true);
 	}
 
-	public TestMixedMediaDb (final String name, boolean autoCommit) throws DbException, MorriganException {
+	public TestMixedMediaDb (final String name, final boolean autoCommit) throws DbException, MorriganException {
 		super(name, new MediaItemDbConfig(name, null));
 		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(this);
 		setDbLayer(new MixedMediaSqliteLayerOuter("file:" + name + "?mode=memory&cache=shared", autoCommit, itemFactory));
@@ -64,6 +68,13 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	@Override
 	public List<MediaNode> getSubNodes() throws MorriganException {
 		return this.nodes;
+	}
+	public void addChildNode(final String id, final IMediaItemList node) {
+		this.childNodes.put(id, node);
+	}
+	@Override
+	public IMediaItemList makeNode(final String id, final String title) throws MorriganException {
+		return this.childNodes.get(id);
 	}
 
 	public IMediaItem addTestTrack() throws MorriganException, DbException {

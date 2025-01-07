@@ -174,16 +174,16 @@ public interface IMediaItemList extends List<AbstractItem> {
 	List<IMediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 
 	/**
-	 * filepath is anything the list identifies entries by, eg could also be an ID.
+	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
 	 * has to match getByFile();
 	 */
-	FileExistance hasFile (String filepath) throws MorriganException, DbException;
+	FileExistance hasFile (String identifer) throws MorriganException, DbException;
 
 	/**
-	 * filepath is anything the list identifies entries by, eg could also be an ID.
+	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
 	 * has to match hasFile();
 	 */
-	IMediaItem getByFile (String filepath) throws DbException;
+	IMediaItem getByFile (String identifer) throws DbException;
 
 	IMediaItem getByMd5 (BigInteger md5) throws DbException;
 

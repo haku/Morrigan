@@ -1,11 +1,13 @@
 package com.vaguehope.morrigan.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +34,7 @@ import com.vaguehope.morrigan.model.media.MediaTag;
  * GET /media/somelist                      root node, nodes and items
  * GET /media/somelist/node/node-id         sub node, nodes and items
  * GET /media/somelist/item/item-id         item file content
+ * GET /media/somelist/item/dir/a/file.ext  item file content
  * GET /media/somelist/search/query-string  list of items
  */
 @SuppressWarnings("serial")
@@ -86,7 +89,7 @@ public class MediaServlet extends HttpServlet {
 		}
 
 		if (!pth.hasSubPath()) {
-			serveNodesAndItems(list, "0", resp);
+			serveNodesAndItems(list, null, resp);
 			return;
 		}
 
@@ -94,11 +97,11 @@ public class MediaServlet extends HttpServlet {
 		if (!subPth.hasSubPath()) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
+		else if (subPth.pathIs("item")) {
+			serveItemContent(list, subPth.getSubPath(), req, resp);
+		}
 		else if (subPth.pathIs("node")) {
 			serveNodesAndItems(list, subPth.getSubPath(), resp);
-		}
-		else if (subPth.pathIs("item")) {
-			serveItemContent(list, subPth.getSubPath(), resp);
 		}
 		else if (subPth.pathIs("search")) {
 			serveSearchResults(list, subPth.getSubPath(), resp);
@@ -108,25 +111,64 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
-	private void serveNodesAndItems(final IMediaItemList list, final String nodeId, final HttpServletResponse resp)
-			throws IOException, MorriganException {
-		if (!list.hasNodes()) {
+	private void serveNodesAndItems(final IMediaItemList list, final String nodeId, final HttpServletResponse resp) throws IOException, MorriganException {
+		final IMediaItemList node = nodeId != null ? list.makeNode(nodeId, null) : list;
+		if (node == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		if (!node.hasNodes()) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-
 		final Map<String, Object> ret = new HashMap<>();
-		ret.put("nodes", list.getSubNodes());
-		ret.put("items", list.getMediaItems());
+		ret.put("nodes", node.getSubNodes());
+		ret.put("items", node.getMediaItems());
 		returnJson(resp, ret);
-	}
-
-	private void serveItemContent(final IMediaItemList list, final String itemId, final HttpServletResponse resp) {
-		throw new UnsupportedOperationException();
 	}
 
 	private void serveSearchResults(final IMediaItemList list, final String search, final HttpServletResponse resp) {
 		throw new UnsupportedOperationException();
+	}
+
+	private static void serveItemContent(final IMediaItemList list, final String itemId, final HttpServletRequest req, final HttpServletResponse resp) throws IOException, MorriganException {
+		final IMediaItem item = list.getByFile(itemId);
+		if (item == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+
+		final File file = item.getFile();
+		if (file != null) {
+			if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
+			if (file.exists()) {
+				returnLocalFile(req, resp, item, file);
+			}
+			else {
+				resp.sendError(HttpServletResponse.SC_GONE);
+			}
+			return;
+		}
+
+		returnRemoteFile(list, req, resp, item);
+	}
+
+	private static void returnLocalFile(final HttpServletRequest req, final HttpServletResponse resp, final IMediaItem item, final File file) throws IOException {
+		// TODO transcodes
+		// TODO resizes
+		// TODO check this sets all the right response headers, cos it probably does not.
+		ServletHelper.returnFile(file, item.getMimeType(), null, req.getHeader("Range"), resp);
+	}
+
+	@SuppressWarnings("resource")
+	private static void returnRemoteFile(final IMediaItemList list, final HttpServletRequest req, final HttpServletResponse resp, final IMediaItem item) throws MorriganException, IOException {
+		final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // TODO this is a total fake, should use last modified from remote system.
+		if (ServletHelper.checkCanReturn304(lastModified, req, resp)) return;
+		// TODO pass through length and modified date?
+		ServletHelper.prepForReturnFile(0, System.currentTimeMillis(), item.getMimeType(), null, resp);
+		// TODO some sort of check this is supported?
+		list.copyItemFile(item, resp.getOutputStream());
+		resp.flushBuffer();
 	}
 
 	@SuppressWarnings("resource")
