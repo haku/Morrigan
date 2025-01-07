@@ -519,7 +519,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	private List<IMediaItem> runSearch (final String term) throws DbException {
-		return this.undertest.search(MediaType.TRACK, term, 10);
+		return this.undertest.search(MediaType.TRACK, term, 10, null, null, false);
 	}
 
 	private static void assertSingleResult (final IMediaItem expected, final List<IMediaItem> actual) {

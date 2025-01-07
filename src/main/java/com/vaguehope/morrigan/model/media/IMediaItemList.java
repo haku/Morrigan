@@ -170,7 +170,12 @@ public interface IMediaItemList extends List<AbstractItem> {
 	 */
 	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
-	List<IMediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException;
+	default List<IMediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException {
+		return search(mediaType, term, maxResults, (SortColumn[]) null, (SortDirection[]) null, false);
+	}
+	default List<IMediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn sortColumn, SortDirection sortDirection, boolean includeDisabled) throws DbException {
+		return search(mediaType, term, maxResults, new SortColumn[] { sortColumn }, new SortDirection[] { sortDirection }, includeDisabled);
+	}
 	List<IMediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 
 	/**

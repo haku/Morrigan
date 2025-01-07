@@ -3,7 +3,10 @@ package com.vaguehope.morrigan.server;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.SerializationException;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,11 +28,15 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.SortColumn;
+import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.util.StringHelper;
 
 /* GET /media                               all lists
  * GET /media/somelist                      root node, nodes and items
@@ -104,14 +112,15 @@ public class MediaServlet extends HttpServlet {
 			serveNodesAndItems(list, subPth.getSubPath(), resp);
 		}
 		else if (subPth.pathIs("search")) {
-			serveSearchResults(list, subPth.getSubPath(), resp);
+			serveSearchResults(list, subPth.getSubPath(), req, resp);
 		}
 		else {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
 
-	private void serveNodesAndItems(final IMediaItemList list, final String nodeId, final HttpServletResponse resp) throws IOException, MorriganException {
+	private void serveNodesAndItems(final IMediaItemList list, final String nodeId, final HttpServletResponse resp)
+			throws IOException, MorriganException {
 		final IMediaItemList node = nodeId != null ? list.makeNode(nodeId, null) : list;
 		if (node == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -127,11 +136,20 @@ public class MediaServlet extends HttpServlet {
 		returnJson(resp, ret);
 	}
 
-	private void serveSearchResults(final IMediaItemList list, final String search, final HttpServletResponse resp) {
-		throw new UnsupportedOperationException();
+	private void serveSearchResults(final IMediaItemList list, final String search, final HttpServletRequest req, final HttpServletResponse resp)
+			throws IOException, MorriganException {
+		// TODO transcodes
+		// TODO specify result limit, including infinite
+		final String decoded = URLDecoder.decode(search, StandardCharsets.UTF_8);
+		final SortColumn sortColumns = parseSortColumns(req, SortColumn.FILE_PATH);
+		final SortDirection sortDirections = parseSortOrder(req, SortDirection.ASC);
+		final boolean includeDisabled = ServletHelper.readParamBoolean(req, "includedisabled", false);
+		final List<IMediaItem> items = list.search(MediaType.TRACK, decoded, MAX_RESULTS, sortColumns, sortDirections, includeDisabled);
+		returnJson(resp, items);
 	}
 
-	private static void serveItemContent(final IMediaItemList list, final String itemId, final HttpServletRequest req, final HttpServletResponse resp) throws IOException, MorriganException {
+	private static void serveItemContent(final IMediaItemList list, final String itemId, final HttpServletRequest req, final HttpServletResponse resp)
+			throws IOException, MorriganException {
 		final IMediaItem item = list.getByFile(itemId);
 		if (item == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -153,7 +171,8 @@ public class MediaServlet extends HttpServlet {
 		returnRemoteFile(list, req, resp, item);
 	}
 
-	private static void returnLocalFile(final HttpServletRequest req, final HttpServletResponse resp, final IMediaItem item, final File file) throws IOException {
+	private static void returnLocalFile(final HttpServletRequest req, final HttpServletResponse resp, final IMediaItem item, final File file)
+			throws IOException {
 		// TODO transcodes
 		// TODO resizes
 		// TODO check this sets all the right response headers, cos it probably does not.
@@ -161,8 +180,12 @@ public class MediaServlet extends HttpServlet {
 	}
 
 	@SuppressWarnings("resource")
-	private static void returnRemoteFile(final IMediaItemList list, final HttpServletRequest req, final HttpServletResponse resp, final IMediaItem item) throws MorriganException, IOException {
-		final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // TODO this is a total fake, should use last modified from remote system.
+	private static void returnRemoteFile(
+			final IMediaItemList list,
+			final HttpServletRequest req,
+			final HttpServletResponse resp,
+			final IMediaItem item) throws MorriganException, IOException {
+		final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // TODO this is fake, should use last modified from remote system.
 		if (ServletHelper.checkCanReturn304(lastModified, req, resp)) return;
 		// TODO pass through length and modified date?
 		ServletHelper.prepForReturnFile(0, System.currentTimeMillis(), item.getMimeType(), null, resp);
@@ -181,8 +204,8 @@ public class MediaServlet extends HttpServlet {
 		@Override
 		public JsonElement serialize(final MediaListReference src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
-			j.add("name", context.serialize(src.getTitle()));
-			j.add("mid", context.serialize(src.getMid().replace("/", ":")));
+			j.addProperty("name", src.getTitle());
+			j.addProperty("mid", src.getMid().replace("/", ":"));
 			return j;
 		}
 	}
@@ -191,9 +214,9 @@ public class MediaServlet extends HttpServlet {
 		@Override
 		public JsonElement serialize(final MediaNode src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
-			j.add("id", context.serialize(src.getId()));
-			j.add("title", context.serialize(src.getTitle()));
-			j.add("parentId", context.serialize(src.getParentId()));
+			j.addProperty("id", src.getId());
+			j.addProperty("title", src.getTitle());
+			j.addProperty("parentId", src.getParentId());
 			return j;
 		}
 	}
@@ -203,21 +226,21 @@ public class MediaServlet extends HttpServlet {
 		public JsonElement serialize(final IMediaItem src, final Type typeOfSrc, final JsonSerializationContext context) {
 			try {
 				final JsonObject j = new JsonObject();
-				j.add("id", context.serialize(src.getRemoteId())); // TODO how does this work for local items?
-				j.add("title", context.serialize(src.getTitle()));
-				j.add("size", context.serialize(src.getFileSize()));
-				j.add("added", context.serialize(src.getDateAdded()));
-				j.add("modified", context.serialize(src.getDateLastModified()));
-				j.add("mimetype", context.serialize(src.getMimeType()));
-				j.add("enabled", context.serialize(src.isEnabled()));
-				j.add("starts", context.serialize(src.getStartCount()));
-				j.add("ends", context.serialize(src.getEndCount()));
-				j.add("lastplayed", context.serialize(src.getDateLastPlayed()));
+				j.addProperty("id", StringUtils.firstNonBlank(src.getRemoteId(), src.getFilepath()));
+				j.addProperty("title", src.getTitle());
+				j.addProperty("size", src.getFileSize());
+				j.addProperty("added", dateToLong(src.getDateAdded()));
+				j.addProperty("modified", dateToLong(src.getDateLastModified()));
+				j.addProperty("mimetype", src.getMimeType());
+				j.addProperty("enabled", src.isEnabled());
+				j.addProperty("starts", src.getStartCount());
+				j.addProperty("ends", src.getEndCount());
+				j.addProperty("lastplayed", dateToLong(src.getDateLastPlayed()));
 				j.add("tags", context.serialize(src.getTags()));
 				return j;
 			}
 			catch (final MorriganException e) {
-				throw new SerializationException(e);  // TODO come up with a better plan here?  like catch and return HTTP 500.
+				throw new SerializationException(e); // TODO come up with a better plan here? like catch and return HTTP 500.
 			}
 		}
 	}
@@ -232,4 +255,26 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
+	private static Long dateToLong(final Date d) {
+		return d != null ? d.getTime() : null;
+	}
+
+	private static SortColumn parseSortColumns (final HttpServletRequest req, SortColumn defVal) {
+		final String raw = StringHelper.downcase(StringHelper.trimToNull(req.getParameter("sort")));
+		for (final SortColumn sortColumn : SortColumn.values()) {
+			if (sortColumn.name().equalsIgnoreCase(raw)) return sortColumn;
+		}
+		return defVal;
+	}
+
+	private static SortDirection parseSortOrder (final HttpServletRequest req, SortDirection defVal) {
+		final String raw = StringHelper.downcase(StringHelper.trimToNull(req.getParameter("order")));
+		if ("asc".equals(raw)) {
+			return SortDirection.ASC;
+		}
+		else if ("desc".equals(raw)) {
+			return SortDirection.DESC;
+		}
+		return defVal;
+	}
 }

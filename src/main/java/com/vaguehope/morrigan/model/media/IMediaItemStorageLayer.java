@@ -77,7 +77,6 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	IMediaItem getByFile (File file) throws DbException;
 	IMediaItem getByFile (String filePath) throws DbException;
 	IMediaItem getByMd5 (BigInteger md5) throws DbException;
-	List<IMediaItem> search(MediaType mediaType, String term, int maxResults) throws DbException;
 	List<IMediaItem> search(MediaType mediaType, String term, int maxResults, SortColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
 	boolean[] addFiles (MediaType mediaType, List<File> files) throws DbException;

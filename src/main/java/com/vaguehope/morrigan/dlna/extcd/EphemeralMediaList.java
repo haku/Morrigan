@@ -47,14 +47,6 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Content.
-
-	@Override
-	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults) throws DbException {
-		return search(mediaType, term, maxResults, null, null, false);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Getters that return nothing.
 
 	@Override
