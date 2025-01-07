@@ -5,15 +5,14 @@ import java.util.Date;
 import java.util.Objects;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaItem;
 
 public class MixedMediaItem extends MediaItem implements IMediaItem {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constructors - protected so only siblings can create instances.
 
-	protected MixedMediaItem (final String filePath) {
-		super(filePath);
+	protected MixedMediaItem (final String filePath, final IMediaItemList list) {
+		super(filePath, list);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

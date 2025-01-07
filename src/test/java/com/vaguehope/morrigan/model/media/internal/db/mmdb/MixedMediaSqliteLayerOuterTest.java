@@ -30,7 +30,7 @@ public class MixedMediaSqliteLayerOuterTest {
 
 	@Before
 	public void before () throws Exception {
-		this.undertest = new MixedMediaSqliteLayerOuter(":memory:", true, new MixedMediaItemFactory());
+		this.undertest = new MixedMediaSqliteLayerOuter(":memory:", true, new MixedMediaItemFactory(null));
 		this.expectedAllItems = new ArrayList<>();
 		addNoiseToDb();
 	}

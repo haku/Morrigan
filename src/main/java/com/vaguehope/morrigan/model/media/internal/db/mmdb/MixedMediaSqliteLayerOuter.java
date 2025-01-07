@@ -20,21 +20,12 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-	private final MixedMediaItemFactory itemFactory;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constructors.
-
 	public MixedMediaSqliteLayerOuter (final String dbFilePath, final boolean autoCommit, final MixedMediaItemFactory itemFactory) throws DbException {
 		super(dbFilePath, autoCommit, itemFactory);
-		this.itemFactory = itemFactory;
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public List<IDbColumn> getMediaTblColumns () {

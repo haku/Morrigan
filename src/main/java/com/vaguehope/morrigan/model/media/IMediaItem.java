@@ -3,8 +3,10 @@ package com.vaguehope.morrigan.model.media;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 
 
@@ -58,6 +60,8 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 	 * May return null.
 	 */
 	String getRemoteId ();
+
+	List<MediaTag> getTags() throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // track

@@ -10,7 +10,6 @@ import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -24,8 +23,8 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 public abstract class AbstractMixedMediaDb extends MediaItemDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected AbstractMixedMediaDb (final String listName, final MediaItemDbConfig config, final IMediaItemStorageLayer dbLayer) {
-		super(listName, config, dbLayer);
+	protected AbstractMixedMediaDb (final String listName, final MediaItemDbConfig config) {
+		super(listName, config);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

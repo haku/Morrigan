@@ -30,7 +30,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 
 	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayerInner.class);
 
-	private final MixedMediaItemFactory itemFactory;
+	protected final MixedMediaItemFactory itemFactory;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

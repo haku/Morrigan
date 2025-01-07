@@ -31,6 +31,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.CopyToLocalMmdbTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
@@ -99,7 +100,8 @@ public class MediaFactoryImpl implements MediaFactory {
 	 */
 	@Override
 	public IMediaItemList getMediaListByMid(final String mid, final String filter) throws DbException, MorriganException {
-		final String[] parts = mid.split("/");
+		String[] parts = mid.split(":", 2);
+		if (parts.length < 2) parts = mid.split("/");
 		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
 
 		final String type = parts[0];
@@ -136,7 +138,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	 * For testing use only.  Can use to add in mock implementations.
 	 */
 	public void addLocalMixedMediaDb (final IMediaItemDb db) {
-		this.addedLocals.put(db.getListName(), db);
+		this.addedLocals.put(db.getListId(), db);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -180,8 +182,9 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IMediaItemStorageLayer getStorageLayer (final String filepath) throws DbException {
-		return MixedMediaSqliteLayerFactory.getTransactional(filepath);
+	public IMediaItemStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
+		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(null);
+		return MixedMediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -241,7 +244,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public MorriganTask getRemoteMixedMediaDbUpdateTask (final IRemoteMixedMediaDb library) {
-		return RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(library);
+		return RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(library, null);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media.test;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
@@ -26,6 +28,8 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	private static final AtomicInteger newDbCounter = new AtomicInteger(0);
 	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
+	private final List<MediaNode> nodes = new ArrayList<>();
+
 	public static int getTrackNumber() {
 		return newTrackCounter.getAndIncrement();
 	}
@@ -39,17 +43,27 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public TestMixedMediaDb (final String name, boolean autoCommit) throws DbException, MorriganException {
-		super(name,
-				new MediaItemDbConfig(name, null),
-				new MixedMediaSqliteLayerOuter(
-						"file:" + name + "?mode=memory&cache=shared",
-						autoCommit, new MixedMediaItemFactory()));
+		super(name, new MediaItemDbConfig(name, null));
+		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(this);
+		setDbLayer(new MixedMediaSqliteLayerOuter("file:" + name + "?mode=memory&cache=shared", autoCommit, itemFactory));
 		read();
 	}
 
 	@Override
 	public String getListId() {
-		return "test:" + getListName();
+		return getListName();
+	}
+
+	public void addNode(final MediaNode node) {
+		this.nodes.add(node);
+	}
+	@Override
+	public boolean hasNodes() {
+		return this.nodes.size() > 0;
+	}
+	@Override
+	public List<MediaNode> getSubNodes() throws MorriganException {
+		return this.nodes;
 	}
 
 	public IMediaItem addTestTrack() throws MorriganException, DbException {
@@ -72,14 +86,17 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
+		final long lastPlayed = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(RND.nextInt(144000));
+		return addTestTrack(file, md5, sha1, lastPlayed, System.currentTimeMillis());
+	}
+
+	public IMediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1, final long lastPlayed, final long dateAdded) throws MorriganException, DbException {
 		addFile(MediaType.TRACK, file);
 		final IMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
 		setItemMd5(track, md5);
 		setItemSha1(track, sha1);
-
-		final Date lastPlayed = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(RND.nextInt(144000)));
-		setTrackDateLastPlayed(track, lastPlayed);
-
+		setTrackDateLastPlayed(track, new Date(lastPlayed));
+		setItemDateAdded(track, new Date(dateAdded));
 		return track;
 	}
 

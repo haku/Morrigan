@@ -323,7 +323,7 @@ public class OrderResolver {
 	}
 
 	private static boolean validChoice (final IMediaItem i, final IMediaItem current) {
-		return i.isEnabled() && i.isPlayable() && !i.isMissing() && i != current;
+		return i.isEnabled() && i.isPlayable() && !i.isMissing() && !i.equals(current);
 	}
 
 	private static long dateDiffDays (final Date olderDate, final Date newerDate) {

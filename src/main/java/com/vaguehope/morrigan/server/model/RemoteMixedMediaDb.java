@@ -29,43 +29,37 @@ import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteMixedMediaDb {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 	public static final String DBKEY_CACHEDATE = "CACHEDATE";
 	public static final String DBKEY_PASS = "PASS";
 
 	public static final long MAX_CACHE_AGE = 60 * 60 * 1000L; // 1 hour.
-	private long cacheDate = -1;
 
+	private final RemoteHostDetails remoteHostDetails;
+
+	private long cacheDate = -1;
 	private TaskEventListener taskEventListener;
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	/**
-	 * Connect to existing DB.
-	 */
-	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final IMediaItemStorageLayer localDbLayer) throws DbException {
-		super(dbName, config, localDbLayer); // TODO expose search term.
-		readCacheDate();
+	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details) throws DbException {
+		super(dbName, config); // TODO expose search term.
+		this.remoteHostDetails = details;
 	}
 
-	/**
-	 * Create a fresh DB.
-	 */
-	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details, final IMediaItemStorageLayer localDbLayer) throws DbException {
-		super(dbName, config, localDbLayer); // TODO expose search term.
+	@Override
+	public void setDbLayer(IMediaItemStorageLayer dbLayer) throws DbException {
+		super.setDbLayer(dbLayer);
 
-		setUri(details.getUri());
-		setPass(details.getPass() != null ? details.getPass() : "");
+		// Create a fresh DB.
+		if (this.remoteHostDetails != null) {
+			setUri(this.remoteHostDetails.getUri());
+			setPass(this.remoteHostDetails.getPass() != null ? this.remoteHostDetails.getPass() : "");
+		}
 		readCacheDate();
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private void readCacheDate () throws DbException {
 		String dateString = getDbLayer().getProp(DBKEY_CACHEDATE);

@@ -3,9 +3,13 @@ package com.vaguehope.morrigan.model.media.internal;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -23,7 +27,10 @@ public abstract class MediaItem implements IMediaItem {
 	private static final boolean ENABLED_DEFAULT = true;
 	private static final int DBROWID_DEFAULT = -1;
 
-	public MediaItem (final String filePath) {
+	private final IMediaItemList list;
+
+	public MediaItem (final String filePath, final IMediaItemList list) {
+		this.list = list;
 		setFilepath(filePath);
 	}
 
@@ -202,6 +209,11 @@ public abstract class MediaItem implements IMediaItem {
 	@Override
 	public String getRemoteId () {
 		return null;
+	}
+
+	@Override
+	public List<MediaTag> getTags() throws MorriganException {
+		return this.list.getTags(this);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

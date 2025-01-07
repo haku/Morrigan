@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -23,12 +24,11 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, Me
 
 	@Override
 	protected IMediaItemDb makeNewProduct (MediaItemDbConfig material) throws DbException {
-		IMediaItemDb r = new LocalMixedMediaDb(
-				LocalMixedMediaDbHelper.getMmdbTitle(material),
-				material,
-				MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath())
-				);
-		return r;
+		final LocalMixedMediaDb db = new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), material);
+		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(db);
+		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
+		db.setDbLayer(dbLayer);
+		return db;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,13 +55,12 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, Me
 	 * use the same object cache as the main instance.
 	 */
 	public static IMediaItemDb getTransactional (String fullFilePath) throws DbException {
-		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
-		IMediaItemDb r = new LocalMixedMediaDb(
-				LocalMixedMediaDbHelper.getMmdbTitle(config),
-				config,
-				MixedMediaSqliteLayerFactory.getTransactional(fullFilePath) // TODO check does not share object cache.
-		);
-		return r;
+		final MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
+		final LocalMixedMediaDb db = new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(config), config);
+		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(db);
+		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getTransactional(fullFilePath, itemFactory);
+		db.setDbLayer(dbLayer);
+		return db;
 	}
 
 	/**

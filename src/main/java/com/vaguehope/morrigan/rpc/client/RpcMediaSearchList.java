@@ -179,7 +179,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 		final ChooseMediaReply resp = blockingStub().chooseMedia(req.build());
 		if (resp.getItemCount() < 1) return null;
-		return makeItem(resp.getItem(0));
+		return makeItem(resp.getItem(0), Collections.emptyList());
 	}
 
 }

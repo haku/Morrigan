@@ -1,8 +1,13 @@
 package com.vaguehope.morrigan.dlna.extcd;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.jupnp.support.model.container.Container;
+
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaTag;
 
 public class DidlContainer extends EphemeralItem {
 
@@ -92,6 +97,11 @@ public class DidlContainer extends EphemeralItem {
 	@Override
 	public int getHeight () {
 		return 0;
+	}
+
+	@Override
+	public List<MediaTag> getTags() throws MorriganException {
+		return Collections.emptyList();
 	}
 
 }

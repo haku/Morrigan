@@ -54,7 +54,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	private final MediaItemDbConfig config;
 	private final String searchTerm;
 
-	private final IMediaItemStorageLayer dbLayer;
+	private IMediaItemStorageLayer dbLayer;
 	private SortColumn librarySort;
 	private SortDirection librarySortDirection;
 	private boolean hideMissing;
@@ -65,13 +65,9 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	 * TODO FIXME merge libraryName and searchTerm to match return value of
 	 * getSerial().
 	 */
-	protected MediaItemDb (final String listName, final MediaItemDbConfig config, final IMediaItemStorageLayer dbLayer) {
-		super(dbLayer.getDbFilePath(), listName);
-
-		if (config == null) throw new IllegalArgumentException("Must not be null: config");
-
+	protected MediaItemDb (final String listName, final MediaItemDbConfig config) {
+		super(config.getFilePath(), listName);
 		this.config = config;
-		this.dbLayer = dbLayer;
 
 		this.librarySort = DEFAULT_SORT_COLUMN;
 		this.librarySortDirection = SortDirection.ASC;
@@ -83,14 +79,6 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		else {
 			this.searchTerm = null;
 		}
-
-		try {
-			readSortFromDb();
-		}
-		catch (DbException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	@SuppressWarnings("deprecation")
@@ -119,6 +107,18 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	@Override
 	public int hashCode() {
 		return this.config.hashCode();
+	}
+
+	public void setDbLayer(final IMediaItemStorageLayer dbLayer) throws DbException {
+		if (this.dbLayer != null) throw new IllegalStateException("dbLayer already set: " + this.dbLayer);
+		this.dbLayer = dbLayer;
+
+		try {
+			readSortFromDb();
+		}
+		catch (DbException e) {
+			e.printStackTrace();
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -154,6 +154,7 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 
 	@Override
 	public IMediaItemStorageLayer getDbLayer() {
+		if (this.dbLayer == null) throw new IllegalStateException("dbLayer not set.");
 		return this.dbLayer;
 	}
 
@@ -1000,8 +1001,8 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	 */
 	@Override
 	public IMediaItem addFile (final MediaType mediaType, final File file) throws MorriganException, DbException {
-		IMediaItem track = null;
 		boolean added = this.dbLayer.addFile(mediaType, file);
+		IMediaItem track = null;
 		if (added) {
 			track = getDbLayer().getNewT(file.getAbsolutePath());
 			track.reset();

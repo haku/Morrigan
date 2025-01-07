@@ -23,7 +23,7 @@ public class RemoteMixedMediaDbUpdateTask implements MorriganTask {
 		}
 
 		@Override
-		protected RemoteMixedMediaDbUpdateTask makeNewProduct (final IRemoteMixedMediaDb material) {
+		protected RemoteMixedMediaDbUpdateTask makeNewProduct(final IRemoteMixedMediaDb material, final Void config) throws RuntimeException {
 			return new RemoteMixedMediaDbUpdateTask(material);
 		}
 

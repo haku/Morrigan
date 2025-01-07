@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaTag;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortBy;
@@ -102,11 +104,11 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	public IMediaItem getByFile(final String identifer) throws DbException {
 		final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
 		if (ret.getExistence() != com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance.EXISTS) return null;
-		return makeItem(ret.getItem());
+		return makeItem(ret.getItem(), ret.getTagList());
 	}
 
-	protected RpcMediaItem makeItem(final MediaItem item) throws DbException {
-		return new RpcMediaItem(item, this.metadataStorage.getMetadataProxy(item.getId()));
+	protected RpcMediaItem makeItem(final MediaItem item, final List<MediaTag> tags) throws DbException {
+		return new RpcMediaItem(item, tags, this.metadataStorage.getMetadataProxy(item.getId()));
 	}
 
 	@Override
@@ -156,7 +158,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 		final List<IMediaItem> items = new ArrayList<>(resp.getResultList().size());
 		for (final MediaItem i : resp.getResultList()) {
-			items.add(makeItem(i));
+			items.add(makeItem(i, Collections.emptyList()));
 		}
 		return items;
 	}

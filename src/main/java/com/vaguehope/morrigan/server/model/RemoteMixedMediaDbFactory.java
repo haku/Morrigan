@@ -5,6 +5,7 @@ import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -28,69 +29,51 @@ public final class RemoteMixedMediaDbFactory {
 		}
 
 		@Override
-		protected IRemoteMixedMediaDb makeNewProduct (final MediaItemDbConfig material) throws MorriganException {
-			return makeNewProduct(material, null);
-		}
-
-		@Override
 		protected IRemoteMixedMediaDb makeNewProduct (final MediaItemDbConfig material, final RemoteHostDetails config) throws MorriganException {
-			IRemoteMixedMediaDb ret = null;
-			if (config != null) {
-				try {
-					ret = new RemoteMixedMediaDb(
-							RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material),
-							material,
-							config,
-							MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath()));
-				}
-				catch (DbException e) {
-					throw new MorriganException(e);
-				}
+			try {
+				final RemoteMixedMediaDb db = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), material, config);
+				final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(db);
+				final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
+				db.setDbLayer(dbLayer);
+				return db;
 			}
-			else {
-				try {
-					ret = new RemoteMixedMediaDb(
-							RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material),
-							material,
-							MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath()));
-				}
-				catch (DbException e) {
-					throw new MorriganException(e);
-				}
+			catch (final DbException e) {
+				throw new MorriganException(e);
 			}
-			return ret;
 		}
-
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static IRemoteMixedMediaDb getNew (final String fullFilePath, final RemoteHostDetails details) throws MorriganException {
-		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
+		final MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
 		return INSTANCE.manufacture(config, details);
 	}
 
 	public static IRemoteMixedMediaDb getExisting (final String fullFilePath) throws MorriganException {
-		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
-		return INSTANCE.manufacture(config);
+		final MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
+		return INSTANCE.manufacture(config, null);
 	}
 
 	public static IRemoteMixedMediaDb getExisting (final String fullFilePath, final String filter) throws MorriganException {
-		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, filter);
-		return INSTANCE.manufacture(config);
+		final MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, filter);
+		return INSTANCE.manufacture(config, null);
 	}
 
 	public static IRemoteMixedMediaDb getExistingBySerial (final String serial) throws MorriganException {
-		MediaItemDbConfig config = new MediaItemDbConfig(serial);
-		return INSTANCE.manufacture(config);
+		final MediaItemDbConfig config = new MediaItemDbConfig(serial);
+		return INSTANCE.manufacture(config, null);
 	}
 
 	public static IRemoteMixedMediaDb getTransactionalClone (final IRemoteMixedMediaDb rmmdb) throws DbException {
-		String title = RemoteMixedMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
-		MediaItemDbConfig config = new MediaItemDbConfig(rmmdb.getDbPath(), null);
-		IMediaItemStorageLayer storage = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath());
-		RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUri(), rmmdb.getPass());
-		return new RemoteMixedMediaDb(title, config, details, storage);
+		final String title = RemoteMixedMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
+		final MediaItemDbConfig config = new MediaItemDbConfig(rmmdb.getDbPath(), null);
+		final RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUri(), rmmdb.getPass());
+		final RemoteMixedMediaDb db = new RemoteMixedMediaDb(title, config, details);
+		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(db);
+		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath(), itemFactory);
+		db.setDbLayer(dbLayer);
+		return db;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

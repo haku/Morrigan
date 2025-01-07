@@ -54,7 +54,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 
 		final List<IMediaItem> items = new ArrayList<>(resp.getItemCount());
 		for (final MediaItem i : resp.getItemList()) {
-			items.add(makeItem(i));
+			items.add(makeItem(i, Collections.emptyList()));
 		}
 
 		this.mediaNodes = nodes;

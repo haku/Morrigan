@@ -1,7 +1,9 @@
 package com.vaguehope.morrigan.dlna.extcd;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.jupnp.model.ModelUtil;
 import org.jupnp.support.model.DIDLObject;
@@ -11,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.dlna.UpnpHelper;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public class DidlItem extends EphemeralItem {
@@ -133,6 +137,11 @@ public class DidlItem extends EphemeralItem {
 	@Override
 	public int getHeight () {
 		return this.primaryRes.getResolutionY();
+	}
+
+	@Override
+	public List<MediaTag> getTags() throws MorriganException {
+		return Collections.emptyList();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

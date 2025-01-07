@@ -161,7 +161,7 @@ public class CoverArtHelperTest {
 	private static class TestItem extends MixedMediaItem {
 
 		public TestItem (final String filePath) {
-			super(filePath);
+			super(filePath, null);
 		}
 
 	}

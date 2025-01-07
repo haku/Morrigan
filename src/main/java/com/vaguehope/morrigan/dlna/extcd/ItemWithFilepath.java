@@ -2,8 +2,11 @@ package com.vaguehope.morrigan.dlna.extcd;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaTag;
 
 public class ItemWithFilepath extends EphemeralItem {
 
@@ -95,6 +98,11 @@ public class ItemWithFilepath extends EphemeralItem {
 	@Override
 	public int getHeight () {
 		return this.item.getHeight();
+	}
+
+	@Override
+	public List<MediaTag> getTags() throws MorriganException {
+		return this.item.getTags();
 	}
 
 }

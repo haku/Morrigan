@@ -1,20 +1,26 @@
 package com.vaguehope.morrigan.rpc.client;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralItem;
 import com.vaguehope.morrigan.dlna.extcd.Metadata;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaTag;
 
 public class RpcMediaItem extends EphemeralItem {
 
 	private final MediaItem rpcItem;
 	private final Metadata metadata;
+	private final List<MediaTag> tags;
 
-	public RpcMediaItem(final MediaItem rpcItem, final Metadata metadata) {
+	public RpcMediaItem(final MediaItem rpcItem, List<MediaToadProto.MediaTag> tags, final Metadata metadata) {
 		this.rpcItem = rpcItem;
 		this.metadata = metadata;
+		this.tags = RpcTag.convertTags(tags);
 	}
 
 	@Override
@@ -95,6 +101,10 @@ public class RpcMediaItem extends EphemeralItem {
 		return 0;
 	}
 
+	@Override
+	public List<MediaTag> getTags() throws MorriganException {
+		return this.tags;
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Persisted metadata.

@@ -69,7 +69,7 @@ public interface MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	IMediaItemStorageLayer getStorageLayer (String filepath) throws DbException;
+	IMediaItemStorageLayer getStorageLayerWithNewItemFactory(String filepath) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

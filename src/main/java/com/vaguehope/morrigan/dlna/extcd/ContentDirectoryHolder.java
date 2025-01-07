@@ -53,7 +53,7 @@ public class ContentDirectoryHolder {
 		final String id = idForDevice(device);
 		this.contentDirectories.put(id, remoteService);
 		try {
-			final IMediaItemStorageLayer storageLayer = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
+			final IMediaItemStorageLayer storageLayer = this.mediaFactory.getStorageLayerWithNewItemFactory(getMetadataDbPath(id).getAbsolutePath());
 			final MetadataStorage storage = new MetadataStorage(storageLayer);
 			final ContentDirectory cd = new ContentDirectory(this.upnpService.getControlPoint(), remoteService, storage);
 			this.mediaFactory.addExternalList(new ContentDirectoryDb(id, ContentDirectory.ROOT_CONTENT_ID, "",

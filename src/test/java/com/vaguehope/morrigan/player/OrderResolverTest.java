@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.player;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 import java.util.Random;
@@ -29,17 +29,25 @@ public class OrderResolverTest {
 	}
 
 	@Test
-	public void itPicksTheOneTrackWhenThereIsOnlyOneTrackByLastPlayed () throws Exception {
-		final IMediaItem expected = this.testDb.addTestTrack();
+	public void itPicksTheOnlyTrackWhenByLastPlayed () throws Exception {
+		final IMediaItem other = this.testDb.addTestTrack();
 		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.BYLASTPLAYED);
-		assertSame(expected, actual);
+		assertEquals(other, actual);
+	}
+
+	@Test
+	public void itDoesNotPickTheSameTrackWhenByLastPlayed () throws Exception {
+		final IMediaItem current = this.testDb.addTestTrack();
+		final IMediaItem other = this.testDb.addTestTrack();
+		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.BYLASTPLAYED);
+		assertEquals(other, actual);
 	}
 
 	@Test
 	public void FollowTagsReturnsNullIfNoOtherTracksToChoose () throws Exception {
 		final IMediaItem expected = this.testDb.addTestTrack();
 		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.FOLLOWTAGS);
-		assertSame(expected, actual);
+		assertEquals(expected, actual);
 	}
 
 	@Test
@@ -47,7 +55,7 @@ public class OrderResolverTest {
 		final IMediaItem current = this.testDb.addTestTrack();
 		final IMediaItem expected = this.testDb.addTestTrack();
 		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
-		assertSame(expected, actual);
+		assertEquals(expected, actual);
 	}
 
 	@Test
@@ -66,7 +74,7 @@ public class OrderResolverTest {
 		addRandomTags(current, expected, tooRecentlyPlayed);
 
 		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
-		assertSame(expected, actual);
+		assertEquals(expected, actual);
 	}
 
 	@Test
@@ -84,7 +92,7 @@ public class OrderResolverTest {
 		setTimeAgoLastPlayed(expected, 100000, TimeUnit.DAYS);
 
 		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
-		assertSame(expected, actual);
+		assertEquals(expected, actual);
 	}
 
 	@Ignore("Adding in randomness broke this.")
@@ -103,7 +111,7 @@ public class OrderResolverTest {
 		addRandomTags(current, next1);
 
 		final IMediaItem actual1 = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
-		assertSame(next1, actual1);
+		assertEquals(next1, actual1);
 		setTimeAgoLastPlayed(next1, 2, TimeUnit.MINUTES);
 
 		final IMediaItem next2 = this.testDb.addTestTrack();
@@ -117,7 +125,7 @@ public class OrderResolverTest {
 		addRandomTags(notNext);
 
 		final IMediaItem actual2 = this.undertest.getNextTrack(this.testDb, next1, PlaybackOrder.FOLLOWTAGS);
-		assertSame(next2, actual2);
+		assertEquals(next2, actual2);
 	}
 
 	@Test
