@@ -31,7 +31,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		try {
 			initDatabaseTables();
 			if (!autoCommit) commitOrRollBack();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new DbException("Failed to initialise database tables for db '" + dbFilePath + "'.", e);
 		}
 	}
@@ -47,7 +47,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	public void dispose () {
 		try {
 			disposeDbCon();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -76,17 +76,17 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 			url = "jdbc:sqlite:/" + this.dbFilePath;
 		}
 
-		Connection con = DriverManager.getConnection(url);
+		final Connection con = DriverManager.getConnection(url);
 		if (con == null) throw new IllegalStateException("DriverManager returned null connection object for " + url + ".");
 
 		// Setup environment.
-		Statement stmt = con.createStatement();
+		final Statement stmt = con.createStatement();
 		try {
 			stmt.execute(PRAGMA_FK_SET);
-			ResultSet rs = stmt.executeQuery(PRAGMA_FK_GET);
+			final ResultSet rs = stmt.executeQuery(PRAGMA_FK_GET);
 			try {
 				rs.next();
-				int fk = rs.getInt(1);
+				final int fk = rs.getInt(1);
 				if (fk != 1) throw new UnsupportedOperationException("Call had no effect: " + PRAGMA_FK_SET + " (v=" + fk + ")");
 			} finally { rs.close(); }
 		} finally { stmt.close(); }
@@ -97,19 +97,24 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		return con;
 	}
 
-	protected Connection getDbCon () throws ClassNotFoundException, SQLException {
-		// TODO FIXME make this thread-safe using atomic objects.
-		if (this.dbConnection == null || this.dbConnection.isClosed()) {
-			this.dbConnection = makeConnection();
+	protected Connection getDbCon () throws DbException {
+		try {
+			// TODO FIXME make this thread-safe using atomic objects.
+			if (this.dbConnection == null || this.dbConnection.isClosed()) {
+				this.dbConnection = makeConnection();
+			}
+	//		else if (!this.dbConnection.isValid(10)) {
+	//			this.dbConnection.close();
+	//			this.dbConnection = makeConnection();
+	//		}
+
+			if (this.dbConnection == null) throw new IllegalArgumentException("Failed to make driver class instance.");
+
+			return this.dbConnection;
 		}
-//		else if (!this.dbConnection.isValid(10)) {
-//			this.dbConnection.close();
-//			this.dbConnection = makeConnection();
-//		}
-
-		if (this.dbConnection == null) throw new IllegalArgumentException("Failed to make driver class instance.");
-
-		return this.dbConnection;
+		catch (final SQLException | ClassNotFoundException e) {
+			throw new DbException(e);
+		}
 	}
 
 	private void disposeDbCon () throws SQLException {
@@ -125,7 +130,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		try {
 			getDbCon().commit();
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			rollback();
 			throw new DbException(e);
 		}
@@ -137,7 +142,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		if (this.autoCommit) throw new IllegalStateException("Can not rollback auto-commit connection.");
 		try {
 			getDbCon().rollback();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new DbException(e);
 		}
 	}
@@ -145,39 +150,23 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Initialise.
 
-	private void initDatabaseTables () throws SQLException, ClassNotFoundException {
-		@SuppressWarnings("resource")
-		Statement stmt = getDbCon().createStatement();
-		try {
-			for (SqlCreateCmd sqlCreateCmd : getTblCreateCmds()) {
-				try {
-					ResultSet rs;
-					rs = stmt.executeQuery(sqlCreateCmd.getTblExistsSql());
-					try {
-						if (!rs.next()) { // True if there are rows in the result.
-							stmt.executeUpdate(sqlCreateCmd.getTblCreateSql());
-						}
+	private void initDatabaseTables () throws DbException {
+		try (final Statement stmt = getDbCon().createStatement()) {
+			for (final SqlCreateCmd sqlCreateCmd : getTblCreateCmds()) {
+				try (final ResultSet rs = stmt.executeQuery(sqlCreateCmd.getTblExistsSql())) {
+					if (!rs.next()) { // True if there are rows in the result.
+						stmt.executeUpdate(sqlCreateCmd.getTblCreateSql());
 					}
-					catch (SQLException e) {
-						System.err.println("SQLException while executing '"+sqlCreateCmd.getTblCreateSql()+"'.");
-						throw e;
-					}
-					finally {
-						rs.close();
-					}
-				}
-				finally {
-					stmt.close();
 				}
 			}
+			migrateDb();
 		}
-		finally {
-			stmt.close();
+		catch (final SQLException e) {
+			throw new DbException(e);
 		}
-		migrateDb();
 	}
 
-	protected void migrateDb() throws SQLException, ClassNotFoundException {
+	protected void migrateDb() throws DbException {
 		// Default does nothing.
 	}
 

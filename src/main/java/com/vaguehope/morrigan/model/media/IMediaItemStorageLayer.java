@@ -30,7 +30,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	void removeSource (String source) throws DbException;
 
 	List<MediaTagClassification> getTagClassifications () throws DbException;
-	void addTagClassification (String classificationName) throws DbException;
+	MediaTagClassification addTagClassification (String classificationName) throws DbException;
 	MediaTagClassification getTagClassification (String classificationName) throws DbException;
 	List<MediaTag> getTopTags (int countLimit) throws DbException;
 	Map<String, MediaTag> tagSearch (String query, MatchMode mode, int resLimit) throws DbException;

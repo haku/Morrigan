@@ -27,11 +27,11 @@ public class MixedMediaSqliteLayerOuterTest {
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	private List<IMediaItem> expectedAllItems;
 
-	private MixedMediaSqliteLayerOuter undertest;
+	private MixedMediaSqliteLayerInner undertest;
 
 	@Before
 	public void before () throws Exception {
-		this.undertest = new MixedMediaSqliteLayerOuter(":memory:", true, new DefaultMediaItemFactory(null));
+		this.undertest = new MixedMediaSqliteLayerInner(":memory:", true, new DefaultMediaItemFactory(null));
 		this.expectedAllItems = new ArrayList<>();
 		addNoiseToDb();
 	}
