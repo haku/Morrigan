@@ -47,7 +47,7 @@ import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb {
+public abstract class AbstractMediaDb extends AbstractMediaList implements IMediaItemDb {
 
 	private static final SortColumn DEFAULT_SORT_COLUMN = SortColumn.FILE_PATH;
 
@@ -66,7 +66,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	 * TODO FIXME merge libraryName and searchTerm to match return value of
 	 * getSerial().
 	 */
-	protected MediaDb (final String listName, final MediaDbConfig config) {
+	protected AbstractMediaDb (final String listName, final MediaDbConfig config) {
 		super(config.getFilePath(), listName);
 		this.config = config;
 
@@ -99,8 +99,8 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	public boolean equals(final Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if (!(obj instanceof MediaDb)) return false;
-		final MediaDb that = (MediaDb) obj;
+		if (!(obj instanceof AbstractMediaDb)) return false;
+		final AbstractMediaDb that = (AbstractMediaDb) obj;
 
 		return Objects.equals(this.config, that.config);
 	}
@@ -508,28 +508,28 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 
 		@Override
 		public void mediaItemTagAdded (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) {
-			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+			if (AbstractMediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
 		public void mediaItemTagsMoved (final IDbItem from_item, final IDbItem to_item) {
-			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+			if (AbstractMediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
 		public void mediaItemTagRemoved (final MediaTag tag) {
-			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+			if (AbstractMediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
 		public void mediaItemTagsCleared (final IDbItem item) {
-			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+			if (AbstractMediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
