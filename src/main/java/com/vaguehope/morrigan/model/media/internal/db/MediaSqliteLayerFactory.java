@@ -4,7 +4,7 @@ import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayerFactory {
+public class MediaSqliteLayerFactory {
 
 	private static class Cfg {
 		final boolean autoCommit;
@@ -24,7 +24,7 @@ public class MixedMediaSqliteLayerFactory {
 
 		@Override
 		protected MediaStorageLayer makeNewProduct(final String material, final Cfg cfg) throws DbException {
-			return new MixedMediaSqliteLayer(material, cfg.autoCommit, cfg.itemFactory);
+			return new MediaSqliteLayer(material, cfg.autoCommit, cfg.itemFactory);
 		}
 	};
 

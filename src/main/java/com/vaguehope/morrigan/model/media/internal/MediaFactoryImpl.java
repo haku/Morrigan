@@ -32,7 +32,7 @@ import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbFactory;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
-import com.vaguehope.morrigan.model.media.internal.db.MixedMediaSqliteLayerFactory;
+import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.RemoteMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
@@ -183,7 +183,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public MediaStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(null);
-		return MixedMediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
+		return MediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
