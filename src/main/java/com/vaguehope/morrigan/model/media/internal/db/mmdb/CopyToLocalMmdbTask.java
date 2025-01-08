@@ -7,7 +7,7 @@ import java.util.Collection;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -22,12 +22,12 @@ import com.vaguehope.morrigan.util.ChecksumHelper;
 public class CopyToLocalMmdbTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final IMediaItemList fromList;
+	private final MediaList fromList;
 	private final Collection<MediaItem> itemsToCopy;
 	private final IMediaItemDb toDb;
 	private final Config config;
 
-	public CopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb, final Config config) {
+	public CopyToLocalMmdbTask (final MediaList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb, final Config config) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;

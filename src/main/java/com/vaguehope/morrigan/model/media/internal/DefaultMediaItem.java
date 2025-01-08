@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -21,9 +21,9 @@ public class DefaultMediaItem implements MediaItem {
 	private static final boolean ENABLED_DEFAULT = true;
 	private static final int DBROWID_DEFAULT = -1;
 
-	private final IMediaItemList list;
+	private final MediaList list;
 
-	public DefaultMediaItem(final String filePath, final IMediaItemList list) {
+	public DefaultMediaItem(final String filePath, final MediaList list) {
 		this.list = list;
 		setFilepath(filePath);
 	}

@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -23,7 +23,7 @@ public class ItemTagsImpl implements ItemTags {
 	/**
 	 * Will not return null.
 	 */
-	public static ItemTags forItem (final IMediaItemList list, final IDbItem item) throws MorriganException {
+	public static ItemTags forItem (final MediaList list, final IDbItem item) throws MorriganException {
 		if (list == null || item == null) return EMPTY;
 		return new ItemTagsImpl(list.getTagsIncludingDeleted(item));
 	}

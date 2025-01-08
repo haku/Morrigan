@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -31,7 +31,7 @@ public class OrderResolver {
 
 	private final LimitedRecentSet<String> recentlyFollowedTags = new LimitedRecentSet<>(FOLLOWTAGS_MAX_TAG_HISTORY);
 
-	public MediaItem getNextTrack (final IMediaItemList list, final MediaItem track, final PlaybackOrder mode) {
+	public MediaItem getNextTrack (final MediaList list, final MediaItem track, final PlaybackOrder mode) {
 		if (list == null || list.size() <= 0) return null;
 
 		switch (mode) {
@@ -59,7 +59,7 @@ public class OrderResolver {
 		}
 	}
 
-	private static MediaItem getNextTrackSequencial (final IMediaItemList list, final MediaItem track) {
+	private static MediaItem getNextTrackSequencial (final MediaList list, final MediaItem track) {
 		MediaItem ret = null;
 		final List<MediaItem> mediaTracks = list.getMediaItems();
 
@@ -97,7 +97,7 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private static MediaItem getNextTrackRandom (final IMediaItemList list, final MediaItem current) {
+	private static MediaItem getNextTrackRandom (final MediaList list, final MediaItem current) {
 		final Random generator = new Random();
 		final List<MediaItem> mediaTracks = list.getMediaItems();
 
@@ -122,7 +122,7 @@ public class OrderResolver {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 
-	private static MediaItem getNextTrackByStartCount (final IMediaItemList list, final MediaItem current) {
+	private static MediaItem getNextTrackByStartCount (final MediaList list, final MediaItem current) {
 		MediaItem ret = null;
 		final List<MediaItem> tracks = list.getMediaItems();
 
@@ -168,7 +168,7 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private static MediaItem getNextTrackByLastPlayedDate (final IMediaItemList list, final MediaItem current) {
+	private static MediaItem getNextTrackByLastPlayedDate (final MediaList list, final MediaItem current) {
 		return getNextTrackByLastPlayedDate(list.getMediaItems(), current);
 	}
 
@@ -232,7 +232,7 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private MediaItem getNextTrackFollowTags (final IMediaItemList list, final MediaItem current) {
+	private MediaItem getNextTrackFollowTags (final MediaList list, final MediaItem current) {
 		try {
 			return getNextTrackFollowTagsOrThrow(list, current);
 		}
@@ -241,7 +241,7 @@ public class OrderResolver {
 		}
 	}
 
-	private MediaItem getNextTrackFollowTagsOrThrow (final IMediaItemList list, final MediaItem current) throws MorriganException, DbException {
+	private MediaItem getNextTrackFollowTagsOrThrow (final MediaList list, final MediaItem current) throws MorriganException, DbException {
 		// Can not follow tags if no current item.
 		if (current == null) return getNextTrackByLastPlayedDate(list, current);
 

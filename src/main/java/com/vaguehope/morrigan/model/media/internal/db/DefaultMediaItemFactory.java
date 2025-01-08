@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.internal.DefaultMediaItem;
 
 /**
@@ -37,9 +37,9 @@ public class DefaultMediaItemFactory {
 		}
 	};
 
-	private final IMediaItemList list;
+	private final MediaList list;
 
-	public DefaultMediaItemFactory (final IMediaItemList list) {
+	public DefaultMediaItemFactory (final MediaList list) {
 		this.list = list;
 	}
 

@@ -29,7 +29,7 @@ import com.google.gson.JsonSerializer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaNode;
@@ -90,7 +90,7 @@ public class MediaServlet extends HttpServlet {
 
 	private void serveListThings(final PathAndSubPath pth, final HttpServletRequest req, final HttpServletResponse resp)
 			throws IOException, MorriganException {
-		final IMediaItemList list = this.mediaFactory.getMediaListByMid(pth.getPath(), null);
+		final MediaList list = this.mediaFactory.getMediaListByMid(pth.getPath(), null);
 		if (list == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -119,9 +119,9 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
-	private void serveNodesAndItems(final IMediaItemList list, final String nodeId, final HttpServletResponse resp)
+	private void serveNodesAndItems(final MediaList list, final String nodeId, final HttpServletResponse resp)
 			throws IOException, MorriganException {
-		final IMediaItemList node = nodeId != null ? list.makeNode(nodeId, null) : list;
+		final MediaList node = nodeId != null ? list.makeNode(nodeId, null) : list;
 		if (node == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -139,7 +139,7 @@ public class MediaServlet extends HttpServlet {
 		returnJson(resp, ret);
 	}
 
-	private void serveSearchResults(final IMediaItemList list, final String search, final HttpServletRequest req, final HttpServletResponse resp)
+	private void serveSearchResults(final MediaList list, final String search, final HttpServletRequest req, final HttpServletResponse resp)
 			throws IOException, MorriganException {
 		// TODO transcodes
 		// TODO specify result limit, including infinite
@@ -151,7 +151,7 @@ public class MediaServlet extends HttpServlet {
 		returnJson(resp, items);
 	}
 
-	private static void serveItemContent(final IMediaItemList list, final String itemId, final HttpServletRequest req, final HttpServletResponse resp)
+	private static void serveItemContent(final MediaList list, final String itemId, final HttpServletRequest req, final HttpServletResponse resp)
 			throws IOException, MorriganException {
 		final MediaItem item = list.getByFile(itemId);
 		if (item == null) {
@@ -184,7 +184,7 @@ public class MediaServlet extends HttpServlet {
 
 	@SuppressWarnings("resource")
 	private static void returnRemoteFile(
-			final IMediaItemList list,
+			final MediaList list,
 			final HttpServletRequest req,
 			final HttpServletResponse resp,
 			final MediaItem item) throws MorriganException, IOException {

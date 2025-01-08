@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
@@ -32,7 +32,7 @@ public class TestMixedMediaDb extends LocalMediaDb {
 	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
 	private final List<MediaNode> nodes = new ArrayList<>();
-	private final Map<String, IMediaItemList> childNodes = new HashMap<>();
+	private final Map<String, MediaList> childNodes = new HashMap<>();
 
 	public static int getTrackNumber() {
 		return newTrackCounter.getAndIncrement();
@@ -73,11 +73,11 @@ public class TestMixedMediaDb extends LocalMediaDb {
 	public List<MediaNode> getSubNodes() throws MorriganException {
 		return this.nodes;
 	}
-	public void addChildNode(final String id, final IMediaItemList node) {
+	public void addChildNode(final String id, final MediaList node) {
 		this.childNodes.put(id, node);
 	}
 	@Override
-	public IMediaItemList makeNode(final String id, final String title) throws MorriganException {
+	public MediaList makeNode(final String id, final String title) throws MorriganException {
 		return this.childNodes.get(id);
 	}
 

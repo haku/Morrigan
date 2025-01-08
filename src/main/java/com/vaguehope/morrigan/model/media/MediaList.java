@@ -19,7 +19,7 @@ import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
-public interface IMediaItemList extends List<AbstractItem> {
+public interface MediaList extends List<AbstractItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void dispose ();
@@ -66,7 +66,7 @@ public interface IMediaItemList extends List<AbstractItem> {
 	default String getNodeId() {
 		throw new UnsupportedOperationException();
 	}
-	default IMediaItemList makeNode(String id, String title) throws MorriganException {
+	default MediaList makeNode(String id, String title) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
 	default List<MediaNode> getSubNodes() throws MorriganException {
@@ -80,7 +80,7 @@ public interface IMediaItemList extends List<AbstractItem> {
 	default boolean canMakeView() {
 		return false;
 	}
-	default IMediaItemList makeView(String filter) throws MorriganException {
+	default MediaList makeView(String filter) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
 

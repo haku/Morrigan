@@ -16,7 +16,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.config.SavedView;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
@@ -161,7 +161,7 @@ public class HomeFace extends MenuFace {
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final Player player = getPlayer(gui, "Play DB");
 			if (player != null) {
-				final IMediaItemList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+				final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 				playPlayItem(new PlayItem(db, null), player);
 			}
 		}
@@ -182,14 +182,14 @@ public class HomeFace extends MenuFace {
 			this.navigation.startFace(new PlayerFace(this.navigation, this.mnContext, this.sessionState, (Player) this.selectionAndScroll.selectedItem));
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final IMediaItemList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
 			final SavedView sv = (SavedView) this.selectionAndScroll.selectedItem;
-			final IMediaItemList db = this.mnContext.getMediaFactory().getMediaListByMid(sv.getDbmid(), sv.getQuery());
+			final MediaList db = this.mnContext.getMediaFactory().getMediaListByMid(sv.getDbmid(), sv.getQuery());
 			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
@@ -219,7 +219,7 @@ public class HomeFace extends MenuFace {
 		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final Player player = getPlayer(gui, "Enqueue DB");
 			if (player != null) {
-				final IMediaItemList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+				final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 				enqueuePlayItem(new PlayItem(db, null), player);
 			}
 		}
@@ -227,20 +227,20 @@ public class HomeFace extends MenuFace {
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
-			final IMediaItemList list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
+			final MediaList list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
 			if (list instanceof IMediaItemDb) {
 				this.dbHelper.askSearch(gui, list);
 			}
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final IMediaItemList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 			this.dbHelper.askSearch(gui, db);
 		}
 	}
 
 	private void showProperties (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final IMediaItemList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 			if (db instanceof IMediaItemDb) {
 				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (IMediaItemDb) db));
 			}

@@ -23,7 +23,7 @@ import com.vaguehope.common.servlet.MockHttpServletRequest;
 import com.vaguehope.common.servlet.MockHttpServletResponse;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
@@ -90,7 +90,7 @@ public class MediaServletTest {
 
 	@Test
 	public void itServesSubNode() throws Exception {
-		final IMediaItemList node = mock(IMediaItemList.class);
+		final MediaList node = mock(MediaList.class);
 		when(node.hasNodes()).thenReturn(true);
 		when(node.getNodeId()).thenReturn("my-node");
 		when(node.getListName()).thenReturn("things");

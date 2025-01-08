@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -102,7 +102,7 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 	}
 
 	@Override
-	public IMediaItemList getCurrentList () {
+	public MediaList getCurrentList () {
 		return null;
 	}
 

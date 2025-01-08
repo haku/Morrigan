@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.player.LocalPlayer;
@@ -90,7 +90,7 @@ public final class PrintingThingsHelper {
 		return String.valueOf(p.getPlaybackOrder());
 	}
 
-	public static String summariseItemWithPlayCounts (final IMediaItemList list, final MediaItem item, final DateFormat dateFormat) throws MorriganException {
+	public static String summariseItemWithPlayCounts (final MediaList list, final MediaItem item, final DateFormat dateFormat) throws MorriganException {
 		if (item.getStartCount() > 0 || item.getEndCount() > 0) {
 			return String.format("%s/%s %s %s",
 					item.getStartCount(), item.getEndCount(),
@@ -100,14 +100,14 @@ public final class PrintingThingsHelper {
 		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
 	}
 
-	public static String summariseItemTags (final IMediaItemList list, final MediaItem item) throws MorriganException {
+	public static String summariseItemTags (final MediaList list, final MediaItem item) throws MorriganException {
 		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
 	}
 
 	public static String summariseTags (final Player player) {
 		final PlayItem playItem = player.getCurrentItem();
 		if (playItem != null && playItem.hasTrack()) {
-			final IMediaItemList list = player.getCurrentList();
+			final MediaList list = player.getCurrentList();
 			if (list != null) {
 				try {
 					final List<MediaTag> tags = list.getTags(playItem.getTrack()); // TODO cache this?
@@ -145,7 +145,7 @@ public final class PrintingThingsHelper {
 		return msg.toString();
 	}
 
-	public static String sortSummary (final IMediaItemList list) {
+	public static String sortSummary (final MediaList list) {
 		final SortColumn col = list.getSortColumn();
 		return String.format("%s %s.",
 				col != null ? col.getUiName() : "(unknown)",

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -33,7 +33,7 @@ public class PlayerStateStorage {
 	private static final String DIR_NAME = "playerstate";
 	private static final Logger LOG = Logger.getLogger(PlayerStateStorage.class.getName());
 
-	private final Map<String, IMediaItemList> listCache = new ConcurrentHashMap<>();
+	private final Map<String, MediaList> listCache = new ConcurrentHashMap<>();
 	private final MediaFactory mf;
 	private final ScheduledExecutorService schEx;
 	private Config config;
@@ -228,7 +228,7 @@ public class PlayerStateStorage {
 			listSerial = listTypeAndSerial;
 		}
 
-		IMediaItemList list = this.listCache.get(listSerial);
+		MediaList list = this.listCache.get(listSerial);
 		if (list == null) {
 			switch (listType) {
 				case LOCALMMDB:

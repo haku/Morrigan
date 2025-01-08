@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Objects;
 
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 
 /**
  * Will always have at least a list or an track.
@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemList;
 public class PlayItem {
 
 	private final PlayItemType type;
-	private final IMediaItemList list;
+	private final MediaList list;
 	private final MediaItem track;
 	private final File altFile;
 	private int id = Integer.MIN_VALUE;
@@ -20,7 +20,7 @@ public class PlayItem {
 	/**
 	 * Either list or track may be null.
 	 */
-	public PlayItem (final IMediaItemList list, final MediaItem track) {
+	public PlayItem (final MediaList list, final MediaItem track) {
 		if (list == null && track == null) throw new IllegalArgumentException("At least one of list and track must be specified.");
 		this.type = PlayItemType.PLAYABLE;
 		this.list = list;
@@ -36,7 +36,7 @@ public class PlayItem {
 		this.altFile = null;
 	}
 
-	private PlayItem (final PlayItemType type, final IMediaItemList list, final MediaItem track, final File altFile) {
+	private PlayItem (final PlayItemType type, final MediaList list, final MediaItem track, final File altFile) {
 		this.type = type;
 		this.list = list;
 		this.track = track;
@@ -66,7 +66,7 @@ public class PlayItem {
 		return this.altFile != null;
 	}
 
-	public IMediaItemList getList () {
+	public MediaList getList () {
 		return this.list;
 	}
 
@@ -116,7 +116,7 @@ public class PlayItem {
 		return new PlayItem(this.type, this.list, this.track, newAltFile);
 	}
 
-	public String resolveTitle(IMediaItemList relativeTo) {
+	public String resolveTitle(MediaList relativeTo) {
 		if (this.type.isPseudo()) return this.type.toString();
 		if (this.track == null) return this.list.getListName();
 		if (this.list.equals(relativeTo)) return this.track.getTitle();

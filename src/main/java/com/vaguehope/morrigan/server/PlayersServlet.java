@@ -22,7 +22,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -275,7 +275,7 @@ public class PlayersServlet extends HttpServlet {
 			if (tag != null && tag.length() > 0) {
 				final PlayItem currentItem = player.getCurrentItem();
 				final MediaItem item = currentItem != null ? currentItem.getTrack() : null;
-				final IMediaItemList list = currentItem != null ? currentItem.getList() : null;
+				final MediaList list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
 					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 					writeResponse(req, resp, player);
@@ -430,7 +430,7 @@ public class PlayersServlet extends HttpServlet {
 		final String listId;
 		final String listUrl;
 		final String listView;
-		final IMediaItemList currentList = p.getCurrentList();
+		final MediaList currentList = p.getCurrentList();
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();

@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -75,7 +75,7 @@ public class ContentDirectoryHolder {
 		return device.getIdentity().getUdn().getIdentifierString();
 	}
 
-	private static void dispose (final IMediaItemList db) {
+	private static void dispose (final MediaList db) {
 		if (db == null) return;
 		db.dispose();
 	}

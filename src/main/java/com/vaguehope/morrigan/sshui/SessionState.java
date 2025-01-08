@@ -5,20 +5,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.util.FileHelper;
 
 public class SessionState {
 
 	public final AtomicReference<File> initialDir;
 
-	private final Map<IMediaItemList, AtomicReference<String>> savedSearchTerms = new ConcurrentHashMap<>();
+	private final Map<MediaList, AtomicReference<String>> savedSearchTerms = new ConcurrentHashMap<>();
 
 	public SessionState() {
 		this.initialDir = new AtomicReference<>(FileHelper.getSomeRootDir());
 	}
 
-	public AtomicReference<String> savedSearchTerm(final IMediaItemList db) {
+	public AtomicReference<String> savedSearchTerm(final MediaList db) {
 		final AtomicReference<String> v = this.savedSearchTerms.get(db);
 		if (v != null) return v;
 

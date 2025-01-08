@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.MnLogger;
@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 public enum Transcode {
 	NONE("", "No Transcode") {
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItemList list, final MediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final MediaList list, final MediaItem item) throws IOException {
 			return null;
 		}
 
@@ -126,7 +126,7 @@ public enum Transcode {
 		return this.uiName;
 	}
 
-	public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItemList list, final MediaItem item) throws IOException, MorriganException {
+	public TranscodeProfile profileForItem (final TranscodeContext context, final MediaList list, final MediaItem item) throws IOException, MorriganException {
 		return profileForItem(context, item, list != null ? list.readTags(item) : ItemTags.EMPTY);
 	}
 

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -13,11 +13,11 @@ import com.vaguehope.morrigan.tasks.TaskResult;
 public class MediaFileCopyTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final IMediaItemList mediaItemList;
+	private final MediaList mediaItemList;
 	private final List<MediaItem> mediaSelection;
 	private final File targetDirectory;
 
-	public MediaFileCopyTask (final IMediaItemList mediaItemList, final List<MediaItem> mediaSelection, final File targetDirectory) {
+	public MediaFileCopyTask (final MediaList mediaItemList, final List<MediaItem> mediaSelection, final File targetDirectory) {
 		this.mediaItemList = mediaItemList;
 		this.mediaSelection = mediaSelection;
 		this.targetDirectory = targetDirectory;

@@ -5,7 +5,7 @@ import java.util.List;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -31,13 +31,13 @@ public class DbHelper {
 		this.defaultDbFace = defaultDbFace;
 	}
 
-	public IMediaItemList resolveReference (final MediaListReference ref) throws DbException, MorriganException {
-		final IMediaItemList db = this.mnContext.getMediaFactory().getMediaListByRef(ref);
+	public MediaList resolveReference (final MediaListReference ref) throws DbException, MorriganException {
+		final MediaList db = this.mnContext.getMediaFactory().getMediaListByRef(ref);
 		db.read();
 		return db;
 	}
 
-	public void askSearch (final WindowBasedTextGUI gui, final IMediaItemList db) throws DbException, MorriganException {
+	public void askSearch (final WindowBasedTextGUI gui, final MediaList db) throws DbException, MorriganException {
 		final JumpResult res = JumpToDialog.show(gui, db, this.sessionState);
 		if (res == null) return;
 		switch (res.getType()) {
@@ -57,14 +57,14 @@ public class DbHelper {
 		}
 	}
 
-	private void enqueueItems (final WindowBasedTextGUI gui, final IMediaItemList db, final List<MediaItem> tracks) {
+	private void enqueueItems (final WindowBasedTextGUI gui, final MediaList db, final List<MediaItem> tracks) {
 		final Player player = getPlayer(gui, String.format("Enqueue %s items", tracks.size()));
 		if (player == null) return;
 		PlayerHelper.enqueueAll(db, tracks, player);
 		if (this.lastActionMessage != null) this.lastActionMessage.setLastActionMessage(String.format("Enqueued %s items in %s.", tracks.size(), player.getName()));
 	}
 
-	private void revealItem (final IMediaItemList db, final MediaItem track) throws MorriganException {
+	private void revealItem (final MediaList db, final MediaItem track) throws MorriganException {
 		if (this.defaultDbFace != null) {
 			this.defaultDbFace.revealItem(track);
 		}
@@ -75,13 +75,13 @@ public class DbHelper {
 		}
 	}
 
-	private void shuffleAndEnqueue (final WindowBasedTextGUI gui, final IMediaItemList db, final List<MediaItem> tracks) {
+	private void shuffleAndEnqueue (final WindowBasedTextGUI gui, final MediaList db, final List<MediaItem> tracks) {
 		final Player player = getPlayer(gui, "Shuffle and enqueue");
 		if (player != null) PlayerHelper.shuffleAndEnqueue(db, tracks, player);
 	}
 
-	private void openFilter (final IMediaItemList db, final String searchTerm) throws MorriganException, DbException {
-		final IMediaItemList view = db.makeView(searchTerm);
+	private void openFilter (final MediaList db, final String searchTerm) throws MorriganException, DbException {
+		final MediaList view = db.makeView(searchTerm);
 		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState, view, this.defaultPlayer));
 	}
 

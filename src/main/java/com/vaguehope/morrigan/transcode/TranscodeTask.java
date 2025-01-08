@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -17,11 +17,11 @@ public class TranscodeTask implements MorriganTask {
 
 	private final Transcoder transcoder;
 	private final Transcode transcode;
-	private final IMediaItemList db;
+	private final MediaList db;
 	private final Integer maxNumber;
 	private final TranscodeContext context;
 
-	public TranscodeTask (final Transcoder transcoder, final Transcode transcode, final IMediaItemList db, final Integer maxNumber, final TranscodeContext context) {
+	public TranscodeTask (final Transcoder transcoder, final Transcode transcode, final MediaList db, final Integer maxNumber, final TranscodeContext context) {
 		this.transcoder = transcoder;
 		this.transcode = transcode;
 		this.db = db;

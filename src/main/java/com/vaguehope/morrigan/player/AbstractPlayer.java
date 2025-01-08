@@ -17,7 +17,7 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
@@ -219,12 +219,12 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final IMediaItemList list) {
+	public final void loadAndStartPlaying (final MediaList list) {
 		loadAndStartPlaying(list, null);
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final IMediaItemList list, final MediaItem track) {
+	public final void loadAndStartPlaying (final MediaList list, final MediaItem track) {
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
 
@@ -361,7 +361,7 @@ public abstract class AbstractPlayer implements Player {
 					currentItem.getList(), currentItem.getTrack(), pbOrder);
 		}
 
-		final IMediaItemList currentList = getCurrentList();
+		final MediaList currentList = getCurrentList();
 		final MediaItem nextTrack = currentList.chooseItem(pbOrder, null);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);

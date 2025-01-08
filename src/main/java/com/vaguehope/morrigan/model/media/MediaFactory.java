@@ -46,10 +46,10 @@ public interface MediaFactory {
 	 * MID is like:
 	 * LOCALMMDB/test.local.db3
 	 */
-	IMediaItemList getMediaListByMid(String mid, String filter) throws DbException, MorriganException;
+	MediaList getMediaListByMid(String mid, String filter) throws DbException, MorriganException;
 
-	IMediaItemList getMediaListByRef(MediaListReference ref) throws DbException, MorriganException;
-	IMediaItemList getMediaListByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
+	MediaList getMediaListByRef(MediaListReference ref) throws DbException, MorriganException;
+	MediaList getMediaListByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -74,10 +74,10 @@ public interface MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	Collection<MediaListReference> getExternalLists();
-	IMediaItemList getExternalList(String id, String filter) throws MorriganException;
-	IMediaItemList getExternalListBySerial(String serial) throws MorriganException;
-	void addExternalList(IMediaItemList db);
-	IMediaItemList removeExternalList(String id);
+	MediaList getExternalList(String id, String filter) throws MorriganException;
+	MediaList getExternalListBySerial(String serial) throws MorriganException;
+	void addExternalList(MediaList db);
+	MediaList removeExternalList(String id);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -88,8 +88,8 @@ public interface MediaFactory {
 	 */
 	MorriganTask getLocalMixedMediaDbUpdateTask (IMediaItemDb library);
 	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
-	MorriganTask getMediaFileCopyTask (IMediaItemList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
-	MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList fromList, Collection<MediaItem> itemsToCopy, IMediaItemDb toDb);
+	MorriganTask getMediaFileCopyTask (MediaList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
+	MorriganTask getNewCopyToLocalMmdbTask (MediaList fromList, Collection<MediaItem> itemsToCopy, IMediaItemDb toDb);
 	MorriganTask getSyncMetadataRemoteToLocalTask (IMediaItemDb local, IRemoteMixedMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -70,7 +70,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public IMediaItemList makeNode(final String id, final String title) throws MorriganException {
+	public MediaList makeNode(final String id, final String title) throws MorriganException {
 		return new RpcMediaNodeList(id, title, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
 	}
 
@@ -80,7 +80,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public IMediaItemList makeView(final String filter) throws MorriganException {
+	public MediaList makeView(final String filter) throws MorriganException {
 		return new RpcMediaSearchList(filter, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
 	}
 

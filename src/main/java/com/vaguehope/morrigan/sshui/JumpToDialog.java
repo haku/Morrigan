@@ -35,7 +35,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -52,7 +52,7 @@ public class JumpToDialog extends DialogWindow {
 	private static final int MAX_AUTOCOMPLETE_RESULTS = 20;
 	private static final Logger LOG = LoggerFactory.getLogger(JumpToDialog.class);
 
-	private final IMediaItemList db;
+	private final MediaList db;
 	private final AtomicReference<String> savedSearchTerm;
 
 	private final Label lblMsgs;
@@ -64,7 +64,7 @@ public class JumpToDialog extends DialogWindow {
 	private List<MediaItem> searchResults;
 	private JumpResult result;
 
-	public JumpToDialog (final IMediaItemList db, final AtomicReference<String> savedSearchTerm) {
+	public JumpToDialog (final MediaList db, final AtomicReference<String> savedSearchTerm) {
 		super(db.getListName());
 		this.db = db;
 		this.savedSearchTerm = savedSearchTerm;
@@ -608,7 +608,7 @@ public class JumpToDialog extends DialogWindow {
 
 	}
 
-	public static JumpResult show (final WindowBasedTextGUI owner, final IMediaItemList db, final SessionState sessionState) {
+	public static JumpResult show (final WindowBasedTextGUI owner, final MediaList db, final SessionState sessionState) {
 		final JumpToDialog dialog = new JumpToDialog(db, sessionState.savedSearchTerm(db));
 		dialog.showDialog(owner);
 		return dialog.getResult();

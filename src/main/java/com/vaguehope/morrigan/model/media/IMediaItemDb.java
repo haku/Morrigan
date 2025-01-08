@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
-public interface IMediaItemDb extends IMediaItemList {
+public interface IMediaItemDb extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	interface SortChangeListener {

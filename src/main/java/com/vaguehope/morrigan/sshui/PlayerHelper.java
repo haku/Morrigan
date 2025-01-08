@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerQueue;
@@ -21,13 +21,13 @@ public final class PlayerHelper {
 		throw new AssertionError();
 	}
 
-	public static void shuffleAndEnqueue (final IMediaItemList db, final List<MediaItem> tracks, final Player player) {
+	public static void shuffleAndEnqueue (final MediaList db, final List<MediaItem> tracks, final Player player) {
 		final List<MediaItem> shuffeledList = new ArrayList<>(tracks);
 		Collections.shuffle(shuffeledList);
 		enqueueAll(db, shuffeledList, player);
 	}
 
-	public static void playAll (final IMediaItemList db, final List<MediaItem> tracks, final Player player) {
+	public static void playAll (final MediaList db, final List<MediaItem> tracks, final Player player) {
 		final List<PlayItem> items = new ArrayList<>();
 		for (final MediaItem track : tracks) {
 			items.add(new PlayItem(db, track));
@@ -37,7 +37,7 @@ public final class PlayerHelper {
 		player.nextTrack();
 	}
 
-	public static void enqueueAll (final IMediaItemList db, final List<MediaItem> tracks, final Player player) {
+	public static void enqueueAll (final MediaList db, final List<MediaItem> tracks, final Player player) {
 		final PlayerQueue queue = player.getQueue();
 		for (final MediaItem track : tracks) {
 			queue.addToQueue(new PlayItem(db, track));

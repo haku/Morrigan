@@ -21,7 +21,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -99,7 +99,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/id%3D1fcee07abcdefghiujklmnopqrstuvwxyz810c6e-foo_bar
 	 */
 	@Override
-	public IMediaItemList getMediaListByMid(final String mid, final String filter) throws DbException, MorriganException {
+	public MediaList getMediaListByMid(final String mid, final String filter) throws DbException, MorriganException {
 		final String[] parts = mid.split(":|/");
 		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
 
@@ -124,12 +124,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public IMediaItemList getMediaListByRef(final MediaListReference ref) throws DbException, MorriganException {
+	public MediaList getMediaListByRef(final MediaListReference ref) throws DbException, MorriganException {
 		return getMediaListByMid(ref.getMid(), null);
 	}
 
 	@Override
-	public IMediaItemList getMediaListByRef(final MediaListReference ref, final String filter) throws DbException, MorriganException {
+	public MediaList getMediaListByRef(final MediaListReference ref, final String filter) throws DbException, MorriganException {
 		return getMediaListByMid(ref.getMid(), filter);
 	}
 
@@ -188,29 +188,29 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<String, IMediaItemList> externalListsByListId = new ConcurrentSkipListMap<>();
+	private final Map<String, MediaList> externalListsByListId = new ConcurrentSkipListMap<>();
 
 	@Override
 	public Collection<MediaListReference> getExternalLists () {
 		final List<MediaListReference> ret = new ArrayList<>();
-		for (final IMediaItemList list : this.externalListsByListId.values()) {
+		for (final MediaList list : this.externalListsByListId.values()) {
 			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, list.getListId(), list.getListName(), list.hasNodes()));
 		}
 		return ret;
 	}
 
 	@Override
-	public IMediaItemList getExternalListBySerial(final String serial) {
+	public MediaList getExternalListBySerial(final String serial) {
 		// FIXME this is slow and brittle, eg if json serials are formatted differently.
-		for (final IMediaItemList list : this.externalListsByListId.values()) {
+		for (final MediaList list : this.externalListsByListId.values()) {
 			if (serial.equals(list.getSerial())) return list;
 		}
 		return null;
 	}
 
 	@Override
-	public IMediaItemList getExternalList (final String id, final String filter) throws MorriganException {
-		IMediaItemList list = this.externalListsByListId.get(id);
+	public MediaList getExternalList (final String id, final String filter) throws MorriganException {
+		MediaList list = this.externalListsByListId.get(id);
 		if (list == null) return null;
 
 		if (StringUtils.isBlank(filter)) return list;
@@ -218,12 +218,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public void addExternalList (final IMediaItemList db) {
+	public void addExternalList (final MediaList db) {
 		this.externalListsByListId.put(db.getListId(), db);
 	}
 
 	@Override
-	public IMediaItemList removeExternalList (final String id) {
+	public MediaList removeExternalList (final String id) {
 		return this.externalListsByListId.remove(id);
 	}
 
@@ -247,12 +247,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MorriganTask getMediaFileCopyTask (final IMediaItemList mediaItemList, final List<MediaItem> mediaSelection, final File targetDirectory) {
+	public MorriganTask getMediaFileCopyTask (final MediaList mediaItemList, final List<MediaItem> mediaSelection, final File targetDirectory) {
 		return new MediaFileCopyTask(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
-	public MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb) {
+	public MorriganTask getNewCopyToLocalMmdbTask (final MediaList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb) {
 		return new CopyToLocalMmdbTask(fromList, itemsToCopy, toDb, this.config);
 	}
 

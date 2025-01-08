@@ -20,11 +20,11 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.util.FileHelper;
 
-public abstract class AbstractMediaList extends AbstractList<AbstractItem> implements IMediaItemList {
+public abstract class AbstractMediaList extends AbstractList<AbstractItem> implements MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	final Logger logger = Logger.getLogger(this.getClass().getName());

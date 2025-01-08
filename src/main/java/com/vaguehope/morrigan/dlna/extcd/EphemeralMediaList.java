@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public abstract class EphemeralMediaList extends AbstractList<AbstractItem> implements IMediaItemList {
+public abstract class EphemeralMediaList extends AbstractList<AbstractItem> implements MediaList {
 
 	@Override
 	public void dispose () {}

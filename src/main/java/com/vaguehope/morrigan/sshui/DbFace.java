@@ -26,7 +26,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -68,7 +68,7 @@ public class DbFace extends DefaultFace {
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
 	private final SessionState sessionState;
-	private final IMediaItemList list;
+	private final MediaList list;
 	private final Player defaultPlayer;
 	private final DbHelper dbHelper;
 
@@ -94,7 +94,7 @@ public class DbFace extends DefaultFace {
 			final FaceNavigation navigation,
 			final MnContext mnContext,
 			final SessionState sessionState,
-			final IMediaItemList list,
+			final MediaList list,
 			final Player defaultPlayer) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
@@ -363,7 +363,7 @@ public class DbFace extends DefaultFace {
 
 	private void navToNode(final String id, String title) {
 		try {
-			final IMediaItemList newList = this.list.makeNode(id, title);
+			final MediaList newList = this.list.makeNode(id, title);
 			final DbFace face = new DbFace(this.navigation, this.mnContext, this.sessionState, newList, this.defaultPlayer);
 			face.restoreSavedScroll();
 			this.navigation.startFace(face);

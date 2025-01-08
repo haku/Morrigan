@@ -19,7 +19,7 @@ import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -121,7 +121,7 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	}
 
 	@Override
-	public IMediaItemList makeNode(final String id, final String nodeTitle) throws MorriganException {
+	public MediaList makeNode(final String id, final String nodeTitle) throws MorriganException {
 		return new ContentDirectoryDb(this.listId, id, nodeTitle, this.controlPoint, this.device, this.remoteService, this.storage, this.contentDirectory);
 	}
 

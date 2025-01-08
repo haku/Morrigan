@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -119,14 +119,14 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
-	public void loadAndStartPlaying (final IMediaItemList list) {
+	public void loadAndStartPlaying (final MediaList list) {
 		final Player p = getRef();
 		if (p == null) return;
 		p.loadAndStartPlaying(list);
 	}
 
 	@Override
-	public void loadAndStartPlaying (final IMediaItemList list, final MediaItem track) {
+	public void loadAndStartPlaying (final MediaList list, final MediaItem track) {
 		final Player p = getRef();
 		if (p == null) return;
 		p.loadAndStartPlaying(list, track);
@@ -182,7 +182,7 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
-	public IMediaItemList getCurrentList () {
+	public MediaList getCurrentList () {
 		final Player p = getRef();
 		if (p == null) return null;
 		return p.getCurrentList();
