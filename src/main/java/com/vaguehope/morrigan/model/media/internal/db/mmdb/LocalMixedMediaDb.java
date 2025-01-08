@@ -3,9 +3,10 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 
-public class LocalMixedMediaDb extends AbstractMixedMediaDb {
+public class LocalMixedMediaDb extends MediaItemDb {
 
 	protected LocalMixedMediaDb (final String listName, final MediaItemDbConfig config) {
 		super(listName, config);

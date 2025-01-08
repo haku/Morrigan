@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
+import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
@@ -35,16 +36,18 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
+import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
+import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
 import com.vaguehope.morrigan.player.OrderResolver;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final SortColumn DEFAULT_SORT_COLUMN = SortColumn.FILE_PATH;
 
@@ -58,8 +61,6 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	private SortColumn librarySort;
 	private SortDirection librarySortDirection;
 	private boolean hideMissing;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
 	 * TODO FIXME merge libraryName and searchTerm to match return value of
@@ -324,6 +325,11 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 		return copyOfMainList;
 	}
 
+	@Override
+	public DurationData getTotalDuration () {
+		return MediaTrackListHelper.getTotalDuration(this.getMediaItems());
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
@@ -451,6 +457,18 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	@Override
 	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		return this.dbLayer.getByMd5(md5);
+	}
+
+	// Search
+
+	@Override
+	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+		return getDbLayer().search(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
+	}
+
+	@Override
+	public File findAlbumCoverArt (final MediaAlbum album) throws MorriganException {
+		return CoverArtHelper.findCoverArt(getAlbumItems(MediaType.PICTURE, album)); // FIXME set max result count for getAlbumItems().
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -642,15 +660,145 @@ public abstract class MediaItemDb extends MediaItemList implements IMediaItemDb 
 	}
 
 	@Override
-	public void persistTrackData (final IMediaItem track) throws MorriganException {
+	public void setItemMimeType(IMediaItem item, String  newType) throws MorriganException {
+		item.setMimeType(newType);
 		try {
-			this.dbLayer.setMd5(track, track.getMd5());
-			this.dbLayer.setSha1(track, track.getSha1());
-			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track, track.getDateAdded());
-			if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track, track.getDateLastModified());
-			this.dbLayer.setRemoteLocation(track, track.getRemoteLocation());
-			this.dbLayer.setEnabled(track, track.isEnabled(), track.enabledLastModified());
-			this.dbLayer.setMissing(track, track.isMissing());
+			this.getDbLayer().setItemMimeType(item, newType);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
+		item.setMediaType(newType);
+		getChangeEventCaller().mediaItemsUpdated(item);
+		this.setDirtyState(DirtyState.METADATA);
+		try {
+			this.getDbLayer().setItemMediaType(item, newType);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void incTrackStartCnt (final IMediaItem track, final long n) throws MorriganException {
+		MediaTrackListHelper.incTrackStartCnt(this, track, n);
+		try {
+			this.getDbLayer().incTrackStartCnt(track, n);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void incTrackEndCnt (final IMediaItem track, final long n) throws MorriganException {
+		MediaTrackListHelper.incTrackEndCnt(this, track, n);
+		try {
+			this.getDbLayer().incTrackEndCnt(track, n);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void setTrackDateLastPlayed (final IMediaItem track, final Date date) throws MorriganException {
+		MediaTrackListHelper.setDateLastPlayed(this, track, date);
+		try {
+			this.getDbLayer().setDateLastPlayed(track, date);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void incTrackStartCnt (final IMediaItem track) throws MorriganException {
+		MediaTrackListHelper.incTrackStartCnt(this, track);
+		try {
+			this.getDbLayer().incTrackPlayed(track);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void incTrackEndCnt (final IMediaItem track) throws MorriganException {
+		MediaTrackListHelper.incTrackEndCnt(this, track);
+		try {
+			this.getDbLayer().incTrackFinished(track);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void setTrackStartCnt (final IMediaItem track, final long n) throws MorriganException {
+		MediaTrackListHelper.setTrackStartCnt(this, track, n);
+		try {
+			this.getDbLayer().setTrackStartCnt(track, n);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void setTrackEndCnt (final IMediaItem track, final long n) throws MorriganException {
+		MediaTrackListHelper.setTrackEndCnt(this, track, n);
+		try {
+			this.getDbLayer().setTrackEndCnt(track, n);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void setTrackDuration (final IMediaItem track, final int duration) throws MorriganException {
+		MediaTrackListHelper.setTrackDuration(this, track, duration);
+		try {
+			this.getDbLayer().setTrackDuration(track, duration);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void setPictureWidthAndHeight (final IMediaItem item, final int width, final int height) throws MorriganException {
+		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
+		try {
+			this.getDbLayer().setDimensions(item, width, height);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void persistTrackData (final IMediaItem item) throws MorriganException {
+		try {
+			this.dbLayer.setMd5(item, item.getMd5());
+			this.dbLayer.setSha1(item, item.getSha1());
+			if (item.getDateAdded() != null) this.dbLayer.setDateAdded(item, item.getDateAdded());
+			if (item.getDateLastModified() != null) this.dbLayer.setDateLastModified(item, item.getDateLastModified());
+			this.dbLayer.setRemoteLocation(item, item.getRemoteLocation());
+			this.dbLayer.setEnabled(item, item.isEnabled(), item.enabledLastModified());
+			this.dbLayer.setMissing(item, item.isMissing());
+			this.dbLayer.setItemMediaType(item, item.getMediaType());
+			this.dbLayer.setTrackStartCnt(item, item.getStartCount());
+			this.dbLayer.setTrackEndCnt(item, item.getEndCount());
+			this.dbLayer.setTrackDuration(item, item.getDuration());
+			if (item.getDateLastPlayed() != null) this.dbLayer.setDateLastPlayed(item, item.getDateLastPlayed());
+
+			this.dbLayer.setDimensions(item, item.getWidth(), item.getHeight());
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
