@@ -22,13 +22,13 @@ import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.AbstractMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 import com.vaguehope.morrigan.server.MlistsServlet;
-import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedReader;
+import com.vaguehope.morrigan.server.feedreader.MediaDbFeedReader;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
-public class RemoteMixedMediaDb extends AbstractMediaDb implements RemoteMediaDb {
+public class RemoteMediaDbImpl extends AbstractMediaDb implements RemoteMediaDb {
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -44,7 +44,7 @@ public class RemoteMixedMediaDb extends AbstractMediaDb implements RemoteMediaDb
 	private TaskEventListener taskEventListener;
 
 
-	public RemoteMixedMediaDb (final String dbName, final MediaDbConfig config, final RemoteHostDetails details) throws DbException {
+	public RemoteMediaDbImpl (final String dbName, final MediaDbConfig config, final RemoteHostDetails details) throws DbException {
 		super(dbName, config); // TODO expose search term.
 		this.remoteHostDetails = details;
 	}
@@ -156,7 +156,7 @@ public class RemoteMixedMediaDb extends AbstractMediaDb implements RemoteMediaDb
 	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.
-			MixedMediaDbFeedReader.read(this, this.taskEventListener);
+			MediaDbFeedReader.read(this, this.taskEventListener);
 
 			this.cacheDate = System.currentTimeMillis();
 			writeCacheDate();
@@ -228,7 +228,7 @@ public class RemoteMixedMediaDb extends AbstractMediaDb implements RemoteMediaDb
 		return targetFile;
 	}
 
-	private static URL getRemoteItemUrl (final RemoteMixedMediaDb rmmdb, final MediaItem mlt) throws MorriganException {
+	private static URL getRemoteItemUrl (final RemoteMediaDbImpl rmmdb, final MediaItem mlt) throws MorriganException {
 		String serverUrlString;
 		try {
 			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL); // e.g. http://localhost:8080/mlists/REMOTEMMDB/localhost_8080_wui.remote.db3

@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
+import com.vaguehope.morrigan.server.model.RemoteMediaDbFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -31,7 +31,7 @@ import com.vaguehope.morrigan.util.httpclient.HttpResponse;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandler;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
-public class MixedMediaDbFeedReader implements HttpStreamHandler {
+public class MediaDbFeedReader implements HttpStreamHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
@@ -44,7 +44,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 
 		try {
 			final URI baseUri = mmdb.getUri();
-			final HttpStreamHandler feedReader = new MixedMediaDbFeedReader(mmdb, taskEventListener);
+			final HttpStreamHandler feedReader = new MediaDbFeedReader(mmdb, taskEventListener);
 
 			if ("http".equalsIgnoreCase(baseUri.getScheme())) {
 				final URI uri = new URI(baseUri + "/" + MlistsServlet.PATH_ITEMS
@@ -109,7 +109,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private MixedMediaDbFeedReader (final RemoteMediaDb mmdb, final TaskEventListener taskEventListener) {
+	private MediaDbFeedReader (final RemoteMediaDb mmdb, final TaskEventListener taskEventListener) {
 		this.mmdb = mmdb;
 		this.taskEventListener = taskEventListener;
 	}
@@ -121,14 +121,14 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		boolean thereWereErrors = true;
 		RemoteMediaDb transClone = null;
 		try {
-			transClone = RemoteMixedMediaDbFactory.getTransactionalClone(this.mmdb);
+			transClone = RemoteMediaDbFactory.getTransactionalClone(this.mmdb);
 			transClone.readFromCache();
 			transClone.beginBulkUpdate();
 			try {
 				final InputSource inputSource = new InputSource(is);
 				inputSource.setEncoding("UTF-8");
 
-				final MixedMediaDbFeedParser handler = new MixedMediaDbFeedParser(transClone, this.taskEventListener);
+				final MediaDbFeedParser handler = new MediaDbFeedParser(transClone, this.taskEventListener);
 
 				final SAXParserFactory factory = SAXParserFactory.newInstance();
 				factory.setNamespaceAware(true);

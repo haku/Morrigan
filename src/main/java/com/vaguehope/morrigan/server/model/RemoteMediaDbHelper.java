@@ -15,9 +15,9 @@ import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 
 
-public final class RemoteMixedMediaDbHelper {
+public final class RemoteMediaDbHelper {
 
-	private RemoteMixedMediaDbHelper () {}
+	private RemoteMediaDbHelper () {}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -37,7 +37,7 @@ public final class RemoteMixedMediaDbHelper {
 		final String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");
 		final String file = getFullPathToMmdb(config, uri.getHost() + "_" + name);
 		final RemoteHostDetails details = new RemoteHostDetails(uri, pass);
-		return RemoteMixedMediaDbFactory.getNew(file, details);
+		return RemoteMediaDbFactory.getNew(file, details);
 	}
 
 	public static boolean isRemoteMmdbFile (final String filePath) {

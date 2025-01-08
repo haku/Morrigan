@@ -9,9 +9,9 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayerFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public final class RemoteMixedMediaDbFactory {
+public final class RemoteMediaDbFactory {
 
-	private RemoteMixedMediaDbFactory () {}
+	private RemoteMediaDbFactory () {}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -31,7 +31,7 @@ public final class RemoteMixedMediaDbFactory {
 		@Override
 		protected RemoteMediaDb makeNewProduct (final MediaDbConfig material, final RemoteHostDetails config) throws MorriganException {
 			try {
-				final RemoteMixedMediaDb db = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), material, config);
+				final RemoteMediaDbImpl db = new RemoteMediaDbImpl(RemoteMediaDbHelper.getRemoteMmdbTitle(material), material, config);
 				final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 				final MediaStorageLayer dbLayer = MediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
 				db.setDbLayer(dbLayer);
@@ -66,10 +66,10 @@ public final class RemoteMixedMediaDbFactory {
 	}
 
 	public static RemoteMediaDb getTransactionalClone (final RemoteMediaDb rmmdb) throws DbException {
-		final String title = RemoteMixedMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
+		final String title = RemoteMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
 		final MediaDbConfig config = new MediaDbConfig(rmmdb.getDbPath(), null);
 		final RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUri(), rmmdb.getPass());
-		final RemoteMixedMediaDb db = new RemoteMixedMediaDb(title, config, details);
+		final RemoteMediaDbImpl db = new RemoteMediaDbImpl(title, config, details);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 		final MediaStorageLayer dbLayer = MediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath(), itemFactory);
 		db.setDbLayer(dbLayer);

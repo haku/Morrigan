@@ -19,7 +19,7 @@ import com.vaguehope.morrigan.model.media.test.TestRemoteDb;
 import com.vaguehope.morrigan.tasks.AsyncTaskEventListener;
 import com.vaguehope.morrigan.util.IoHelper;
 
-public class MixedMediaDbFeedReaderTest {
+public class MediaDbFeedReaderTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 
@@ -39,7 +39,7 @@ public class MixedMediaDbFeedReaderTest {
 		IoHelper.write(getClass().getResourceAsStream("/mlist-single-item.xml"), file);
 		this.remote.setUri(new URI("file://" + file.getAbsolutePath()));
 
-		MixedMediaDbFeedReader.read(this.remote, this.eventListener);
+		MediaDbFeedReader.read(this.remote, this.eventListener);
 
 		final List<MediaItem> items = this.remote.getAllDbEntries();
 		final MediaItem item = items.get(0);

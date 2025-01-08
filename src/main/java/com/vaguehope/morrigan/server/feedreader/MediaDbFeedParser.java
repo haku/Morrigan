@@ -21,14 +21,14 @@ import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public class MixedMediaDbFeedParser extends DefaultHandler {
+public class MediaDbFeedParser extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final RemoteMediaDb rmmdb;
 	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
 
-	MixedMediaDbFeedParser(final RemoteMediaDb rmmdb, final TaskEventListener taskEventListener) {
+	MediaDbFeedParser(final RemoteMediaDb rmmdb, final TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 		this.stack = new Stack<>();
 		this.rmmdb = rmmdb;

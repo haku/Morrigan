@@ -44,9 +44,9 @@ public class PullRemoteToLocal implements MorriganTask {
 			final UUID uuid = metadata.getUuid();
 
 			taskEventListener.subTask("Fetching metadata");
-			final String file = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, uuid.toString());
+			final String file = RemoteMediaDbHelper.getFullPathToMmdb(this.config, uuid.toString());
 			final RemoteHostDetails details = new RemoteHostDetails(this.remoteUri);
-			final RemoteMediaDb rdb = RemoteMixedMediaDbFactory.getNew(file, details);
+			final RemoteMediaDb rdb = RemoteMediaDbFactory.getNew(file, details);
 
 			taskEventListener.subTask("Fetching DB");
 			rdb.setTaskEventListener(taskEventListener.newSubTaskListener(50));

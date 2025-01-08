@@ -35,8 +35,8 @@ import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.RemoteMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
+import com.vaguehope.morrigan.server.model.RemoteMediaDbFactory;
+import com.vaguehope.morrigan.server.model.RemoteMediaDbHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
@@ -114,8 +114,8 @@ public class MediaFactoryImpl implements MediaFactory {
 			return getLocalMixedMediaDb(f, filter);
 		}
 		else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
-			final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, name);
-			return RemoteMixedMediaDbFactory.getExisting(f, filter);
+			final String f = RemoteMediaDbHelper.getFullPathToMmdb(this.config, name);
+			return RemoteMediaDbFactory.getExisting(f, filter);
 		}
 		else if (type.equals(MediaListType.EXTMMDB.toString())) {
 			return getExternalList(name, filter);
