@@ -38,7 +38,7 @@ import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
-import com.vaguehope.morrigan.model.media.internal.MediaItemList;
+import com.vaguehope.morrigan.model.media.internal.AbstractMediaList;
 import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
@@ -47,7 +47,7 @@ import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public abstract class MediaDb extends MediaItemList implements IMediaItemDb {
+public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb {
 
 	private static final SortColumn DEFAULT_SORT_COLUMN = SortColumn.FILE_PATH;
 
