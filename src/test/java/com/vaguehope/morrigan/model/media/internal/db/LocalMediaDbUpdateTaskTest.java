@@ -33,7 +33,7 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -43,7 +43,7 @@ import com.vaguehope.morrigan.util.FileSystem;
 
 public class LocalMediaDbUpdateTaskTest {
 
-	private TestMixedMediaDb testDb;
+	private TestMediaDb testDb;
 	private PlaybackEngineFactory playbackEngineFactory;
 	private MediaFactory mediaFactory;
 	private TaskEventListener taskEventListener;
@@ -54,14 +54,14 @@ public class LocalMediaDbUpdateTaskTest {
 
 	@Before
 	public void before() throws Exception {
-		this.testDb = new TestMixedMediaDb();
+		this.testDb = new TestMediaDb();
 		this.testDb.setHideMissing(false);
 
 		this.mediaFactory = mock(MediaFactory.class);
 		when(this.mediaFactory.getLocalMixedMediaDbTransactional(this.testDb)).thenAnswer(new Answer<MediaDb>() {
 			@Override
 			public MediaDb answer(final InvocationOnMock invocation) throws Throwable {
-				return new TestMixedMediaDb(LocalMediaDbUpdateTaskTest.this.testDb.getListName(), false);
+				return new TestMediaDb(LocalMediaDbUpdateTaskTest.this.testDb.getListName(), false);
 			}
 		});
 
@@ -245,14 +245,14 @@ public class LocalMediaDbUpdateTaskTest {
 	}
 
 	private File mockFileInDir(final File dir) throws Exception {
-		final int n = TestMixedMediaDb.getTrackNumber();
+		final int n = TestMediaDb.getTrackNumber();
 		final long mtime = 1234567890000L + (n * 1000);
 		final Md5AndSha1 md5AndSha1 = new Md5AndSha1(BigInteger.valueOf(mtime), BigInteger.valueOf(mtime + 1));
 		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime, md5AndSha1);
 	}
 
 	private File mockFileInDir(final File dir, final String fileName, final Md5AndSha1 md5andSha1) throws Exception {
-		final int n = TestMixedMediaDb.getTrackNumber();
+		final int n = TestMediaDb.getTrackNumber();
 		final long mtime = 1234567890000L + n;
 		return mockFileInDir(dir, fileName, mtime, md5andSha1);
 	}

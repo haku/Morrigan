@@ -7,7 +7,7 @@ import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class TestRemoteDb extends TestMixedMediaDb implements RemoteMediaDb {
+public class TestRemoteDb extends TestMediaDb implements RemoteMediaDb {
 
 	private URI uri;
 	private String pass;

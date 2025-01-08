@@ -20,7 +20,7 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.player.test.MockPlayerReader;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
@@ -43,7 +43,7 @@ public class MlistsServletTest {
 
 	private MlistsServlet undertest;
 
-	private TestMixedMediaDb testDb;
+	private TestMediaDb testDb;
 	private MockHttpServletRequest req;
 	private MockHttpServletResponse resp;
 
@@ -61,7 +61,7 @@ public class MlistsServletTest {
 		this.req = new MockHttpServletRequest();
 		this.resp = new MockHttpServletResponse();
 
-		this.testDb = new TestMixedMediaDb("server-test-db");
+		this.testDb = new TestMediaDb("server-test-db");
 		this.mediaFactory.addLocalMixedMediaDb(this.testDb);
 	}
 

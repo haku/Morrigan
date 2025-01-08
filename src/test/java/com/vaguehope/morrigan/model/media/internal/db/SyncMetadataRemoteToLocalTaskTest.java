@@ -15,7 +15,7 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.model.media.test.Tag;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.model.media.test.TestRemoteDb;
 import com.vaguehope.morrigan.tasks.AsyncTaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
@@ -26,14 +26,14 @@ public class SyncMetadataRemoteToLocalTaskTest {
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	private static final Random RND = new Random(System.currentTimeMillis());
 
-	private TestMixedMediaDb local;
+	private TestMediaDb local;
 	private TestRemoteDb remote;
 	private SyncMetadataRemoteToLocalTask underTest;
 	private AsyncTaskEventListener eventListener;
 
 	@Before
 	public void before () throws Exception {
-		this.local = new TestMixedMediaDb();
+		this.local = new TestMediaDb();
 		this.remote = new TestRemoteDb();
 		final Config config = new Config(this.tmp.getRoot());
 		final MediaFactory mediaFactory = new MediaFactoryImpl(config, null);
@@ -43,7 +43,7 @@ public class SyncMetadataRemoteToLocalTaskTest {
 		addNoise(this.remote);
 	}
 
-	private static void addNoise (final TestMixedMediaDb db) throws Exception {
+	private static void addNoise (final TestMediaDb db) throws Exception {
 		final int itemCount = RND.nextInt(5);
 		for (int i = 0; i < itemCount; i++) {
 			final MediaItem item = db.addTestTrack();

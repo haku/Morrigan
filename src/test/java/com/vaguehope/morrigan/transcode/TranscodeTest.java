@@ -22,19 +22,19 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.util.MimeType;
 
 public class TranscodeTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
-	private TestMixedMediaDb testDb;
+	private TestMediaDb testDb;
 	private FfprobeCache ffprobeCache;
 	private TranscodeContext context;
 
 	@Before
 	public void before () throws Exception {
-		this.testDb = new TestMixedMediaDb();
+		this.testDb = new TestMediaDb();
 		this.ffprobeCache = mock(FfprobeCache.class);
 		this.context = new TranscodeContext(new Config(this.tmp.getRoot()), this.ffprobeCache);
 	}

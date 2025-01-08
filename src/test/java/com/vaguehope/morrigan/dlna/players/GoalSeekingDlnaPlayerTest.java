@@ -43,7 +43,7 @@ import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingP
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
@@ -75,7 +75,7 @@ public class GoalSeekingDlnaPlayerTest {
 	private RenderingControlActions renderingControl;
 	private ScheduledExecutorService scheduledExecutor;
 	private final Queue<Runnable> scheduledActions = new ConcurrentLinkedQueue<>();
-	private TestMixedMediaDb testDb;
+	private TestMediaDb testDb;
 	private GoalSeekingDlnaPlayer undertest;
 
 	@Before
@@ -96,7 +96,7 @@ public class GoalSeekingDlnaPlayerTest {
 		makeTransportService();
 		this.avTransport = mock(AvTransportActions.class);
 		this.renderingControl = mock(RenderingControlActions.class);
-		this.testDb = new TestMixedMediaDb();
+		this.testDb = new TestMediaDb();
 		this.undertest = new GoalSeekingDlnaPlayer(
 				this.playerRegister, this.controlPoint, this.avTransportSvc,
 				this.dlnaPlayingParamsFactory, this.scheduledExecutor,

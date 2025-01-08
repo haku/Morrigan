@@ -13,18 +13,18 @@ import org.junit.Test;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class OrderResolverTest {
 
 	private final Random random = new Random();
-	private TestMixedMediaDb testDb;
+	private TestMediaDb testDb;
 	private OrderResolver undertest;
 
 	@Before
 	public void before () throws Exception {
-		this.testDb = new TestMixedMediaDb();
+		this.testDb = new TestMediaDb();
 		this.undertest = new OrderResolver();
 	}
 

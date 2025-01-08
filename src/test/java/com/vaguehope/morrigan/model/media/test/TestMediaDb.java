@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.MimeType;
 
-public class TestMixedMediaDb extends LocalMediaDb {
+public class TestMediaDb extends LocalMediaDb {
 
 	private static final String NAME = "testDb";
 
@@ -38,15 +38,15 @@ public class TestMixedMediaDb extends LocalMediaDb {
 		return newTrackCounter.getAndIncrement();
 	}
 
-	public TestMixedMediaDb () throws DbException, MorriganException {
+	public TestMediaDb () throws DbException, MorriganException {
 		this(NAME + newDbCounter.getAndIncrement());
 	}
 
-	public TestMixedMediaDb (final String name) throws DbException, MorriganException {
+	public TestMediaDb (final String name) throws DbException, MorriganException {
 		this(name, true);
 	}
 
-	public TestMixedMediaDb (final String name, final boolean autoCommit) throws DbException, MorriganException {
+	public TestMediaDb (final String name, final boolean autoCommit) throws DbException, MorriganException {
 		super(name, new MediaDbConfig(name, null));
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(this);
 		setDbLayer(new MediaSqliteLayer("file:" + name + "?mode=memory&cache=shared", autoCommit, itemFactory));

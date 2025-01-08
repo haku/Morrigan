@@ -27,7 +27,7 @@ import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
+import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 
 public class MediaServletTest {
 
@@ -35,7 +35,7 @@ public class MediaServletTest {
 
 	private Config config;
 	private MediaFactoryImpl mediaFactory;
-	private TestMixedMediaDb testDb;
+	private TestMediaDb testDb;
 
 	private MediaServlet undertest;
 
@@ -48,7 +48,7 @@ public class MediaServletTest {
 		this.config = new Config(this.tmp.getRoot());
 		this.mediaFactory = new MediaFactoryImpl(this.config, null);
 
-		this.testDb = new TestMixedMediaDb("media-servlet-test-db");
+		this.testDb = new TestMediaDb("media-servlet-test-db");
 		this.mediaFactory.addLocalMixedMediaDb(this.testDb);
 
 		this.undertest = new MediaServlet(this.mediaFactory);
