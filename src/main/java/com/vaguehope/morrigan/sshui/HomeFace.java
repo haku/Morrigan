@@ -15,7 +15,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.config.SavedView;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -228,7 +228,7 @@ public class HomeFace extends MenuFace {
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
 			final MediaList list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
-			if (list instanceof IMediaItemDb) {
+			if (list instanceof MediaDb) {
 				this.dbHelper.askSearch(gui, list);
 			}
 		}
@@ -241,8 +241,8 @@ public class HomeFace extends MenuFace {
 	private void showProperties (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
-			if (db instanceof IMediaItemDb) {
-				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (IMediaItemDb) db));
+			if (db instanceof MediaDb) {
+				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (MediaDb) db));
 			}
 			else {
 				this.lastActionMessage.setLastActionMessage(String.format("Can not show properties for non-DB."));

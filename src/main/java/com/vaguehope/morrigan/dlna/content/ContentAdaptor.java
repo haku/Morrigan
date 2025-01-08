@@ -30,7 +30,7 @@ import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -121,7 +121,7 @@ public class ContentAdaptor {
 		return null;
 	}
 
-	public IMediaItemDb objectIdToDb (final String objectId) throws DbException, MorriganException {
+	public MediaDb objectIdToDb (final String objectId) throws DbException, MorriganException {
 		final MediaListReference mlr = this.objectIdToMediaListReference.get(objectId);
 		if (mlr == null) return null;
 		return this.dbHelper.mediaListReferenceToDb(mlr);
@@ -176,7 +176,7 @@ public class ContentAdaptor {
 	}
 
 	private ContentNode makeDbSubNode (final String objectId, final MediaListReference mlr, final DbSubNodeType type) throws DbException, MorriganException {
-		final IMediaItemDb db = this.dbHelper.mediaListReferenceToDb(mlr);
+		final MediaDb db = this.dbHelper.mediaListReferenceToDb(mlr);
 		if (db != null) {
 			switch (type) {
 				case TAGS:
@@ -194,7 +194,7 @@ public class ContentAdaptor {
 		throw new IllegalArgumentException("Unknown DB type: " + mlr);
 	}
 
-	private ContentNode makeDbTagsNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db) throws MorriganException {
+	private ContentNode makeDbTagsNode (final String objectId, final MediaListReference mlr, final MediaDb db) throws MorriganException {
 		final Container c = makeContainer(localMmdbObjectId(mlr), objectId, mlr.getTitle());
 
 		for (final MediaTag tag : db.getTopTags(MAX_TAGS)) {
@@ -206,12 +206,12 @@ public class ContentAdaptor {
 	}
 
 	private ContentNode makeTagNode (final String objectId, final MediaListReference mlr, final MediaTag tag) throws DbException, MorriganException {
-		final IMediaItemDb db = this.dbHelper.mediaListReferenceToDb(mlr);
+		final MediaDb db = this.dbHelper.mediaListReferenceToDb(mlr);
 		if (db != null) return makeDbTagNode(objectId, mlr, db, tag);
 		throw new IllegalArgumentException("Unknown DB type: " + mlr);
 	}
 
-	private ContentNode makeDbTagNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db, final MediaTag tag) throws DbException, MorriganException {
+	private ContentNode makeDbTagNode (final String objectId, final MediaListReference mlr, final MediaDb db, final MediaTag tag) throws DbException, MorriganException {
 		return queryToContentNode(dbSubNodeObjectId(mlr, DbSubNodeType.TAGS), objectId, mlr, db,
 				String.format("t=\"%s\"", tag.getTag()),
 				new SortColumn[] {
@@ -222,7 +222,7 @@ public class ContentAdaptor {
 				new SortDirection[] { SortDirection.DESC, SortDirection.ASC, SortDirection.ASC });
 	}
 
-	private ContentNode makeDbAlbumsNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db) throws MorriganException {
+	private ContentNode makeDbAlbumsNode (final String objectId, final MediaListReference mlr, final MediaDb db) throws MorriganException {
 		final Container c = makeContainer(localMmdbObjectId(mlr), objectId, mlr.getTitle());
 
 		for (final MediaAlbum album : db.getAlbums()) {
@@ -242,18 +242,18 @@ public class ContentAdaptor {
 	}
 
 	private ContentNode makeAlbumNode (final String objectId, final MediaListReference mlr, final MediaAlbum album) throws DbException, MorriganException {
-		final IMediaItemDb db = this.dbHelper.mediaListReferenceToDb(mlr);
+		final MediaDb db = this.dbHelper.mediaListReferenceToDb(mlr);
 		if (db != null) return makeDbAlbumNode(objectId, mlr, db, album);
 		throw new IllegalArgumentException("Unknown DB type: " + mlr);
 	}
 
-	private ContentNode makeDbAlbumNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db, final MediaAlbum album) throws MorriganException {
+	private ContentNode makeDbAlbumNode (final String objectId, final MediaListReference mlr, final MediaDb db, final MediaAlbum album) throws MorriganException {
 		final Container c = makeContainer(dbSubNodeObjectId(mlr, DbSubNodeType.ALBUMS), objectId, mlr.getTitle());
 		addItemsToContainer(mlr, c, db, db.getAlbumItems(MediaType.TRACK, album));
 		return new ContentNode(c);
 	}
 
-	private ContentNode makeDbRecentlyAddedNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db) throws DbException, MorriganException {
+	private ContentNode makeDbRecentlyAddedNode (final String objectId, final MediaListReference mlr, final MediaDb db) throws DbException, MorriganException {
 		return queryToContentNode(localMmdbObjectId(mlr), objectId, mlr, db,
 				"*",
 				new SortColumn[] {
@@ -263,7 +263,7 @@ public class ContentAdaptor {
 				new SortDirection[] { SortDirection.DESC, SortDirection.ASC });
 	}
 
-	private ContentNode makeDbMostPlayedNode (final String objectId, final MediaListReference mlr, final IMediaItemDb db) throws DbException, MorriganException {
+	private ContentNode makeDbMostPlayedNode (final String objectId, final MediaListReference mlr, final MediaDb db) throws DbException, MorriganException {
 		return queryToContentNode(localMmdbObjectId(mlr), objectId, mlr, db,
 				"*",
 				new SortColumn[] {
@@ -274,13 +274,13 @@ public class ContentAdaptor {
 	}
 
 	private ContentNode queryToContentNode (final String parentObjectId, final String objectId, final MediaListReference mlr,
-			final IMediaItemDb db, final String term, final SortColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException, MorriganException {
+			final MediaDb db, final String term, final SortColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException, MorriganException {
 		final Container c = makeContainer(parentObjectId, objectId, mlr.getTitle());
 		addItemsToContainer(mlr, c, db, db.search(MediaType.TRACK, term, MAX_ITEMS, sortColumns, sortDirections, false));
 		return new ContentNode(c);
 	}
 
-	private void addItemsToContainer (final MediaListReference mlr, final Container c, final IMediaItemDb db, final Collection<MediaItem> items) throws MorriganException {
+	private void addItemsToContainer (final MediaListReference mlr, final Container c, final MediaDb db, final Collection<MediaItem> items) throws MorriganException {
 		for (final MediaItem item : items) {
 			final Item i = makeItem(c, mlr, item);
 			if (i != null) {
@@ -293,7 +293,7 @@ public class ContentAdaptor {
 
 	private final Cache<String, List<MediaItem>> queryCache = new Cache<>(50);
 
-	public List<Item> queryToItems(final MediaListReference mlr, final IMediaItemDb db, final String term, final Container parentContainer, final int maxResults) throws DbException, MorriganException {
+	public List<Item> queryToItems(final MediaListReference mlr, final MediaDb db, final String term, final Container parentContainer, final int maxResults) throws DbException, MorriganException {
 		final String cacheKey = String.format("%s|%s|%s", term, maxResults, mlr.getIdentifier());
 		List<MediaItem> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
 		if (results == null) {
@@ -356,7 +356,7 @@ public class ContentAdaptor {
 		return item;
 	}
 
-	private static void tagsToDescription (final IMediaItemDb db, final MediaItem mediaItem, final Item item) throws MorriganException {
+	private static void tagsToDescription (final MediaDb db, final MediaItem mediaItem, final Item item) throws MorriganException {
 		final List<MediaTag> tags = db.getTags(mediaItem);
 		if (tags != null && tags.size() > 0) {
 			StringBuilder s = null;

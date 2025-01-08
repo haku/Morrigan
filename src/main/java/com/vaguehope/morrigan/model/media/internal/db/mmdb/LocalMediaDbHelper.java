@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
@@ -30,7 +30,7 @@ public final class LocalMediaDbHelper {
 		return file;
 	}
 
-	public static IMediaItemDb createMmdb (final Config config, final String name) throws MorriganException {
+	public static MediaDb createMmdb (final Config config, final String name) throws MorriganException {
 		final String file = getFullPathToMmdb(config, name);
 		try {
 			return LocalMediaDbFactory.getMain(file);

@@ -26,7 +26,7 @@ import com.vaguehope.cdsc.CDSCLexer;
 import com.vaguehope.cdsc.CDSCParser;
 import com.vaguehope.cdsc.CDSCParser.RelExpContext;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -56,7 +56,7 @@ public class SearchEngine {
 
 		final List<Item> ret = new ArrayList<>();
 		for (final MediaListReference mlr : this.mediaFactory.getAllLocalMixedMediaDbs()) {
-			final IMediaItemDb db = this.mediaFactory.getLocalMixedMediaDb(mlr.getIdentifier());
+			final MediaDb db = this.mediaFactory.getLocalMixedMediaDb(mlr.getIdentifier());
 			if (db.size() > 0) { // Only search loaded DBs.
 				final String cacheKey = String.format("%s|%s|%s", term, contentNode.getContainer().getId(), mlr.getIdentifier());
 				List<Item> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);

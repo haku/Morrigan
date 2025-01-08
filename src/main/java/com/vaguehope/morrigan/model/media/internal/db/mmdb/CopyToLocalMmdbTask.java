@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -24,10 +24,10 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 
 	private final MediaList fromList;
 	private final Collection<MediaItem> itemsToCopy;
-	private final IMediaItemDb toDb;
+	private final MediaDb toDb;
 	private final Config config;
 
-	public CopyToLocalMmdbTask (final MediaList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb, final Config config) {
+	public CopyToLocalMmdbTask (final MediaList fromList, final Collection<MediaItem> itemsToCopy, final MediaDb toDb, final Config config) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
@@ -94,7 +94,7 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO extract this to Config class?
-	private File getCheckoutDirectory (final IMediaItemDb db) {
+	private File getCheckoutDirectory (final MediaDb db) {
 		final File coDir = new File(this.config.getConfigDir(), "checkout");
 		if (!coDir.exists()) {
 			if (!coDir.mkdir()) {

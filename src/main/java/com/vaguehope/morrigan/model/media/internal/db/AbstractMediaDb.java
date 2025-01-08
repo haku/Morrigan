@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
@@ -47,7 +47,7 @@ import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public abstract class AbstractMediaDb extends AbstractMediaList implements IMediaItemDb {
+public abstract class AbstractMediaDb extends AbstractMediaList implements MediaDb {
 
 	private static final SortColumn DEFAULT_SORT_COLUMN = SortColumn.FILE_PATH;
 

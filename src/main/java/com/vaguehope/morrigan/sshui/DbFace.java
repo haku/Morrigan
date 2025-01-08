@@ -25,7 +25,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -275,8 +275,8 @@ public class DbFace extends DefaultFace {
 						askSearch(gui);
 						return true;
 					case 'p':
-						if (this.list instanceof IMediaItemDb) {
-							this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (IMediaItemDb) this.list));
+						if (this.list instanceof MediaDb) {
+							this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (MediaDb) this.list));
 						}
 						else {
 							this.lastActionMessage.setLastActionMessage(String.format("Can not show properties for non-DB."));
@@ -543,8 +543,8 @@ public class DbFace extends DefaultFace {
 		if (this.lastRefreshError != null) {
 			summary += ": " + this.lastRefreshError;
 		}
-		else if (this.list instanceof IMediaItemDb) {
-			final IMediaItemDb db = (IMediaItemDb) this.list;
+		else if (this.list instanceof MediaDb) {
+			final MediaDb db = (MediaDb) this.list;
 			summary += ": " + PrintingThingsHelper.dbSummary(db);
 			summary += "   " + PrintingThingsHelper.sortSummary(db);
 		}

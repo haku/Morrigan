@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -32,7 +32,7 @@ import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
 import com.vaguehope.morrigan.util.FileSystem;
 import com.vaguehope.morrigan.util.MimeType;
 
-public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements MorriganTask {
+public abstract class LocalDbUpdateTask<Q extends MediaDb> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected enum ScanOption {

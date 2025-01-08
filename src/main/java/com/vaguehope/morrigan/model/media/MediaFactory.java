@@ -25,22 +25,22 @@ public interface MediaFactory {
 	/**
 	 * Create a new one.
 	 */
-	IMediaItemDb createLocalMixedMediaDb (String name) throws MorriganException;
+	MediaDb createLocalMixedMediaDb (String name) throws MorriganException;
 
 	/**
 	 * Main instance.
 	 */
-	IMediaItemDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
+	MediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
 
 	/**
 	 * With a filter set: a view.
 	 */
-	IMediaItemDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
+	MediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
 
 	/**
 	 * Same as getLocalMixedMediaDb().
 	 */
-	IMediaItemDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
+	MediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
 
 	/**
 	 * MID is like:
@@ -56,9 +56,9 @@ public interface MediaFactory {
 	/**
 	 * Create an new instance with transactional behaviour.
 	 */
-	IMediaItemDb getLocalMixedMediaDbTransactional (IMediaItemDb lmmdb) throws DbException;
+	MediaDb getLocalMixedMediaDbTransactional (MediaDb lmmdb) throws DbException;
 
-	IMediaItemDb getMediaItemDbTransactional (IMediaItemDb db) throws DbException;
+	MediaDb getMediaItemDbTransactional (MediaDb db) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -86,15 +86,15 @@ public interface MediaFactory {
 	/*
 	 * TODO merge these next two methods?
 	 */
-	MorriganTask getLocalMixedMediaDbUpdateTask (IMediaItemDb library);
+	MorriganTask getLocalMixedMediaDbUpdateTask (MediaDb library);
 	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
 	MorriganTask getMediaFileCopyTask (MediaList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
-	MorriganTask getNewCopyToLocalMmdbTask (MediaList fromList, Collection<MediaItem> itemsToCopy, IMediaItemDb toDb);
-	MorriganTask getSyncMetadataRemoteToLocalTask (IMediaItemDb local, IRemoteMixedMediaDb remote);
+	MorriganTask getNewCopyToLocalMmdbTask (MediaList fromList, Collection<MediaItem> itemsToCopy, MediaDb toDb);
+	MorriganTask getSyncMetadataRemoteToLocalTask (MediaDb local, IRemoteMixedMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	void readTrackTags (IMediaItemDb itemDb, MediaItem mlt, File file) throws IOException, MorriganException;
+	void readTrackTags (MediaDb itemDb, MediaItem mlt, File file) throws IOException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

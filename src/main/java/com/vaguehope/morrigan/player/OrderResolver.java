@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -245,8 +245,8 @@ public class OrderResolver {
 		// Can not follow tags if no current item.
 		if (current == null) return getNextTrackByLastPlayedDate(list, current);
 
-		if (!(list instanceof IMediaItemDb)) throw new IllegalArgumentException("Only DB lists supported.");
-		final IMediaItemDb db = (IMediaItemDb) list;
+		if (!(list instanceof MediaDb)) throw new IllegalArgumentException("Only DB lists supported.");
+		final MediaDb db = (MediaDb) list;
 
 		final Random rnd = new Random();
 

@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.dlna.httpserver.FileLocator;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -78,7 +78,7 @@ public class MediaFileLocator implements FileLocator {
 
 		final MediaListReference mlr = derefMlr(parts[0]);
 		if (mlr == null) throw new IllegalArgumentException("Invalid ref in ID: " + id);
-		final IMediaItemDb db = this.dbHelper.mediaListReferenceToDb(mlr);
+		final MediaDb db = this.dbHelper.mediaListReferenceToDb(mlr);
 
 		if ("item".equals(parts[1])) {
 			if (parts.length < 4) throw new IllegalArgumentException("Need at least 4 parts: " + id);

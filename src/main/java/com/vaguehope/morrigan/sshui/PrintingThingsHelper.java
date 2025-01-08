@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -132,7 +132,7 @@ public final class PrintingThingsHelper {
 				TimeHelper.formatTimeSeconds(d.getDuration()));
 	}
 
-	public static String dbSummary (final IMediaItemDb db) {
+	public static String dbSummary (final MediaDb db) {
 		final StringBuilder msg = new StringBuilder();
 		msg.append(db.size());
 		msg.append(" items totaling ");

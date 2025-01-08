@@ -36,7 +36,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
@@ -334,8 +334,8 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_SCAN)) {
-			if (mmdb instanceof IMediaItemDb) {
-				final AsyncTask at = this.asyncActions.scheduleMmdbScan((IMediaItemDb) mmdb);
+			if (mmdb instanceof MediaDb) {
+				final AsyncTask at = this.asyncActions.scheduleMmdbScan((MediaDb) mmdb);
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Scan scheduled desu~");
 				resp.getWriter().println("id=" + at.id());
@@ -345,10 +345,10 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_PULL)) {
-			if (mmdb instanceof IMediaItemDb) {
+			if (mmdb instanceof MediaDb) {
 				final String remote = req.getParameter(PARAM_REMOTE);
 				if (StringHelper.notBlank(remote)) {
-					final AsyncTask at = this.asyncActions.scheduleMmdbPull((IMediaItemDb) mmdb, remote);
+					final AsyncTask at = this.asyncActions.scheduleMmdbPull((MediaDb) mmdb, remote);
 					resp.setContentType("text/plain");
 					resp.getWriter().println("Pull scheduled desu~");
 					resp.getWriter().println("id=" + at.id());
@@ -641,8 +641,8 @@ public class MlistsServlet extends HttpServlet {
 					query, maxResults, sortColumns, sortDirections, includeDisabled, transcode);
 		}
 		else if (path.equals(PATH_SHA1TAGS)) {
-			if (mmdb instanceof IMediaItemDb) {
-				final IMediaItemDb db = (IMediaItemDb) mmdb;
+			if (mmdb instanceof MediaDb) {
+				final MediaDb db = (MediaDb) mmdb;
 				final boolean includeAutoTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_AUTO_TAGS, false);
 				// TODO it would be nice to make the gson instance static and reusable, but ATM the type converted wraps the DB.
 				// TODO do not output entries that do not have any tags.
@@ -779,8 +779,8 @@ public class MlistsServlet extends HttpServlet {
 			dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
 			dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
 
-			if (ml instanceof IMediaItemDb) {
-				final IMediaItemDb db = (IMediaItemDb) ml;
+			if (ml instanceof MediaDb) {
+				final MediaDb db = (MediaDb) ml;
 				dw.dataElement("sortcolumn", db.getSortColumn().getUiName());
 				dw.dataElement("sortdirection", db.getSortDirection().toString());
 			}
@@ -792,8 +792,8 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 
-		if (ml instanceof IMediaItemDb) {
-			final IMediaItemDb db = (IMediaItemDb) ml;
+		if (ml instanceof MediaDb) {
+			final MediaDb db = (MediaDb) ml;
 			for (final String remote : db.getRemotes().keySet()) {
 				FeedHelper.addElement(dw, "remote", remote);
 			}

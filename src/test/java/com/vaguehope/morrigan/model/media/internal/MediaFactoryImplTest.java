@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 
 public class MediaFactoryImplTest {
@@ -29,13 +29,13 @@ public class MediaFactoryImplTest {
 
 	@Test
 	public void itGetsLocalByMid() throws Exception {
-		final IMediaItemDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
+		final MediaDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
 		final MediaListReference ref = this.undertest.getAllLocalMixedMediaDbs().iterator().next();
 		assertEquals(db, this.undertest.getMediaListByMid(ref.getMid(), null));
 		assertEquals(db, this.undertest.getMediaListByRef(ref));
 
 		final String filter = "some-filter" + RND.nextLong();
-		final IMediaItemDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
+		final MediaDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
 		assertEquals(dbWithFilter, this.undertest.getMediaListByMid(ref.getMid(), filter));
 		assertEquals(dbWithFilter, this.undertest.getMediaListByRef(ref, filter));
 	}
@@ -43,14 +43,14 @@ public class MediaFactoryImplTest {
 	@Test
 	public void itGetsLocalWithPathThatHasStuffOnTheEnd() throws Exception {
 		final String name = "test" + RND.nextLong();
-		final IMediaItemDb db = this.undertest.createLocalMixedMediaDb(name);
+		final MediaDb db = this.undertest.createLocalMixedMediaDb(name);
 		assertEquals(db, this.undertest.getMediaListByMid("LOCALMMDB/" + name + ".local.db3/query/*?&column=DATE_LAST_PLAYED&order=desc&_=1736334474459", null));
 		assertEquals(db, this.undertest.getMediaListByMid("LOCALMMDB:" + name + ".local.db3/query/*?&column=DATE_LAST_PLAYED&order=desc&_=1736334474459", null));
 	}
 
 	@Test
 	public void itGetsRemoteByMid() throws Exception {
-		final IMediaItemDb external = mock(IMediaItemDb.class);
+		final MediaDb external = mock(MediaDb.class);
 		final String id = "id" + RND.nextLong();
 		when(external.getListId()).thenReturn(id);
 		when(external.getListName()).thenReturn("name for " + id);
