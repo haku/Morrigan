@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,6 +20,7 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
+import com.vaguehope.morrigan.model.media.internal.db.MixedMediaSqliteLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerTest {

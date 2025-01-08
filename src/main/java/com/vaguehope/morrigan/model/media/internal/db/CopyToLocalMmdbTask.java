@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.io.File;
 import java.io.FileNotFoundException;

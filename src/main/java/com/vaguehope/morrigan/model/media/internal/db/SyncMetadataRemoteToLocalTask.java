@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.math.BigInteger;
 import java.util.HashMap;

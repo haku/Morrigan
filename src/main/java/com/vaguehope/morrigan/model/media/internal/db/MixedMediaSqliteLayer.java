@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -22,9 +22,6 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
-import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
-import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayer;
-import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.GeneratedString;
 

@@ -6,7 +6,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
+import com.vaguehope.morrigan.model.media.internal.db.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public final class RemoteMixedMediaDbFactory {

@@ -17,9 +17,9 @@ import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
+import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMediaDb;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayer;
+import com.vaguehope.morrigan.model.media.internal.db.MixedMediaSqliteLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.MimeType;
 

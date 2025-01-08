@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.math.BigInteger;
 import java.util.Random;
@@ -13,6 +13,7 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
+import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.model.media.test.Tag;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.model.media.test.TestRemoteDb;

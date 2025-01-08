@@ -1,10 +1,8 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
-import com.vaguehope.morrigan.model.media.internal.db.AbstractMediaDb;
-import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 
 public class LocalMediaDb extends AbstractMediaDb {
 

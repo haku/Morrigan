@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
-import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public final class LocalMediaDbHelper {

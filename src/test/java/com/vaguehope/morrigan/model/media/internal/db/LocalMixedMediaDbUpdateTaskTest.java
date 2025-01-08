@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -33,6 +33,7 @@ import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;

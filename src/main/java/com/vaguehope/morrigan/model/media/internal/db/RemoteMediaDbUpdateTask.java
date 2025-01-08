@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;

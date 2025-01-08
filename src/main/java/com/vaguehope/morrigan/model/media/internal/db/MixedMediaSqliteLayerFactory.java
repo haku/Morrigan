@@ -1,8 +1,7 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerFactory {

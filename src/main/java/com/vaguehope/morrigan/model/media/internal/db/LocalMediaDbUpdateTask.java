@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -27,7 +27,6 @@ import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.TrackTagHelper;
-import com.vaguehope.morrigan.model.media.internal.db.LocalDbUpdateTask;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.transcode.Ffprobe;
