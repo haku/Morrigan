@@ -26,5 +26,6 @@ public interface MediaListReference extends Comparable<MediaListReference> {
 	String getIdentifier ();
 	String getTitle ();
 	String getMid();
+	boolean isHasRootNodes();
 
 }

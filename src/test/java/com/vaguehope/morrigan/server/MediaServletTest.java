@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.server;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public class MediaServletTest {
 	public void itServesLists() throws Exception {
 		this.req.setPathInfo(null);
 		this.undertest.service(this.req, this.resp);
-		assertOkJson("[{\"name\":\"media-servlet-test-db\",\"mid\":\"LOCALMMDB:media-servlet-test-db\"}]\n");
+		assertOkJson("[{\"title\":\"media-servlet-test-db\",\"mid\":\"LOCALMMDB:media-servlet-test-db\",\"hasRootNodes\":false}]\n");
 	}
 
 	@Test
@@ -70,7 +71,10 @@ public class MediaServletTest {
 		this.testDb.addTag(track, "some-tag", MediaTagType.MANUAL, (String) null);
 		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db");
 		this.undertest.service(this.req, this.resp);
-		assertOkJson("{\"nodes\":[{\"id\":\"node-id\",\"title\":\"node tile\",\"parentId\":\"0\"}],"
+		assertOkJson("{"
+				+ "\"nodeId\":\"0\","
+				+ "\"title\":\"media-servlet-test-db\","
+				+ "\"nodes\":[{\"id\":\"node-id\",\"title\":\"node tile\",\"parentId\":\"0\"}],"
 				+ "\"items\":["
 				+ "{\"id\":\"/path/file.mp3\",\"title\":\"file.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890000,"
 				+ "\"tags\":[{\"t\":\"some-tag\"}]}"
@@ -88,11 +92,18 @@ public class MediaServletTest {
 	public void itServesSubNode() throws Exception {
 		final IMediaItemList node = mock(IMediaItemList.class);
 		when(node.hasNodes()).thenReturn(true);
+		when(node.getNodeId()).thenReturn("my-node");
+		when(node.getListName()).thenReturn("things");
 		when(node.getSubNodes()).thenReturn(ImmutableList.of(new MediaNode("sub-node-id", "node tile", "my-node")));
 		this.testDb.addChildNode("my-node", node);
 		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db/node/my-node");
 		this.undertest.service(this.req, this.resp);
-		assertOkJson("{\"nodes\":[{\"id\":\"sub-node-id\",\"title\":\"node tile\",\"parentId\":\"my-node\"}],\"items\":[]}\n");
+		verify(node).read();
+		assertOkJson("{"
+				+ "\"nodeId\":\"my-node\","
+				+ "\"title\":\"things\","
+				+ "\"nodes\":[{\"id\":\"sub-node-id\",\"title\":\"node tile\",\"parentId\":\"my-node\"}],"
+				+ "\"items\":[]}\n");
 	}
 
 	@Test

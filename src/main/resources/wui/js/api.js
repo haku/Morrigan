@@ -283,27 +283,44 @@ MnApi = {};
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists',
-      dataType : 'xml',
+      url : 'media',
+      dataType : 'json',
       beforeSend : function() {
         msgHandler.onInfo('Reading DBs...');
       },
-      success : function(xml) {
-        var mlists = [];
-        var entires = $(xml).find('entry');
-        entires.each(function() {
-          var node = $(this);
-          var mlist = parseMlistNode(node);
-          mlists.push(mlist);
-        });
-        mlists.sort(function(a, b) {
-          return a.mid - b.mid;
-        });
-        onDbs(mlists);
+      success : function(dbs) {
+        onDbs(dbs);
         msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         msgHandler.onError('Error fetching media lists: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
+  }
+
+  MnApi.getNode = function(mid, nodeId, parentNodeId, msgHandler, onNode) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'media/' + mid + '/node/' + nodeId,
+      dataType : 'json',
+      beforeSend : function() {
+        msgHandler.onInfo('Reading Node...');
+      },
+      success : function(node) {
+        // stuffing mid everywhere seems silly, but seems to make everything else simpler.
+        node.mid = mid;
+        node.parentNodeId = parentNodeId;  // for implementing ".." in the UI.  showing proper browing breadcome would hopefully make this not needed.
+        node.nodes.forEach(n => n.mid = mid);
+        node.items.forEach(i => {
+          i.mid = mid;
+          i.url = 'mlists/' + mid + "/items/" + i.id;  // for now point to old handler so playback etc works.
+        });
+        onNode(node);
+        msgHandler.onInfo('');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        msgHandler.onError('Error fetching node: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -525,6 +542,7 @@ MnApi = {};
   };
 
   function actionItem(item, action, args, msgHandler, onComplete) {
+    console.log(item);
     var data = 'action=' + action;
     if (args) data += '&' + args;
 

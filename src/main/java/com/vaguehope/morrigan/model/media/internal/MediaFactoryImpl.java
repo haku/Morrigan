@@ -63,7 +63,7 @@ public class MediaFactoryImpl implements MediaFactory {
 		final Collection<MediaListReference> ret = new ArrayList<>();
 		ret.addAll(real);
 		for (final IMediaItemDb db : this.addedLocals.values()) {
-			ret.add(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName()));
+			ret.add(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName(), false));
 		}
 		return ret;
 	}
@@ -100,8 +100,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	 */
 	@Override
 	public IMediaItemList getMediaListByMid(final String mid, final String filter) throws DbException, MorriganException {
-		String[] parts = mid.split(":", 2);
-		if (parts.length < 2) parts = mid.split("/");
+		final String[] parts = mid.split(":|/");
 		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
 
 		final String type = parts[0];
@@ -195,7 +194,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	public Collection<MediaListReference> getExternalLists () {
 		final List<MediaListReference> ret = new ArrayList<>();
 		for (final IMediaItemList list : this.externalListsByListId.values()) {
-			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, list.getListId(), list.getListName()));
+			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, list.getListId(), list.getListName(), list.hasNodes()));
 		}
 		return ret;
 	}

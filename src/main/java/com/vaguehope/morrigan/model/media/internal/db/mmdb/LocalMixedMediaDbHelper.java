@@ -62,7 +62,7 @@ public final class LocalMixedMediaDbHelper {
 		for (final File file : files) {
 			final String absolutePath = file.getAbsolutePath();
 			if (isMmdbFile(config, absolutePath)) {
-				final MediaListReference newItem = new MediaListReferenceImpl(MediaListType.LOCALMMDB, absolutePath, getMmdbFileTitle(absolutePath));
+				final MediaListReference newItem = new MediaListReferenceImpl(MediaListType.LOCALMMDB, absolutePath, getMmdbFileTitle(absolutePath), false);
 				ret.add(newItem);
 			}
 		}

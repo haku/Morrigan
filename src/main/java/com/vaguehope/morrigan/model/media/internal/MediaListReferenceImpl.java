@@ -10,16 +10,18 @@ public class MediaListReferenceImpl implements MediaListReference {
 	private final MediaListType type;
 	private final String identifier;
 	private final String title;
+	private final boolean hasRootNodes;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MediaListReferenceImpl (MediaListType type, String identifier, String title) {
+	public MediaListReferenceImpl (MediaListType type, String identifier, String title, boolean hasRootNodes) {
 		if (type == null) throw new IllegalArgumentException("type is required.");
 		if (identifier == null) throw new IllegalArgumentException("identifier is required.");
 		if (title == null) throw new IllegalArgumentException("title is required.");
 		this.type = type;
 		this.identifier = identifier;
 		this.title = title;
+		this.hasRootNodes = hasRootNodes;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -37,6 +39,11 @@ public class MediaListReferenceImpl implements MediaListReference {
 	@Override
 	public String getTitle () {
 		return this.title;
+	}
+
+	@Override
+	public boolean isHasRootNodes() {
+		return this.hasRootNodes;
 	}
 
 	@Override

@@ -63,6 +63,9 @@ public interface IMediaItemList extends List<AbstractItem> {
 	default boolean hasNodes() {
 		return false;
 	}
+	default String getNodeId() {
+		throw new UnsupportedOperationException();
+	}
 	default IMediaItemList makeNode(String id, String title) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}

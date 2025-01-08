@@ -245,7 +245,7 @@ public class MlistsServlet extends HttpServlet {
 		else {
 			final String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
 			if (path.length() > 0) {
-				final String[] pathParts = path.split("/");
+				final String[] pathParts = path.split(":|/");
 				if (pathParts.length >= 2) {
 					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 					final IMediaItemList mmdb = this.mediaFactory.getMediaListByMid(path, filter);

@@ -41,6 +41,14 @@ public class MediaFactoryImplTest {
 	}
 
 	@Test
+	public void itGetsLocalWithPathThatHasStuffOnTheEnd() throws Exception {
+		final String name = "test" + RND.nextLong();
+		final IMediaItemDb db = this.undertest.createLocalMixedMediaDb(name);
+		assertEquals(db, this.undertest.getMediaListByMid("LOCALMMDB/" + name + ".local.db3/query/*?&column=DATE_LAST_PLAYED&order=desc&_=1736334474459", null));
+		assertEquals(db, this.undertest.getMediaListByMid("LOCALMMDB:" + name + ".local.db3/query/*?&column=DATE_LAST_PLAYED&order=desc&_=1736334474459", null));
+	}
+
+	@Test
 	public void itGetsRemoteByMid() throws Exception {
 		final IMediaItemDb external = mock(IMediaItemDb.class);
 		final String id = "id" + RND.nextLong();

@@ -66,6 +66,10 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 		return this.nodes.size() > 0;
 	}
 	@Override
+	public String getNodeId() {
+		return "0"; // TODO allow setting this?
+	}
+	@Override
 	public List<MediaNode> getSubNodes() throws MorriganException {
 		return this.nodes;
 	}

@@ -34,12 +34,17 @@ public class RpcMediaNodeList extends RpcMediaList {
 
 	@Override
 	public String getSerial() {
-		return new RpcListSerial(this.ri.getLocalIdentifier(), null).serialise();
+		return new RpcListSerial(this.ri.getLocalIdentifier(), null).serialise();  // TODO include nodeId
 	}
 
 	@Override
 	public boolean hasNodes() {
 		return true;
+	}
+
+	@Override
+	public String getNodeId() {
+		return this.nodeId;
 	}
 
 	@Override
@@ -98,8 +103,8 @@ public class RpcMediaNodeList extends RpcMediaList {
 	}
 
 	@Override
-	public int indexOf(Object o) {
-		int i = this.mediaNodes.indexOf(o);
+	public int indexOf(final Object o) {
+		final int i = this.mediaNodes.indexOf(o);
 		if (i >= 0) return i;
 		return this.mediaItems.indexOf(o);
 	}

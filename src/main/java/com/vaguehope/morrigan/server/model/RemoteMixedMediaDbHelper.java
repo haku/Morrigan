@@ -56,7 +56,8 @@ public final class RemoteMixedMediaDbHelper {
 		for (final File file : files) {
 			final String absolutePath = file.getAbsolutePath();
 			if (isRemoteMmdbFile(absolutePath)) {
-				final MediaListReference newItem = new MediaListReferenceImpl(MediaListReference.MediaListType.REMOTEMMDB, absolutePath, getRemoteMmdbTitle(absolutePath));
+				final MediaListReference newItem = new MediaListReferenceImpl(
+						MediaListReference.MediaListType.REMOTEMMDB, absolutePath, getRemoteMmdbTitle(absolutePath), false);
 				ret.add(newItem);
 			}
 		}

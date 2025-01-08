@@ -116,6 +116,11 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	}
 
 	@Override
+	public String getNodeId() {
+		return this.containerId;
+	}
+
+	@Override
 	public IMediaItemList makeNode(final String id, final String nodeTitle) throws MorriganException {
 		return new ContentDirectoryDb(this.listId, id, nodeTitle, this.controlPoint, this.device, this.remoteService, this.storage, this.contentDirectory);
 	}

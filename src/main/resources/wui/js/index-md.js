@@ -615,6 +615,37 @@
     });
   }
 
+  function setDbTabToNode(mid, nodeId, parentNodeId) {
+    currentDbMid = mid;
+    currentDbQuery = null;
+    currentDbResults = null;
+    $('#db_fab').hide();
+
+    MnApi.getNode(mid, nodeId, parentNodeId, msgHandler, displayNode);
+
+    $('#db_title').text('Fetching...');
+    $('#db_list').empty();
+
+    $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
+    $('#db_query').off('keyup').on('keyup', function(event) {
+      onAutocompleteKeyup(event);
+      if (event.keyCode == 13) {
+        setDbTabToSearch(mid);
+      }
+    });
+    $('#db_sort_column').unbind();
+    $('#db_sort_order').unbind();
+    $('#db_include_disabled').unbind().click(function(event){
+      var current_icon = $('#db_include_disabled .material-icons').text();
+      var new_icon = 'deleted';
+      if (current_icon === 'deleted') new_icon = 'delete_outline';
+      $('#db_include_disabled .material-icons').text(new_icon);
+    });
+    $('#db_go_tags').unbind().click(function(){setDbTabToTags(mid, view)});
+    $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(mid, view)});
+    $('#db_sort_options').show();
+  }
+
   function setDbTabToSearch(mid, view, query) {
     if (query) {
       $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
@@ -691,7 +722,7 @@
     dbList.empty();
     var count = 0;
     $.each(dbs, function(index, db) {
-      if (db.type === "remote") return true;
+      if (db.mid.startsWith("REMOTEMMDB")) return true;
       dbList.append(makeDbItem(db));
       count += 1;
     });
@@ -707,22 +738,70 @@
     var el = $('<li class="item bigger">');
     el.append(a);
 
-    a.unbind().click(function(event) {
-      event.preventDefault();
-      restoreSavedSearch(db.mid);
-      setDbTabToSearch(db.mid);
-    });
+    if (db.hasRootNodes) {
+      a.unbind().click(function(event) {
+        event.preventDefault();
+        setDbTabToNode(db.mid, "0", null);
+      });
+    }
+    else {
+      a.unbind().click(function(event) {
+        event.preventDefault();
+        restoreSavedSearch(db.mid);
+        setDbTabToSearch(db.mid);
+      });
+    }
 
     return el;
   }
 
-  function displayResults(results) {
-    currentDbResults = results;
+  function displayNode(node) {
+    $('#db_title').text(node.title);
 
+    var dbList = $('#db_list');
+    dbList.empty();
+
+    if (node.parentNodeId) {
+      dbList.append(makeNodeItem({
+        "mid": node.mid,
+        "id": node.parentNodeId,
+        "title": "..",
+      }));
+    }
+    node.nodes.forEach(n => {
+      dbList.append(makeNodeItem(n, node.nodeId));
+    });
+    displayItems(node.items);
+  }
+
+  function makeNodeItem(node, parentNodeId) {
+    var a = $('<a class="clickable title" href="">');
+    a.text(node.title);
+
+    var row = $('<li class="item">');
+    row.append(a);
+
+    a.unbind().click(function(event) {
+      event.preventDefault();
+      setDbTabToNode(node.mid, node.id, parentNodeId);
+    });
+
+    return row;
+  }
+
+  function displayResults(results) {
     $('#db_title').text(results.length + ' items');
 
     var dbList = $('#db_list');
     dbList.empty();
+
+    displayItems(results);
+  }
+
+  function displayItems(items) {
+    currentDbResults = items;
+
+    var dbList = $('#db_list');
 
     var selectedItems = new Set();
     var dbFab = $('#db_fab');
@@ -754,7 +833,7 @@
     }
 
     var itemToRow = new Map();
-    $.each(results, function(index, result) {
+    $.each(items, function(index, result) {
       var row = makeResultItem(result, selectedItems, invertSelection);
       dbList.append(row);
       itemToRow.set(result, row);
@@ -764,7 +843,7 @@
       if (!currentDbResults) return;
 
       $('.item', dbList).addClass('selected');
-      results.forEach(function(item) {
+      items.forEach(function(item) {
         selectedItems.add(item);
       });
       onSelectionChange();

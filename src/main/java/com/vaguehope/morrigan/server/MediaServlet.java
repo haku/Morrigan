@@ -7,7 +7,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -126,11 +126,14 @@ public class MediaServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
+		node.read();
 		if (!node.hasNodes()) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		final Map<String, Object> ret = new HashMap<>();
+		final Map<String, Object> ret = new LinkedHashMap<>();
+		ret.put("nodeId", node.getNodeId());
+		ret.put("title", node.getListName());
 		ret.put("nodes", node.getSubNodes());
 		ret.put("items", node.getMediaItems());
 		returnJson(resp, ret);
@@ -204,8 +207,9 @@ public class MediaServlet extends HttpServlet {
 		@Override
 		public JsonElement serialize(final MediaListReference src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
-			j.addProperty("name", src.getTitle());
+			j.addProperty("title", src.getTitle());
 			j.addProperty("mid", src.getMid().replace("/", ":"));
+			j.addProperty("hasRootNodes", src.isHasRootNodes());
 			return j;
 		}
 	}
