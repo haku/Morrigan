@@ -11,12 +11,12 @@ import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public final class LocalMixedMediaDbHelper {
+public final class LocalMediaDbHelper {
 
-	private LocalMixedMediaDbHelper () {}
+	private LocalMediaDbHelper () {}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -33,7 +33,7 @@ public final class LocalMixedMediaDbHelper {
 	public static IMediaItemDb createMmdb (final Config config, final String name) throws MorriganException {
 		final String file = getFullPathToMmdb(config, name);
 		try {
-			return LocalMixedMediaDbFactory.getMain(file);
+			return LocalMediaDbFactory.getMain(file);
 		}
 		catch (final DbException e) {
 			throw new MorriganException(e);
@@ -72,7 +72,7 @@ public final class LocalMixedMediaDbHelper {
 		return ret;
 	}
 
-	public static String getMmdbTitle (final MediaItemDbConfig config) {
+	public static String getMmdbTitle (final MediaDbConfig config) {
 		String ret = getMmdbFileTitle(config.getFilePath());
 
 		if (config.getFilter() != null) {

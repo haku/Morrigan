@@ -33,11 +33,11 @@ import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.transcode.Ffprobe;
 import com.vaguehope.morrigan.transcode.FfprobeCache;
 
-public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<IMediaItemDb> {
+public class LocalMediaDbUpdateTask extends LocalDbUpdateTask<IMediaItemDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 
-	public static class Factory extends RecyclingFactory2<LocalMixedMediaDbUpdateTask, IMediaItemDb, RuntimeException> {
+	public static class Factory extends RecyclingFactory2<LocalMediaDbUpdateTask, IMediaItemDb, RuntimeException> {
 
 		private final PlaybackEngineFactory playbackEngineFactory;
 		private final MediaFactory mediaFactory;
@@ -49,13 +49,13 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<IMediaItemDb>
 		}
 
 		@Override
-		protected boolean isValidProduct (final LocalMixedMediaDbUpdateTask product) {
+		protected boolean isValidProduct (final LocalMediaDbUpdateTask product) {
 			return !product.isFinished();
 		}
 
 		@Override
-		protected LocalMixedMediaDbUpdateTask makeNewProduct (final IMediaItemDb material) {
-			return new LocalMixedMediaDbUpdateTask(material, this.playbackEngineFactory, this.mediaFactory);
+		protected LocalMediaDbUpdateTask makeNewProduct (final IMediaItemDb material) {
+			return new LocalMediaDbUpdateTask(material, this.playbackEngineFactory, this.mediaFactory);
 		}
 
 	}
@@ -65,7 +65,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<IMediaItemDb>
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
 
-	protected LocalMixedMediaDbUpdateTask (final IMediaItemDb library, final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
+	protected LocalMediaDbUpdateTask (final IMediaItemDb library, final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
 		super(library);
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.mediaFactory = mediaFactory;

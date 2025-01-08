@@ -3,12 +3,12 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDb;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 
-public class LocalMixedMediaDb extends MediaItemDb {
+public class LocalMediaDb extends MediaDb {
 
-	protected LocalMixedMediaDb (final String listName, final MediaItemDbConfig config) {
+	protected LocalMediaDb (final String listName, final MediaDbConfig config) {
 		super(listName, config);
 	}
 
@@ -24,7 +24,7 @@ public class LocalMixedMediaDb extends MediaItemDb {
 
 	@Override
 	public IMediaItemList makeView(String filter) throws MorriganException {
-		return LocalMixedMediaDbFactory.getView(getDbPath(), filter);
+		return LocalMediaDbFactory.getView(getDbPath(), filter);
 	}
 
 }

@@ -47,7 +47,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 	private PlaybackEngineFactory playbackEngineFactory;
 	private MediaFactory mediaFactory;
 	private TaskEventListener taskEventListener;
-	private LocalMixedMediaDbUpdateTask undertest;
+	private LocalMediaDbUpdateTask undertest;
 
 	private Map<String, File> mockFiles;
 	private FileSystem fileSystem;
@@ -109,7 +109,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		}).when(this.taskEventListener).logError(anyString(), anyString(), any(Throwable.class));
 
 		this.playbackEngineFactory = mock(PlaybackEngineFactory.class);
-		this.undertest = new LocalMixedMediaDbUpdateTask(this.testDb, this.playbackEngineFactory, this.mediaFactory);
+		this.undertest = new LocalMediaDbUpdateTask(this.testDb, this.playbackEngineFactory, this.mediaFactory);
 		this.undertest.setFileSystem(this.fileSystem);
 	}
 

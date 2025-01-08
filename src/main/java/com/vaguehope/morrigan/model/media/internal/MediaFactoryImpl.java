@@ -29,11 +29,11 @@ import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.CopyToLocalMmdbTask;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbFactory;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMediaDbFactory;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMediaDbHelper;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
@@ -44,11 +44,11 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Config config;
-	private final LocalMixedMediaDbUpdateTask.Factory localMixedMediaDbUpdateTaskFactory;
+	private final LocalMediaDbUpdateTask.Factory localMixedMediaDbUpdateTaskFactory;
 
 	public MediaFactoryImpl (final Config config, final PlaybackEngineFactory playbackEngineFactoryTracker) {
 		this.config = config;
-		this.localMixedMediaDbUpdateTaskFactory = new LocalMixedMediaDbUpdateTask.Factory(playbackEngineFactoryTracker, this);
+		this.localMixedMediaDbUpdateTaskFactory = new LocalMediaDbUpdateTask.Factory(playbackEngineFactoryTracker, this);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,7 +57,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs () {
-		final List<MediaListReference> real = LocalMixedMediaDbHelper.getAllMmdb(this.config);
+		final List<MediaListReference> real = LocalMediaDbHelper.getAllMmdb(this.config);
 		if (this.addedLocals.size() < 1) return real;
 
 		final Collection<MediaListReference> ret = new ArrayList<>();
@@ -70,25 +70,25 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public IMediaItemDb createLocalMixedMediaDb (final String name) throws MorriganException {
-		return LocalMixedMediaDbHelper.createMmdb(this.config, name);
+		return LocalMediaDbHelper.createMmdb(this.config, name);
 	}
 
 	@Override
 	public IMediaItemDb getLocalMixedMediaDb (final String fullFilePath) throws DbException {
 		if (!new File(fullFilePath).isFile()) throw new DbException("File not found: " + fullFilePath);
-		return LocalMixedMediaDbFactory.getMain(fullFilePath);
+		return LocalMediaDbFactory.getMain(fullFilePath);
 	}
 
 	@Override
 	public IMediaItemDb getLocalMixedMediaDb (final String fullFilePath, final String filter) throws DbException {
 		if (!new File(fullFilePath).isFile()) throw new DbException("File not found: " + fullFilePath);
 		if (filter == null || filter.length() < 1) return getLocalMixedMediaDb(fullFilePath);
-		return LocalMixedMediaDbFactory.getView(fullFilePath, filter);
+		return LocalMediaDbFactory.getView(fullFilePath, filter);
 	}
 
 	@Override
 	public IMediaItemDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
-		return LocalMixedMediaDbFactory.getMainBySerial(serial);
+		return LocalMediaDbFactory.getMainBySerial(serial);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class MediaFactoryImpl implements MediaFactory {
 			final IMediaItemDb local = this.addedLocals.get(StringUtils.removeEndIgnoreCase(name, Config.MMDB_LOCAL_FILE_EXT));
 			if (local != null) return local;
 
-			final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(this.config, name);
+			final String f = LocalMediaDbHelper.getFullPathToMmdb(this.config, name);
 			return getLocalMixedMediaDb(f, filter);
 		}
 		else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
@@ -144,14 +144,14 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public IMediaItemDb getLocalMixedMediaDbTransactional (final IMediaItemDb lmmdb) throws DbException {
-		return LocalMixedMediaDbFactory.getTransactional(lmmdb.getDbPath());
+		return LocalMediaDbFactory.getTransactional(lmmdb.getDbPath());
 	}
 
 
 	@Override
 	public IMediaItemDb getMediaItemDbTransactional (final IMediaItemDb db) throws DbException {
 		if (MediaListType.LOCALMMDB.toString().equals(db.getType())) {
-			return LocalMixedMediaDbFactory.getTransactional(db.getDbPath());
+			return LocalMediaDbFactory.getTransactional(db.getDbPath());
 		}
 		throw new IllegalArgumentException("Can't create transactional connection to DB of type '" + db.getType() + "'.");
 	}
@@ -243,7 +243,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public MorriganTask getRemoteMixedMediaDbUpdateTask (final IRemoteMixedMediaDb library) {
-		return RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(library, null);
+		return RemoteMediaDbUpdateTask.FACTORY.manufacture(library, null);
 	}
 
 	@Override

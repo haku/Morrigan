@@ -4,17 +4,17 @@ import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, MediaItemDbConfig, DbException> {
+public class LocalMediaDbFactory extends RecyclingFactory2<IMediaItemDb, MediaDbConfig, DbException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final LocalMixedMediaDbFactory INSTANCE = new LocalMixedMediaDbFactory();
+	private static final LocalMediaDbFactory INSTANCE = new LocalMediaDbFactory();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private LocalMixedMediaDbFactory () {
+	private LocalMediaDbFactory () {
 		super(true);
 	}
 
@@ -24,8 +24,8 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, Me
 	}
 
 	@Override
-	protected IMediaItemDb makeNewProduct (MediaItemDbConfig material) throws DbException {
-		final LocalMixedMediaDb db = new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), material);
+	protected IMediaItemDb makeNewProduct (MediaDbConfig material) throws DbException {
+		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getMmdbTitle(material), material);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
 		db.setDbLayer(dbLayer);
@@ -39,13 +39,13 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, Me
 	 * does not use transactions. All changes are auto committed.
 	 */
 	public static IMediaItemDb getMain (String fullFilePath) throws DbException {
-		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
+		MediaDbConfig config = new MediaDbConfig(fullFilePath, null);
 		IMediaItemDb r = INSTANCE.manufacture(config);
 		return r;
 	}
 
 	public static IMediaItemDb getMainBySerial (String serial) throws DbException {
-		MediaItemDbConfig config = new MediaItemDbConfig(serial);
+		MediaDbConfig config = new MediaDbConfig(serial);
 		IMediaItemDb r = INSTANCE.manufacture(config);
 		return r;
 	}
@@ -56,8 +56,8 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, Me
 	 * use the same object cache as the main instance.
 	 */
 	public static IMediaItemDb getTransactional (String fullFilePath) throws DbException {
-		final MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
-		final LocalMixedMediaDb db = new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(config), config);
+		final MediaDbConfig config = new MediaDbConfig(fullFilePath, null);
+		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getMmdbTitle(config), config);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getTransactional(fullFilePath, itemFactory);
 		db.setDbLayer(dbLayer);
@@ -79,7 +79,7 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<IMediaItemDb, Me
 	 *
 	 */
 	public static IMediaItemDb getView (String fullFilePath, String filter) throws DbException {
-		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, filter);
+		MediaDbConfig config = new MediaDbConfig(fullFilePath, filter);
 		IMediaItemDb r = INSTANCE.manufacture(config);
 		return r;
 	}

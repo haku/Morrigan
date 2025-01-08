@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 
 
 public final class RemoteMixedMediaDbHelper {
@@ -67,7 +67,7 @@ public final class RemoteMixedMediaDbHelper {
 		return ret;
 	}
 
-	public static String getRemoteMmdbTitle (final MediaItemDbConfig config) {
+	public static String getRemoteMmdbTitle (final MediaDbConfig config) {
 		String ret = getRemoteMmdbTitle(config.getFilePath());
 
 		if (config.getFilter() != null) {

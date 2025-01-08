@@ -19,8 +19,8 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDb;
+import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedReader;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
-public class RemoteMixedMediaDb extends MediaItemDb implements IRemoteMixedMediaDb {
+public class RemoteMixedMediaDb extends MediaDb implements IRemoteMixedMediaDb {
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -44,7 +44,7 @@ public class RemoteMixedMediaDb extends MediaItemDb implements IRemoteMixedMedia
 	private TaskEventListener taskEventListener;
 
 
-	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details) throws DbException {
+	public RemoteMixedMediaDb (final String dbName, final MediaDbConfig config, final RemoteHostDetails details) throws DbException {
 		super(dbName, config); // TODO expose search term.
 		this.remoteHostDetails = details;
 	}

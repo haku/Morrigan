@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.model.media.internal.db;
 import java.io.File;
 import java.util.Objects;
 
-public final class MediaItemDbConfig {
+public final class MediaDbConfig {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final String filePath;
@@ -12,11 +12,11 @@ public final class MediaItemDbConfig {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MediaItemDbConfig (String serial) {
+	public MediaDbConfig (String serial) {
 		this(fileFromSerial(serial), filterFromSerial(serial));
 	}
 
-	public MediaItemDbConfig (String filePath, String filterString) {
+	public MediaDbConfig (String filePath, String filterString) {
 		this.filePath = filePath;
 		this.filter = filterString;
 		this.hash = (filePath + filterString).hashCode();
@@ -54,8 +54,8 @@ public final class MediaItemDbConfig {
 	public boolean equals (Object aThat) {
 		if (aThat == null) return false;
 		if (this == aThat) return true;
-		if (!(aThat instanceof MediaItemDbConfig)) return false;
-		MediaItemDbConfig that = (MediaItemDbConfig) aThat;
+		if (!(aThat instanceof MediaDbConfig)) return false;
+		MediaDbConfig that = (MediaDbConfig) aThat;
 
 		return Objects.equals(getFilePath(), that.getFilePath())
 				&& Objects.equals(getFilter(), that.getFilter());
@@ -74,9 +74,9 @@ public final class MediaItemDbConfig {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static void main (String[] args) {
-		MediaItemDbConfig a = new MediaItemDbConfig("/path/var/foo", ":;abc");
+		MediaDbConfig a = new MediaDbConfig("/path/var/foo", ":;abc");
 		System.out.println(a);
-		MediaItemDbConfig b = new MediaItemDbConfig(a.getSerial());
+		MediaDbConfig b = new MediaDbConfig(a.getSerial());
 		System.out.println(b);
 	}
 

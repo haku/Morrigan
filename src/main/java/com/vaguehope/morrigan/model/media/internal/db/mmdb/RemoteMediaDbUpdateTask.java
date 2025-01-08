@@ -7,24 +7,24 @@ import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
 
-public class RemoteMixedMediaDbUpdateTask implements MorriganTask {
+public class RemoteMediaDbUpdateTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 
-	public static class Factory extends RecyclingFactory<RemoteMixedMediaDbUpdateTask, IRemoteMixedMediaDb, Void, RuntimeException> {
+	public static class Factory extends RecyclingFactory<RemoteMediaDbUpdateTask, IRemoteMixedMediaDb, Void, RuntimeException> {
 
 		protected Factory () {
 			super(false);
 		}
 
 		@Override
-		protected boolean isValidProduct (final RemoteMixedMediaDbUpdateTask product) {
+		protected boolean isValidProduct (final RemoteMediaDbUpdateTask product) {
 			return !product.isFinished();
 		}
 
 		@Override
-		protected RemoteMixedMediaDbUpdateTask makeNewProduct(final IRemoteMixedMediaDb material, final Void config) throws RuntimeException {
-			return new RemoteMixedMediaDbUpdateTask(material);
+		protected RemoteMediaDbUpdateTask makeNewProduct(final IRemoteMixedMediaDb material, final Void config) throws RuntimeException {
+			return new RemoteMediaDbUpdateTask(material);
 		}
 
 	}
@@ -37,7 +37,7 @@ public class RemoteMixedMediaDbUpdateTask implements MorriganTask {
 
 	private volatile boolean isFinished = false;
 
-	RemoteMixedMediaDbUpdateTask (final IRemoteMixedMediaDb rmmdb) {
+	RemoteMediaDbUpdateTask (final IRemoteMixedMediaDb rmmdb) {
 		this.rmmdb = rmmdb;
 	}
 
