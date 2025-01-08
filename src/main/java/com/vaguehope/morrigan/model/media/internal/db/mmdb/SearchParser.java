@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -274,11 +274,11 @@ class SearchParser {
 			}
 		}
 
-		public List<IMediaItem> execute (final Connection con, final DefaultMediaItemFactory itemFactory) throws SQLException {
+		public List<MediaItem> execute (final Connection con, final DefaultMediaItemFactory itemFactory) throws SQLException {
 			return execute(con, itemFactory, -1);
 		}
 
-		public List<IMediaItem> execute (final Connection con, final DefaultMediaItemFactory itemFactory, final int maxResults) throws SQLException {
+		public List<MediaItem> execute (final Connection con, final DefaultMediaItemFactory itemFactory, final int maxResults) throws SQLException {
 			final PreparedStatement ps = prepare(con);
 			try {
 				int parmIn = 1;

@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
@@ -45,7 +45,7 @@ public class SyncMetadataRemoteToLocalTaskTest {
 	private static void addNoise (final TestMixedMediaDb db) throws Exception {
 		final int itemCount = RND.nextInt(5);
 		for (int i = 0; i < itemCount; i++) {
-			final IMediaItem item = db.addTestTrack();
+			final MediaItem item = db.addTestTrack();
 			final int tagCount = RND.nextInt(5);
 			for (int x = 0; x < tagCount; x++) {
 				new Tag(rndString(), MediaTagType.AUTOMATIC, rndString(), RND.nextBoolean()).addTo(db, item);
@@ -111,8 +111,8 @@ public class SyncMetadataRemoteToLocalTaskTest {
 	}
 
 	private void testTagMerge (final Tag localTag, final Tag remoteTag, final Tag expectedLocalTagAfterMerge) throws Throwable {
-		final IMediaItem lTrack = this.local.addTestTrack();
-		final IMediaItem rTrack = this.remote.addTestTrack(lTrack.getMd5(), lTrack.getSha1());
+		final MediaItem lTrack = this.local.addTestTrack();
+		final MediaItem rTrack = this.remote.addTestTrack(lTrack.getMd5(), lTrack.getSha1());
 
 		if (localTag != null) localTag.addTo(this.local, lTrack);
 		remoteTag.addTo(this.remote, rTrack);

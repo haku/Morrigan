@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 
 public class CoverArtHelper {
 
@@ -18,7 +18,7 @@ public class CoverArtHelper {
 		throw new AssertionError();
 	}
 
-	public static File findCoverArt (final IMediaItem item) {
+	public static File findCoverArt (final MediaItem item) {
 		return findCoverArt(new File(item.getFilepath()));
 	}
 
@@ -66,16 +66,16 @@ public class CoverArtHelper {
 		return null;
 	}
 
-	public static File findCoverArt (final Collection<? extends IMediaItem> possiblePics) {
-		if (possiblePics instanceof List) return findCoverArt((List<? extends IMediaItem>) possiblePics);
+	public static File findCoverArt (final Collection<? extends MediaItem> possiblePics) {
+		if (possiblePics instanceof List) return findCoverArt((List<? extends MediaItem>) possiblePics);
 		return findCoverArt(new ArrayList<>(possiblePics));
 	}
 
-	public static File findCoverArt (final List<? extends IMediaItem> possiblePics) {
+	public static File findCoverArt (final List<? extends MediaItem> possiblePics) {
 		if (possiblePics == null || possiblePics.size() < 1) return null;
 
 		final List<String> paths = new ArrayList<>(possiblePics.size());
-		for (final IMediaItem possiblePic : possiblePics) {
+		for (final MediaItem possiblePic : possiblePics) {
 			paths.add(possiblePic.getFilepath());
 		}
 

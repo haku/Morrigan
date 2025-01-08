@@ -17,7 +17,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -117,7 +117,7 @@ public class PlayerFace extends DefaultFace {
 		this.itemDetailsBarItem = this.selectedItem;
 		if (this.selectedItem instanceof PlayItem) {
 			final PlayItem playItem = (PlayItem) this.selectedItem;
-			final IMediaItem item = playItem.getTrack();
+			final MediaItem item = playItem.getTrack();
 			if (item != null) {
 				this.itemDetailsBar = PrintingThingsHelper.summariseItemWithPlayCounts(playItem.getList(), item, this.dateFormat);
 			}

@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -30,31 +30,31 @@ public class OrderResolverTest {
 
 	@Test
 	public void itPicksTheOnlyTrackWhenByLastPlayed () throws Exception {
-		final IMediaItem other = this.testDb.addTestTrack();
-		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.BYLASTPLAYED);
+		final MediaItem other = this.testDb.addTestTrack();
+		final MediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.BYLASTPLAYED);
 		assertEquals(other, actual);
 	}
 
 	@Test
 	public void itDoesNotPickTheSameTrackWhenByLastPlayed () throws Exception {
-		final IMediaItem current = this.testDb.addTestTrack();
-		final IMediaItem other = this.testDb.addTestTrack();
-		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.BYLASTPLAYED);
+		final MediaItem current = this.testDb.addTestTrack();
+		final MediaItem other = this.testDb.addTestTrack();
+		final MediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.BYLASTPLAYED);
 		assertEquals(other, actual);
 	}
 
 	@Test
 	public void FollowTagsReturnsNullIfNoOtherTracksToChoose () throws Exception {
-		final IMediaItem expected = this.testDb.addTestTrack();
-		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.FOLLOWTAGS);
+		final MediaItem expected = this.testDb.addTestTrack();
+		final MediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.FOLLOWTAGS);
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void itPicksTheOneTrackWhenThereIsOnlyOneTrackFollowTags () throws Exception {
-		final IMediaItem current = this.testDb.addTestTrack();
-		final IMediaItem expected = this.testDb.addTestTrack();
-		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final MediaItem current = this.testDb.addTestTrack();
+		final MediaItem expected = this.testDb.addTestTrack();
+		final MediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertEquals(expected, actual);
 	}
 
@@ -62,36 +62,36 @@ public class OrderResolverTest {
 	public void itPicksTheOneTrackWithSameTagWhenThereIsOnlyOneTagToFollow () throws Exception {
 		addRandomTracks();
 
-		final IMediaItem current = this.testDb.addTestTrack();
+		final MediaItem current = this.testDb.addTestTrack();
 
-		final IMediaItem expected = this.testDb.addTestTrack();
+		final MediaItem expected = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(expected, 2, TimeUnit.DAYS);
 
-		final IMediaItem tooRecentlyPlayed = this.testDb.addTestTrack();
+		final MediaItem tooRecentlyPlayed = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(tooRecentlyPlayed, 2, TimeUnit.HOURS);
 
 		addTag("foobar", current, expected, tooRecentlyPlayed);
 		addRandomTags(current, expected, tooRecentlyPlayed);
 
-		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final MediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void itDoesNotPickTheOneTrackWithSameTagWhenItHasBeenPlayedRecently () throws Exception {
-		final IMediaItem current = this.testDb.addTestTrack();
+		final MediaItem current = this.testDb.addTestTrack();
 
-		final IMediaItem tooRecentlyPlayed = this.testDb.addTestTrack();
+		final MediaItem tooRecentlyPlayed = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(tooRecentlyPlayed, 1, TimeUnit.HOURS);
 
 		addTag("foobar", current, tooRecentlyPlayed);
 
 		// This should be the only candidate even though it does not have the tag.
 		// This test has a probability of flaking, but its very low.
-		final IMediaItem expected = this.testDb.addTestTrack();
+		final MediaItem expected = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(expected, 100000, TimeUnit.DAYS);
 
-		final IMediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final MediaItem actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertEquals(expected, actual);
 	}
 
@@ -100,31 +100,31 @@ public class OrderResolverTest {
 	public void itFollowsTheSameTagAsBeforeIfPossible () throws Exception {
 		addRandomTracks();
 
-		final IMediaItem current = this.testDb.addTestTrack();
+		final MediaItem current = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(current, 2, TimeUnit.MINUTES);
 
-		final IMediaItem next1 = this.testDb.addTestTrack();
+		final MediaItem next1 = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(next1, 2, TimeUnit.DAYS);
 
 		addTag("foobar", current, next1);
 		addTag("batbif", next1);
 		addRandomTags(current, next1);
 
-		final IMediaItem actual1 = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final MediaItem actual1 = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertEquals(next1, actual1);
 		setTimeAgoLastPlayed(next1, 2, TimeUnit.MINUTES);
 
-		final IMediaItem next2 = this.testDb.addTestTrack();
+		final MediaItem next2 = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(next2, 2, TimeUnit.DAYS);
 		addTag("foobar", next2);
 		addRandomTags(next2);
 
-		final IMediaItem notNext = this.testDb.addTestTrack();
+		final MediaItem notNext = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(notNext, 2, TimeUnit.DAYS);
 		addTag("batbif", notNext);
 		addRandomTags(notNext);
 
-		final IMediaItem actual2 = this.undertest.getNextTrack(this.testDb, next1, PlaybackOrder.FOLLOWTAGS);
+		final MediaItem actual2 = this.undertest.getNextTrack(this.testDb, next1, PlaybackOrder.FOLLOWTAGS);
 		assertEquals(next2, actual2);
 	}
 
@@ -133,7 +133,7 @@ public class OrderResolverTest {
 		addRandomTracks();
 
 		for (int i = 0; i < 200; i++) {
-			final IMediaItem track = this.testDb.addTestTrack();
+			final MediaItem track = this.testDb.addTestTrack();
 			for (int j = 0; j < 3; j++) {
 				addTag("tag_" + this.random.nextInt(20), track);
 			}
@@ -141,25 +141,25 @@ public class OrderResolverTest {
 		}
 
 		final OrderResolver or = new OrderResolver();
-		IMediaItem track = null;
+		MediaItem track = null;
 		for (int i = 0; i < 100; i++) {
 			track = or.getNextTrack(this.testDb, track, PlaybackOrder.FOLLOWTAGS);
 			setTimeAgoLastPlayed(track, 5, TimeUnit.SECONDS);
 		}
 	}
 
-	private void setTimeAgoLastPlayed (final IMediaItem toRecentlyPlayed, final int time, final TimeUnit unit) throws MorriganException {
+	private void setTimeAgoLastPlayed (final MediaItem toRecentlyPlayed, final int time, final TimeUnit unit) throws MorriganException {
 		this.testDb.setTrackDateLastPlayed(toRecentlyPlayed, new Date(System.currentTimeMillis() - unit.toMillis(time)));
 	}
 
-	private void addTag (final String tag, final IMediaItem... items) throws MorriganException {
-		for (final IMediaItem item : items) {
+	private void addTag (final String tag, final MediaItem... items) throws MorriganException {
+		for (final MediaItem item : items) {
 			this.testDb.addTag(item, tag, MediaTagType.MANUAL, (String) null);
 		}
 	}
 
-	private void addRandomTags (final IMediaItem... items) throws MorriganException {
-		for (final IMediaItem item : items) {
+	private void addRandomTags (final MediaItem... items) throws MorriganException {
+		for (final MediaItem item : items) {
 			for (int i = 0; i < 10 + this.random.nextInt(10); i++) {
 				addTag("random_tag_" + this.random.nextInt(), item);
 			}
@@ -168,7 +168,7 @@ public class OrderResolverTest {
 
 	private void addRandomTracks () throws MorriganException, DbException {
 		for (int i = 0; i < 10 + this.random.nextInt(10); i++) {
-			final IMediaItem item = this.testDb.addTestTrack();
+			final MediaItem item = this.testDb.addTestTrack();
 			addRandomTags(item);
 		}
 	}

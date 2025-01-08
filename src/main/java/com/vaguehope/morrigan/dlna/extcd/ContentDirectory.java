@@ -20,8 +20,8 @@ import org.jupnp.support.model.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.Cache;
@@ -42,7 +42,7 @@ public class ContentDirectory {
 	private final RemoteService contentDirectory;
 	private final MetadataStorage metadataStorage;
 
-	private final Cache<String, IMediaItem> itemCache = new Cache<>(100);
+	private final Cache<String, MediaItem> itemCache = new Cache<>(100);
 
 	public ContentDirectory (final ControlPoint controlPoint, final RemoteService contentDirectory, final MetadataStorage metadataStorage) {
 		this.controlPoint = controlPoint;
@@ -50,7 +50,7 @@ public class ContentDirectory {
 		this.metadataStorage = metadataStorage;
 	}
 
-	public IMediaItem fetchItemByIdWithRetry (final String remoteId, final int maxTries) throws DbException {
+	public MediaItem fetchItemByIdWithRetry (final String remoteId, final int maxTries) throws DbException {
 		int attempt = 0;
 		while (true) {
 			attempt += 1;
@@ -67,7 +67,7 @@ public class ContentDirectory {
 		}
 	}
 
-	public List<IMediaItem> searchWithRetry (final String term, final int maxResults, final int maxTries) throws DbException {
+	public List<MediaItem> searchWithRetry (final String term, final int maxResults, final int maxTries) throws DbException {
 		int attempt = 0;
 		while (true) {
 			attempt += 1;
@@ -84,8 +84,8 @@ public class ContentDirectory {
 		}
 	}
 
-	public IMediaItem fetchItemById (final String remoteId) throws DbException {
-		final IMediaItem cached = this.itemCache.getFresh(remoteId, 1, TimeUnit.MINUTES);
+	public MediaItem fetchItemById (final String remoteId) throws DbException {
+		final MediaItem cached = this.itemCache.getFresh(remoteId, 1, TimeUnit.MINUTES);
 		if (cached != null) return cached;
 
 		final CountDownLatch cdl = new CountDownLatch(1);
@@ -98,12 +98,12 @@ public class ContentDirectory {
 		final List<Item> items = req.getRef().getItems();
 		if (items.size() < 1) return null;
 		if (items.size() > 1) LOG.warn("Fetching item {} returned more than 1 result.", remoteId);
-		final IMediaItem item = didlItemToMnItem(items.get(0));
+		final MediaItem item = didlItemToMnItem(items.get(0));
 		this.itemCache.put(remoteId, item);
 		return item;
 	}
 
-	public List<IMediaItem> search (final String term, final int maxResults) throws DbException {
+	public List<MediaItem> search (final String term, final int maxResults) throws DbException {
 		if (StringHelper.blank(term) || "*".equals(term)) {
 			return oldDlnaBrowseRoot(maxResults);
 		}
@@ -113,11 +113,11 @@ public class ContentDirectory {
 		return dlnaSearch(term, maxResults);
 	}
 
-	private List<IMediaItem> oldDlnaBrowseRoot (final int maxResults) throws DbException {
+	private List<MediaItem> oldDlnaBrowseRoot (final int maxResults) throws DbException {
 		return oldDlnaBrowse(ROOT_CONTENT_ID, maxResults);
 	}
 
-	private List<IMediaItem> oldDlnaBrowse (final String containerId, final int maxResults) throws DbException {
+	private List<MediaItem> oldDlnaBrowse (final String containerId, final int maxResults) throws DbException {
 		final CountDownLatch cdl = new CountDownLatch(2);
 		final SyncBrowse mdReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L);
 		final SyncBrowse dcReq = new SyncBrowse(cdl, this.contentDirectory, containerId, BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) maxResults);
@@ -128,7 +128,7 @@ public class ContentDirectory {
 		if (mdReq.getRef() == null) throw new DbException(mdReq.getErr());
 		if (dcReq.getRef() == null) throw new DbException(dcReq.getErr());
 
-		final List<IMediaItem> ret = new ArrayList<>();
+		final List<MediaItem> ret = new ArrayList<>();
 		if (mdReq.getRef().getContainers().size() > 0) {
 			final String parentId = mdReq.getRef().getContainers().get(0).getParentID();
 			if (!"-1".equals(parentId)) ret.add(new DidlContainer(parentId, ".."));
@@ -138,7 +138,7 @@ public class ContentDirectory {
 		return ret;
 	}
 
-	private List<IMediaItem> dlnaSearch (final String term, final int maxResults) throws DbException {
+	private List<MediaItem> dlnaSearch (final String term, final int maxResults) throws DbException {
 		final String searchCriteria = String.format("(%s and dc:title contains \"%s\")", TYPE_CRITERIA, term);
 
 		final CountDownLatch cdl = new CountDownLatch(1);
@@ -179,23 +179,23 @@ public class ContentDirectory {
 		return ret;
 	}
 
-	private static List<IMediaItem> didlContainersToMnItems (final List<Container> containers) {
-		final List<IMediaItem> ret = new ArrayList<>();
+	private static List<MediaItem> didlContainersToMnItems (final List<Container> containers) {
+		final List<MediaItem> ret = new ArrayList<>();
 		for (final Container container : containers) {
 			ret.add(new DidlContainer(container));
 		}
 		return ret;
 	}
 
-	public List<IMediaItem> didlItemsToMnItems (final List<Item> items) throws DbException {
-		final List<IMediaItem> ret = new ArrayList<>();
+	public List<MediaItem> didlItemsToMnItems (final List<Item> items) throws DbException {
+		final List<MediaItem> ret = new ArrayList<>();
 		for (final Item item : items) {
 			ret.add(didlItemToMnItem(item));
 		}
 		return ret;
 	}
 
-	private IMediaItem didlItemToMnItem (final Item item) throws DbException {
+	private MediaItem didlItemToMnItem (final Item item) throws DbException {
 		Res primaryRes = null;
 		MediaType mediaType = MediaType.UNKNOWN;
 		Res artRes = null;

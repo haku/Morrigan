@@ -10,7 +10,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 
 
-public interface IMediaItem extends AbstractItem, IDbItem {
+public interface MediaItem extends AbstractItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
@@ -154,7 +154,7 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 	 */
 	void reset ();
 
-	boolean setFromMediaItem (IMediaItem mt);
+	boolean setFromMediaItem (MediaItem mt);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

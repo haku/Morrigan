@@ -24,7 +24,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaNode;
@@ -76,7 +76,7 @@ public class DbFace extends DefaultFace {
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final Set<IMediaItem> selectedItems = new HashSet<>();
+	private final Set<MediaItem> selectedItems = new HashSet<>();
 
 	private String lastRefreshError = null;
 	private int selectedItemIndex = -1;
@@ -86,7 +86,7 @@ public class DbFace extends DefaultFace {
 	private boolean multiSelectActive = false;
 	private int multiSelectStartIndex = -1;
 	private String itemDetailsBar = "";
-	private IMediaItem itemDetailsBarItem;
+	private MediaItem itemDetailsBarItem;
 	private boolean saveScrollOnClose = false;
 
 
@@ -145,7 +145,7 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	public void revealItem (final IMediaItem track) throws MorriganException {
+	public void revealItem (final MediaItem track) throws MorriganException {
 		final int i = this.list.indexOf(track);
 		if (i >= 0) {
 			setSelectedItem(i);
@@ -176,8 +176,8 @@ public class DbFace extends DefaultFace {
 		final AbstractItem item = getSelectedItem();
 		if (this.itemDetailsBarItem != null && this.itemDetailsBarItem.equals(item)) return;
 
-		if (!(item instanceof IMediaItem)) return;
-		final IMediaItem mi = (IMediaItem) item;
+		if (!(item instanceof MediaItem)) return;
+		final MediaItem mi = (MediaItem) item;
 
 		this.mnContext.getUnreliableEs().submit(new Callable<Void>() {
 			@Override
@@ -333,18 +333,18 @@ public class DbFace extends DefaultFace {
 		return this.list.get(this.selectedItemIndex);
 	}
 
-	private List<IMediaItem> getSelectedItems () {
+	private List<MediaItem> getSelectedItems () {
 		if (this.selectedItems.size() > 0) {
-			final List<IMediaItem> ret = new ArrayList<>();
+			final List<MediaItem> ret = new ArrayList<>();
 			for (final AbstractItem item : this.list) {
-				if (this.selectedItems.contains(item)) ret.add((IMediaItem) item);
+				if (this.selectedItems.contains(item)) ret.add((MediaItem) item);
 			}
 			return ret;
 		}
 
 		if (this.selectedItemIndex >= 0 && this.list.size() > 0) {
 			final AbstractItem item = this.list.get(this.selectedItemIndex);
-			if (item instanceof IMediaItem) return Collections.singletonList((IMediaItem) item);
+			if (item instanceof MediaItem) return Collections.singletonList((MediaItem) item);
 		}
 
 		return Collections.emptyList();
@@ -390,14 +390,14 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void enqueueSelection (final WindowBasedTextGUI gui) throws MorriganException {
-		final List<IMediaItem> items = getSelectedItems();
+		final List<MediaItem> items = getSelectedItems();
 		enqueueItems(gui, items);
 		if (items.size() == 1 && items.contains(getSelectedItem())) {
 			menuMove(this.lastMoveDirection, 1);
 		}
 	}
 
-	private void enqueueItems (final WindowBasedTextGUI gui, final List<IMediaItem> tracks) {
+	private void enqueueItems (final WindowBasedTextGUI gui, final List<MediaItem> tracks) {
 		if (tracks.size() < 1) return;
 		final Player player = getPlayer(gui, String.format("Enqueue %s items", tracks.size()));
 		if (player == null) return;
@@ -409,7 +409,7 @@ public class DbFace extends DefaultFace {
 		playItems(gui, getSelectedItems());
 	}
 
-	private void playItems (final WindowBasedTextGUI gui, final List<IMediaItem> tracks) {
+	private void playItems (final WindowBasedTextGUI gui, final List<MediaItem> tracks) {
 		if (tracks.size() < 1) return;
 		final Player player = getPlayer(gui, String.format("Play %s items", tracks.size()));
 		if (player == null) return;
@@ -420,22 +420,22 @@ public class DbFace extends DefaultFace {
 	private void showEditTagsForSelectedItem (final WindowBasedTextGUI gui) throws MorriganException {
 		final AbstractItem item = getSelectedItem();
 		if (item == null) return;
-		if (!(item instanceof IMediaItem)) return;
-		TagEditor.show(gui, this.list, (IMediaItem) item);
+		if (!(item instanceof MediaItem)) return;
+		TagEditor.show(gui, this.list, (MediaItem) item);
 	}
 
 	private void toggleSelection () throws MorriganException {
 		final AbstractItem item = getSelectedItem();
 		if (item == null) return;
-		if (!(item instanceof IMediaItem)) return;
-		if (!this.selectedItems.remove(item)) this.selectedItems.add((IMediaItem) item);
+		if (!(item instanceof MediaItem)) return;
+		if (!this.selectedItems.remove(item)) this.selectedItems.add((MediaItem) item);
 		updateItemDetailsBar();
 	}
 
 	private void selectItem(final AbstractItem item, final boolean updateDetailsBar) throws MorriganException {
 		if (item == null) return;
-		if (!(item instanceof IMediaItem)) return;
-		if (!this.selectedItems.contains(item)) this.selectedItems.add((IMediaItem) item);
+		if (!(item instanceof MediaItem)) return;
+		if (!this.selectedItems.contains(item)) this.selectedItems.add((MediaItem) item);
 		if (updateDetailsBar) updateItemDetailsBar();
 	}
 
@@ -485,7 +485,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askExportSelection (final WindowBasedTextGUI gui) {
-		final List<IMediaItem> items = getSelectedItems();
+		final List<MediaItem> items = getSelectedItems();
 		if (items.size() < 1) return;
 		final File dir = DirDialog.show(gui, String.format("Export %s tracks", items.size()), "Export", this.sessionState.initialDir);
 		if (dir == null) return;
@@ -495,8 +495,8 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void toggleEnabledSelection () throws MorriganException {
-		final List<IMediaItem> items = getSelectedItems();
-		for (final IMediaItem item : items) {
+		final List<MediaItem> items = getSelectedItems();
+		for (final MediaItem item : items) {
 			this.list.setItemEnabled(item, !item.isEnabled());
 		}
 		this.lastActionMessage.setLastActionMessage(String.format("Toggled enabled on %s items.", items.size()));
@@ -568,8 +568,8 @@ public class DbFace extends DefaultFace {
 			final String name = item.getTitle();
 			final boolean invert = i == this.selectedItemIndex;
 
-			if (item instanceof IMediaItem) {
-				drawMediaItem(tg, (IMediaItem) item, name,
+			if (item instanceof MediaItem) {
+				drawMediaItem(tg, (MediaItem) item, name,
 						invert, l,
 						colRightDuration, colRightPlayCount, colRightLastPlayed);
 			}
@@ -599,7 +599,7 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	private void drawMediaItem(final TextGraphics tg, final IMediaItem item, final String name, boolean invert,
+	private void drawMediaItem(final TextGraphics tg, final MediaItem item, final String name, boolean invert,
 			int l, final int colRightDuration, final int colRightPlayCount, final int colRightLastPlayed) {
 		final boolean selectedItem = this.selectedItems.contains(item);
 		if (selectedItem) {

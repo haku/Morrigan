@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -47,7 +47,7 @@ public interface IMediaItemList extends List<AbstractItem> {
 	void removeChangeEventListener (MediaItemListChangeListener listener);
 	MediaItemListChangeListener getChangeEventCaller ();
 
-	List<IMediaItem> getMediaItems();
+	List<MediaItem> getMediaItems();
 
 	/**
 	 * This is the signal to read any source data needed.
@@ -73,7 +73,7 @@ public interface IMediaItemList extends List<AbstractItem> {
 		throw new UnsupportedOperationException();
 	}
 
-	default String prepairRemoteLocation(IMediaItem item, ContentProxy contentProxy) {
+	default String prepairRemoteLocation(MediaItem item, ContentProxy contentProxy) {
 		return item.getRemoteLocation();
 	}
 
@@ -101,27 +101,27 @@ public interface IMediaItemList extends List<AbstractItem> {
 	}
 
 	List<PlaybackOrder> getSupportedChooseMethods();
-	IMediaItem chooseItem(PlaybackOrder order, IMediaItem previousItem) throws MorriganException;
+	MediaItem chooseItem(PlaybackOrder order, MediaItem previousItem) throws MorriganException;
 
-	void addItem (IMediaItem item);
-	void removeItem (IMediaItem item) throws MorriganException;
+	void addItem (MediaItem item);
+	void removeItem (MediaItem item) throws MorriganException;
 
-	void setItemDateAdded (IMediaItem item, Date date) throws MorriganException;
-	void setItemMd5 (IMediaItem item, BigInteger md5) throws MorriganException;
-	void setItemSha1 (IMediaItem item, BigInteger sha1) throws MorriganException;
-	void setItemDateLastModified (IMediaItem item, Date date) throws MorriganException;
-	void setItemEnabled (IMediaItem item, boolean value) throws MorriganException;
-	void setItemEnabled (IMediaItem item, boolean value, Date lastModified) throws MorriganException;
-	void setItemMissing (IMediaItem item, boolean value) throws MorriganException;
-	void setRemoteLocation (IMediaItem track, String remoteLocation) throws MorriganException; // TODO unused?
-	void persistTrackData (IMediaItem track) throws MorriganException;
+	void setItemDateAdded (MediaItem item, Date date) throws MorriganException;
+	void setItemMd5 (MediaItem item, BigInteger md5) throws MorriganException;
+	void setItemSha1 (MediaItem item, BigInteger sha1) throws MorriganException;
+	void setItemDateLastModified (MediaItem item, Date date) throws MorriganException;
+	void setItemEnabled (MediaItem item, boolean value) throws MorriganException;
+	void setItemEnabled (MediaItem item, boolean value, Date lastModified) throws MorriganException;
+	void setItemMissing (MediaItem item, boolean value) throws MorriganException;
+	void setRemoteLocation (MediaItem track, String remoteLocation) throws MorriganException; // TODO unused?
+	void persistTrackData (MediaItem track) throws MorriganException;
 
 	/**
 	 * This will flush the OutputStream.
 	 * This will not close the output stream.
 	 */
-	void copyItemFile (IMediaItem item, OutputStream os) throws MorriganException;
-	File copyItemFile (IMediaItem item, File targetDirectory) throws MorriganException;
+	void copyItemFile (MediaItem item, OutputStream os) throws MorriganException;
+	File copyItemFile (MediaItem item, File targetDirectory) throws MorriganException;
 
 	List<MediaTagClassification> getTagClassifications () throws MorriganException;
 	void addTagClassification (String classificationName) throws MorriganException;
@@ -157,7 +157,7 @@ public interface IMediaItemList extends List<AbstractItem> {
 	MediaAlbum getAlbum (String name) throws MorriganException;
 	void removeAlbum (MediaAlbum album) throws MorriganException;
 	Collection<MediaAlbum> getAlbums () throws MorriganException;
-	Collection<IMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
+	Collection<MediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
 	/**
 	 * Will have no effect if already in album.
 	 */
@@ -173,13 +173,13 @@ public interface IMediaItemList extends List<AbstractItem> {
 	 */
 	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
-	default List<IMediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException {
+	default List<MediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException {
 		return search(mediaType, term, maxResults, (SortColumn[]) null, (SortDirection[]) null, false);
 	}
-	default List<IMediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn sortColumn, SortDirection sortDirection, boolean includeDisabled) throws DbException {
+	default List<MediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn sortColumn, SortDirection sortDirection, boolean includeDisabled) throws DbException {
 		return search(mediaType, term, maxResults, new SortColumn[] { sortColumn }, new SortDirection[] { sortDirection }, includeDisabled);
 	}
-	List<IMediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	List<MediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 
 	/**
 	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
@@ -191,9 +191,9 @@ public interface IMediaItemList extends List<AbstractItem> {
 	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
 	 * has to match hasFile();
 	 */
-	IMediaItem getByFile (String identifer) throws DbException;
+	MediaItem getByFile (String identifer) throws DbException;
 
-	IMediaItem getByMd5 (BigInteger md5) throws DbException;
+	MediaItem getByMd5 (BigInteger md5) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // track
@@ -201,38 +201,38 @@ public interface IMediaItemList extends List<AbstractItem> {
 	/**
 	 * Adds n.
 	 */
-	void incTrackStartCnt (IMediaItem item, long n) throws MorriganException;
+	void incTrackStartCnt (MediaItem item, long n) throws MorriganException;
 	/**
 	 * Adds 1 and sets last played date.
 	 */
-	void incTrackStartCnt (IMediaItem item) throws MorriganException;
-	void setTrackStartCnt (IMediaItem item, long n) throws MorriganException;
+	void incTrackStartCnt (MediaItem item) throws MorriganException;
+	void setTrackStartCnt (MediaItem item, long n) throws MorriganException;
 
 	/**
 	 * Adds n.
 	 */
-	void incTrackEndCnt (IMediaItem item, long n) throws MorriganException;
+	void incTrackEndCnt (MediaItem item, long n) throws MorriganException;
 	/**
 	 * Adds 1.
 	 */
-	void incTrackEndCnt (IMediaItem item) throws MorriganException;
-	void setTrackEndCnt (IMediaItem item, long n) throws MorriganException;
+	void incTrackEndCnt (MediaItem item) throws MorriganException;
+	void setTrackEndCnt (MediaItem item, long n) throws MorriganException;
 
-	void setTrackDuration (IMediaItem item, int duration) throws MorriganException;
-	void setTrackDateLastPlayed (IMediaItem item, Date date) throws MorriganException;
+	void setTrackDuration (MediaItem item, int duration) throws MorriganException;
+	void setTrackDateLastPlayed (MediaItem item, Date date) throws MorriganException;
 
 	DurationData getTotalDuration ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // picture
 
-	void setPictureWidthAndHeight (IMediaItem item, int width, int height) throws MorriganException;
+	void setPictureWidthAndHeight (MediaItem item, int width, int height) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // mixed
 
-	void setItemMimeType (IMediaItem item, String newType) throws MorriganException;
-	void setItemMediaType (IMediaItem item, MediaType newType) throws MorriganException;
+	void setItemMimeType (MediaItem item, String newType) throws MorriganException;
+	void setItemMediaType (MediaItem item, MediaType newType) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -113,7 +113,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 	@Override
 	public TaskResult run (final TaskEventListener taskEventListener) {
 		TaskResult ret = null;
-		final List<IMediaItem> changedItems = new ArrayList<>();
+		final List<MediaItem> changedItems = new ArrayList<>();
 
 		try {
 			taskEventListener.onStart();
@@ -287,7 +287,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private TaskResult updateLibraryMetadata (final TaskEventListener taskEventListener, final int prgTotal, final List<IMediaItem> changedItems) throws DbException {
+	private TaskResult updateLibraryMetadata (final TaskEventListener taskEventListener, final int prgTotal, final List<MediaItem> changedItems) throws DbException {
 		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
 
 		final String SUBTASK_TITLE = "Reading file metadata";
@@ -300,8 +300,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 
 		final ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
 
-		final List<IMediaItem> allLibraryEntries = this.itemList.getAllDbEntries();
-		for (final IMediaItem mi : allLibraryEntries) {
+		final List<MediaItem> allLibraryEntries = this.itemList.getAllDbEntries();
+		for (final MediaItem mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask(SUBTASK_TITLE + ": " + mi.getTitle());
 
@@ -399,8 +399,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 
 	private void checkForDuplicates (final TaskEventListener taskEventListener, final int prgTotal) throws MorriganException, DbException {
 		taskEventListener.subTask("Scanning for duplicates");
-		final List<IMediaItem> tracks = this.itemList.getAllDbEntries();
-		final Map<IMediaItem, ScanOption> dupicateItems = findDuplicates(taskEventListener, tracks, prgTotal);
+		final List<MediaItem> tracks = this.itemList.getAllDbEntries();
+		final Map<MediaItem, ScanOption> dupicateItems = findDuplicates(taskEventListener, tracks, prgTotal);
 		if (dupicateItems.size() > 0) {
 			mergeDuplicates(taskEventListener, dupicateItems);
 			printDuplicates(taskEventListener, dupicateItems);
@@ -412,8 +412,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 	}
 
 	// Eclipse lies.
-	private Map<IMediaItem, ScanOption> findDuplicates (final TaskEventListener taskEventListener, final List<IMediaItem> tracks, final int prgTotal) {
-		final Map<IMediaItem, ScanOption> dupicateItems = new HashMap<>();
+	private Map<MediaItem, ScanOption> findDuplicates (final TaskEventListener taskEventListener, final List<MediaItem> tracks, final int prgTotal) {
+		final Map<MediaItem, ScanOption> dupicateItems = new HashMap<>();
 		int progress = 0;
 		int n = 0;
 		final int N = tracks.size();
@@ -454,14 +454,14 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		return dupicateItems;
 	}
 
-	private static boolean hasMd5 (final IMediaItem item) {
+	private static boolean hasMd5 (final MediaItem item) {
 		return item.getMd5() != null && !item.getMd5().equals(BigInteger.ZERO);
 	}
 
 	/**
 	 * Duplicates will be removed from the supplied Map if they are merged.
 	 */
-	private void mergeDuplicates (final TaskEventListener taskEventListener, final Map<IMediaItem, ScanOption> dupicateItems) throws MorriganException, DbException {
+	private void mergeDuplicates (final TaskEventListener taskEventListener, final Map<MediaItem, ScanOption> dupicateItems) throws MorriganException, DbException {
 		taskEventListener.subTask("Merging " + dupicateItems.size() + " duplicates");
 		int count = 0;
 		final long startTime = System.currentTimeMillis();
@@ -487,10 +487,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 	/**
 	 * @return Number of items merged.
 	 */
-	private int mergeDuplicates (final TaskEventListener taskEventListener, final Q list, final Map<IMediaItem, ScanOption> dupicateItems) throws MorriganException {
+	private int mergeDuplicates (final TaskEventListener taskEventListener, final Q list, final Map<MediaItem, ScanOption> dupicateItems) throws MorriganException {
 		// Make a list of all the unique hashcodes we know.
 		final Set<BigInteger> md5s = new HashSet<>();
-		for (final IMediaItem mi : dupicateItems.keySet()) {
+		for (final MediaItem mi : dupicateItems.keySet()) {
 			md5s.add(mi.getMd5());
 		}
 		taskEventListener.logMsg(this.itemList.getListName(), "Found " + md5s.size() + " unique MD5s.");
@@ -499,13 +499,13 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		int countMerges = 0;
 		for (final BigInteger h : md5s) {
 			if (taskEventListener.isCanceled()) break;
-			final Map<IMediaItem, ScanOption> items = findByMd5(dupicateItems, h);
+			final Map<MediaItem, ScanOption> items = findByMd5(dupicateItems, h);
 
 			// If there is only one entry that still exists, merge metadata and remove bad references.
 			// This is the only supported merge case at the moment.
 			if (countEntriesInMap(items, ScanOption.KEEP) == 1 && countEntriesInMap(items, ScanOption.DELREF) == items.size() - 1) {
-				IMediaItem keep = null;
-				for (final IMediaItem i : items.keySet()) {
+				MediaItem keep = null;
+				for (final MediaItem i : items.keySet()) {
 					if (items.get(i) == ScanOption.KEEP) keep = i;
 				}
 				if (keep == null) throw new NullPointerException("Out of cheese error.  Please reinstall universe and reboot.");
@@ -513,7 +513,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 
 				// Now merge: start count, end count, added data, last played data.
 				// Then remove missing tracks from library.
-				for (final IMediaItem i : items.keySet()) {
+				for (final MediaItem i : items.keySet()) {
 					mergeItems(list, keep, i);
 					list.removeItem(i);
 					taskEventListener.logMsg(list.getListName(), "[REMOVED] " + i.getFilepath());
@@ -522,7 +522,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 
 				// Removed processed entries from duplicate items list.
 				dupicateItems.remove(keep);
-				for (final IMediaItem i : items.keySet()) {
+				for (final MediaItem i : items.keySet()) {
 					dupicateItems.remove(i);
 				}
 			}
@@ -533,9 +533,9 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 	/*
 	 * Find all the entries with this hashcode.
 	 */
-	private static Map<IMediaItem, ScanOption> findByMd5 (final Map<IMediaItem, ScanOption> items, final BigInteger md5) {
-		final Map<IMediaItem, ScanOption> ret = new HashMap<>();
-		for (final Entry<IMediaItem, ScanOption> i : items.entrySet()) {
+	private static Map<MediaItem, ScanOption> findByMd5 (final Map<MediaItem, ScanOption> items, final BigInteger md5) {
+		final Map<MediaItem, ScanOption> ret = new HashMap<>();
+		for (final Entry<MediaItem, ScanOption> i : items.entrySet()) {
 			if (md5.equals(i.getKey().getMd5())) {
 				ret.put(i.getKey(), i.getValue());
 			}
@@ -543,24 +543,24 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		return ret;
 	}
 
-	private void printDuplicates (final TaskEventListener taskEventListener, final Map<IMediaItem, ScanOption> items) {
-		final List<Entry<IMediaItem, ScanOption>> dups = new ArrayList<>(items.entrySet());
+	private void printDuplicates (final TaskEventListener taskEventListener, final Map<MediaItem, ScanOption> items) {
+		final List<Entry<MediaItem, ScanOption>> dups = new ArrayList<>(items.entrySet());
 		Collections.sort(dups, new Md5Comparator());
 
 		taskEventListener.logMsg(this.itemList.getListName(), "Found " + dups.size() + " duplicates:");
-		for (final Entry<IMediaItem, ScanOption> e : dups) {
+		for (final Entry<MediaItem, ScanOption> e : dups) {
 			final BigInteger md5 = e.getKey().getMd5();
 			final String md5String = md5 == null ? "null" : md5.toString(16);
 			taskEventListener.logMsg(this.itemList.getListName(), md5String + " : " + e.getValue() + " : " + e.getKey().getTitle());
 		}
 	}
 
-	private final class Md5Comparator implements Comparator<Entry<IMediaItem, ScanOption>> {
+	private final class Md5Comparator implements Comparator<Entry<MediaItem, ScanOption>> {
 
 		public Md5Comparator () {}
 
 		@Override
-		public int compare (final Entry<IMediaItem, ScanOption> o1, final Entry<IMediaItem, ScanOption> o2) {
+		public int compare (final Entry<MediaItem, ScanOption> o1, final Entry<MediaItem, ScanOption> o2) {
 			// comp(1234, null) == -1, comp(null, null) == 0, comp(null, 1234) == 1
 
 			final BigInteger h1 = o1.getKey().getMd5();
@@ -571,20 +571,20 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 
 	}
 
-	protected abstract void mergeItems (Q list, IMediaItem itemToKeep, IMediaItem itemToBeRemove) throws MorriganException;
+	protected abstract void mergeItems (Q list, MediaItem itemToKeep, MediaItem itemToBeRemove) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private TaskResult updateTrackMetadata1 (final TaskEventListener taskEventListener, final int prgTotal, final List<IMediaItem> changedItems) throws MorriganException, DbException {
+	private TaskResult updateTrackMetadata1 (final TaskEventListener taskEventListener, final int prgTotal, final List<MediaItem> changedItems) throws MorriganException, DbException {
 		taskEventListener.subTask("Reading metadata");
 		final long startTime = System.currentTimeMillis();
 		int progress = 0;
 		int n = 0;
 		final int N = this.itemList.getAllDbEntries().size();
 
-		final List<IMediaItem> allLibraryEntries = this.itemList.getAllDbEntries();
+		final List<MediaItem> allLibraryEntries = this.itemList.getAllDbEntries();
 		try {
-			for (final IMediaItem mi : allLibraryEntries) {
+			for (final MediaItem mi : allLibraryEntries) {
 				if (taskEventListener.isCanceled()) break;
 
 				if (!mi.hasMimeType()) {
@@ -641,22 +641,22 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		return null;
 	}
 
-	protected abstract boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, Q library, IMediaItem item) throws MorriganException;
+	protected abstract boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, Q library, MediaItem item) throws MorriganException;
 
-	protected abstract OpResult readTrackMetaData1 (Q library, IMediaItem item, File file);
+	protected abstract OpResult readTrackMetaData1 (Q library, MediaItem item, File file);
 
 	protected abstract void cleanUpAfterTrackMetaData1 ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private TaskResult updateTrackMetadata2 (final TaskEventListener taskEventListener, final int prgTotal, final List<IMediaItem> changedItems) throws DbException {
+	private TaskResult updateTrackMetadata2 (final TaskEventListener taskEventListener, final int prgTotal, final List<MediaItem> changedItems) throws DbException {
 		taskEventListener.subTask("Reading more metadata");
 		final long startTime = System.currentTimeMillis();
 		int progress = 0;
 		int n = 0;
 		final int N = this.itemList.getAllDbEntries().size();
 
-		for (final IMediaItem mlt : changedItems) {
+		for (final MediaItem mlt : changedItems) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading more metadata: " + mlt.getTitle());
 
@@ -683,7 +683,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 		return null;
 	}
 
-	protected abstract void readTrackMetaData2 (Q library, IMediaItem item, File file) throws Exception;
+	protected abstract void readTrackMetaData2 (Q library, MediaItem item, File file) throws Exception;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -738,7 +738,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 					final MediaAlbum album = this.itemList.createAlbum(dir.getName());
 					for (final File file : dir.listFiles()) {
 						if (this.itemList.hasFile(file).isKnown()) {
-							final IMediaItem item = this.itemList.getByFile(file);
+							final MediaItem item = this.itemList.getByFile(file);
 							this.itemList.addToAlbum(album, item);
 						}
 					}
@@ -755,7 +755,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb> implements Morri
 			int albumsRemoved = 0;
 			for (final MediaAlbum album : this.itemList.getAlbums()) {
 				if (taskEventListener.isCanceled()) break;
-				for (final IMediaItem item : this.itemList.getAlbumItems(MediaType.UNKNOWN, album)) {
+				for (final MediaItem item : this.itemList.getAlbumItems(MediaType.UNKNOWN, album)) {
 					if (!isDirectoryAnAlbum(this.fileSystem.makeFile(item.getFilepath()).getParentFile())) {
 						this.itemList.removeFromAlbum(album, item);
 					}

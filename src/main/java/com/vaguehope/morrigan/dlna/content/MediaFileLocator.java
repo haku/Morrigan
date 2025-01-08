@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import com.vaguehope.morrigan.dlna.httpserver.FileLocator;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -42,11 +42,11 @@ public class MediaFileLocator implements FileLocator {
 		return id;
 	}
 
-	public String mediaItemId (final MediaListReference mlr, final IMediaItem mi) {
+	public String mediaItemId (final MediaListReference mlr, final MediaItem mi) {
 		return String.format("%s/item/%s/%s", mlrRef(mlr), encodeFilepath(mi), mi.getMd5().toString(16));
 	}
 
-	public String mediaItemArtId (final MediaListReference mlr, final IMediaItem mi) {
+	public String mediaItemArtId (final MediaListReference mlr, final MediaItem mi) {
 		return String.format("%s/item/%s/%s/art", mlrRef(mlr), encodeFilepath(mi), mi.getMd5().toString(16));
 	}
 
@@ -84,7 +84,7 @@ public class MediaFileLocator implements FileLocator {
 			if (parts.length < 4) throw new IllegalArgumentException("Need at least 4 parts: " + id);
 
 			final String filepath = decodeString(parts[2]);
-			final IMediaItem item = db.hasFile(filepath).isKnown() ? db.getByFile(filepath) : db.getByMd5(new BigInteger(parts[3], 16));
+			final MediaItem item = db.hasFile(filepath).isKnown() ? db.getByFile(filepath) : db.getByMd5(new BigInteger(parts[3], 16));
 
 			if (parts.length == 4) {
 				return new File(item.getFilepath());
@@ -133,7 +133,7 @@ public class MediaFileLocator implements FileLocator {
 		return null;
 	}
 
-	private static String encodeFilepath (final IMediaItem mi) {
+	private static String encodeFilepath (final MediaItem mi) {
 		try {
 			return URLEncoder.encode(mi.getFilepath(), "UTF-8");
 		}

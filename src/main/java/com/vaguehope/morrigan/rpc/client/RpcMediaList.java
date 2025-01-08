@@ -12,7 +12,6 @@ import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
-import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaTag;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
@@ -22,8 +21,8 @@ import com.vaguehope.morrigan.dlna.extcd.EphemeralMediaList;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -101,23 +100,23 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public IMediaItem getByFile(final String identifer) throws DbException {
+	public MediaItem getByFile(final String identifer) throws DbException {
 		final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
 		if (ret.getExistence() != com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance.EXISTS) return null;
 		return makeItem(ret.getItem(), ret.getTagList());
 	}
 
-	protected RpcMediaItem makeItem(final MediaItem item, final List<MediaTag> tags) throws DbException {
+	protected RpcMediaItem makeItem(final MediaToadProto.MediaItem item, final List<MediaTag> tags) throws DbException {
 		return new RpcMediaItem(item, tags, this.metadataStorage.getMetadataProxy(item.getId()));
 	}
 
 	@Override
-	public String prepairRemoteLocation(final IMediaItem item, final ContentProxy contentProxy) {
+	public String prepairRemoteLocation(final MediaItem item, final ContentProxy contentProxy) {
 		return contentProxy.makeUri(this.rpcContentServer, this.ri.getLocalIdentifier(), item.getRemoteId());
 	}
 
 	@Override
-	public List<IMediaItem> search(
+	public List<MediaItem> search(
 			final MediaType mediaType,
 			final String term,
 			final int maxResults,
@@ -165,8 +164,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 		final SearchReply resp = blockingStub().search(req.build());
 
-		final List<IMediaItem> items = new ArrayList<>(resp.getResultList().size());
-		for (final MediaItem i : resp.getResultList()) {
+		final List<MediaItem> items = new ArrayList<>(resp.getResultList().size());
+		for (final MediaToadProto.MediaItem i : resp.getResultList()) {
 			items.add(makeItem(i, Collections.emptyList()));
 		}
 		return items;
@@ -200,12 +199,12 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 //	Metadata.
 
 	@Override
-	public void incTrackStartCnt(final IMediaItem item) throws MorriganException {
+	public void incTrackStartCnt(final MediaItem item) throws MorriganException {
 		this.metadataStorage.incTrackStartCnt(item);
 	}
 
 	@Override
-	public void incTrackEndCnt(final IMediaItem item) throws MorriganException {
+	public void incTrackEndCnt(final MediaItem item) throws MorriganException {
 		this.metadataStorage.incTrackEndCnt(item);
 	}
 

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.MatchMode;

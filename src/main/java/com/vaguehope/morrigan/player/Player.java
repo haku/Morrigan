@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.player;
 import java.util.List;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.transcode.Transcode;
 
@@ -30,7 +30,7 @@ public interface Player {
 	/**
 	 * May be async.
 	 */
-	void loadAndStartPlaying(IMediaItemList list, IMediaItem track);
+	void loadAndStartPlaying(IMediaItemList list, MediaItem track);
 
 	/**
 	 * May be async.

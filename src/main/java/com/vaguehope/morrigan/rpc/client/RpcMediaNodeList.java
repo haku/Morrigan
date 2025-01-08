@@ -10,11 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeRequest;
-import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaNode;
 
 public class RpcMediaNodeList extends RpcMediaList {
@@ -23,7 +22,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 	private final String title;
 
 	private volatile List<MediaNode> mediaNodes = Collections.emptyList();
-	private volatile List<IMediaItem> mediaItems = Collections.emptyList();
+	private volatile List<MediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
 
 	public RpcMediaNodeList(final String nodeId, final String title, final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage storage) {
@@ -57,8 +56,8 @@ public class RpcMediaNodeList extends RpcMediaList {
 			nodes.add(new MediaNode(n.getId(), n.getTitle(), this.nodeId));
 		}
 
-		final List<IMediaItem> items = new ArrayList<>(resp.getItemCount());
-		for (final MediaItem i : resp.getItemList()) {
+		final List<MediaItem> items = new ArrayList<>(resp.getItemCount());
+		for (final MediaToadProto.MediaItem i : resp.getItemList()) {
 			items.add(makeItem(i, Collections.emptyList()));
 		}
 
@@ -98,7 +97,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 	}
 
 	@Override
-	public List<IMediaItem> getMediaItems() {
+	public List<MediaItem> getMediaItems() {
 		return this.mediaItems;
 	}
 

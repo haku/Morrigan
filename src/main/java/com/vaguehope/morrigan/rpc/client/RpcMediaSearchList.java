@@ -14,8 +14,8 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -26,7 +26,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 	private final String searchTerm;
 
-	private volatile List<IMediaItem> mediaItems = Collections.emptyList();
+	private volatile List<MediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
 	private volatile SortColumn sortColumn = null;
 	private volatile SortDirection sortDirection = SortDirection.ASC;
@@ -59,7 +59,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
-	public List<IMediaItem> getMediaItems() {
+	public List<MediaItem> getMediaItems() {
 		return this.mediaItems;
 	}
 
@@ -162,7 +162,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
-	public IMediaItem chooseItem(final PlaybackOrder order, final IMediaItem previousItem) throws MorriganException {
+	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) throws MorriganException {
 		final ChooseMediaRequest.Builder req = ChooseMediaRequest.newBuilder()
 				.setQuery(this.searchTerm)
 				.setCount(1);

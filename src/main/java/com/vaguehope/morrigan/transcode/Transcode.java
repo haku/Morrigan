@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
@@ -18,18 +18,18 @@ import com.vaguehope.morrigan.util.StringHelper;
 public enum Transcode {
 	NONE("", "No Transcode") {
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItemList list, final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItemList list, final MediaItem item) throws IOException {
 			return null;
 		}
 
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItem item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final MediaItem item, final ItemTags tags) throws IOException {
 			return null;
 		}
 	},
 	COMMON_AUDIO_ONLY("common_audio_only", "Common Audio Only") {
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItem item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final MediaItem item, final ItemTags tags) throws IOException {
 			final String itemMimeType = item.getMimeType();
 			final String itemMimeTypeLower = itemMimeType != null ? itemMimeType.toLowerCase(Locale.ENGLISH) : null;
 
@@ -41,7 +41,7 @@ public enum Transcode {
 	},
 	MOBILE_AUDIO("mobile_audio", "Mobile Audio") {
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItem item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final MediaItem item, final ItemTags tags) throws IOException {
 			final String itemMimeType = item.getMimeType();
 			final String itemMimeTypeLower = itemMimeType != null ? itemMimeType.toLowerCase(Locale.ENGLISH) : null;
 
@@ -53,7 +53,7 @@ public enum Transcode {
 	},
 	MP3_ONLY("mp3_only", "MP3 Only") {
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItem item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final MediaItem item, final ItemTags tags) throws IOException {
 			if (MimeType.MP3.getMimeType().equalsIgnoreCase(item.getMimeType()) && !ConfigTag.isAnyPresent(tags)) {
 				return null;
 			}
@@ -62,7 +62,7 @@ public enum Transcode {
 	},
 	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
 		@Override
-		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItem item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final MediaItem item, final ItemTags tags) throws IOException {
 			final boolean hasConfigTags = ConfigTag.isAnyPresent(tags);
 
 			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
@@ -126,7 +126,7 @@ public enum Transcode {
 		return this.uiName;
 	}
 
-	public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItemList list, final IMediaItem item) throws IOException, MorriganException {
+	public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItemList list, final MediaItem item) throws IOException, MorriganException {
 		return profileForItem(context, item, list != null ? list.readTags(item) : ItemTags.EMPTY);
 	}
 
@@ -134,7 +134,7 @@ public enum Transcode {
 	 * Returns null if no transcode is required.
 	 * Ideally should be quite quick as its used to determine if a transcode is needed when building API list responses.
 	 */
-	public abstract TranscodeProfile profileForItem (final TranscodeContext context, final IMediaItem item, final ItemTags tags) throws IOException;
+	public abstract TranscodeProfile profileForItem (final TranscodeContext context, final MediaItem item, final ItemTags tags) throws IOException;
 
 	/**
 	 * Case-insensitive.

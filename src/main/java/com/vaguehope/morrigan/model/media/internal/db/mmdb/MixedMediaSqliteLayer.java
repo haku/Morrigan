@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -271,12 +271,12 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public List<IMediaItem> getAllMedia (final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<MediaItem> getAllMedia (final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		return getMedia(MediaType.UNKNOWN, sorts, directions, hideMissing);
 	}
 
 	@Override
-	public List<IMediaItem> getMedia (final MediaType mediaType, final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+	public List<MediaItem> getMedia (final MediaType mediaType, final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false).execute(getDbCon(), this.itemFactory);
 		}
@@ -286,7 +286,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public List<IMediaItem> getMedia (final MediaType mediaType, final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
+	public List<MediaItem> getMedia (final MediaType mediaType, final SortColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false, search).execute(getDbCon(), this.itemFactory);
 		}
@@ -299,7 +299,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
 	 */
 	@Override
-	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
+	public List<MediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, sortColumn, sortDirection, true, !includeDisabled, term).execute(getDbCon(), this.itemFactory, maxResults);
 		}
@@ -309,8 +309,8 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public Collection<IMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws DbException {
-		List<IMediaItem> ret;
+	public Collection<MediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws DbException {
+		List<MediaItem> ret;
 
 		final StringBuilder sql = new StringBuilder();
 		sql.append(_SQL_MEDIAFILESALBUMS_SELECT);
@@ -375,18 +375,18 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public IMediaItem getByFile (final File file) throws DbException {
+	public MediaItem getByFile (final File file) throws DbException {
 		return getByFile(file.getAbsolutePath());
 	}
 
 	@Override
-	public IMediaItem getByFile (final String filePath) throws DbException {
+	public MediaItem getByFile (final String filePath) throws DbException {
 		final String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHEREFILEEQ;
 		try (final PreparedStatement ps = getDbCon().prepareStatement(sql)) {
 			ps.setString(1, filePath);
 			ps.setMaxRows(2); // Ask for 1, so we know if there is more than 1.
 
-			final List<IMediaItem> res;
+			final List<MediaItem> res;
 			try (final ResultSet rs = ps.executeQuery()) {
 				res = local_parseRecordSet(rs, this.itemFactory);
 			}
@@ -399,13 +399,13 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
+	public MediaItem getByMd5 (final BigInteger md5) throws DbException {
 		final String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHERE_MD5_EQ;
 		try (final PreparedStatement ps = getDbCon().prepareStatement(sql)) {
 			ps.setBytes(1, md5.toByteArray());
 			ps.setMaxRows(2); // Ask for 2 so we know if there is more than 1.
 			try (final ResultSet rs = ps.executeQuery()) {
-				final List<IMediaItem> res = local_parseRecordSet(rs, this.itemFactory);
+				final List<MediaItem> res = local_parseRecordSet(rs, this.itemFactory);
 				if (res.size() == 1) return res.get(0);
 				throw new IllegalArgumentException("File not found '" + md5.toString(16) + "' (results count = " + res.size() + ").");
 			}
@@ -552,7 +552,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setDateAdded (final IMediaItem item, final Date date) throws DbException {
+	public void setDateAdded (final MediaItem item, final Date date) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATEADDED)) {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setString(2, item.getFilepath());
@@ -566,7 +566,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setMd5 (final IMediaItem item, final BigInteger md5) throws DbException {
+	public void setMd5 (final MediaItem item, final BigInteger md5) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SET_MD5)) {
 			if (md5 != null) {
 				ps.setBytes(1, md5.toByteArray());
@@ -585,7 +585,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setSha1(final IMediaItem item, final BigInteger sha1) throws DbException {
+	public void setSha1(final MediaItem item, final BigInteger sha1) throws DbException {
 		try (final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SET_SHA1)) {
 			if (sha1 != null) {
 				ps.setBytes(1, sha1.toByteArray());
@@ -604,7 +604,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setDateLastModified (final IMediaItem item, final Date date) throws DbException {
+	public void setDateLastModified (final MediaItem item, final Date date) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDMODIFIED)) {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setString(2, item.getFilepath());
@@ -618,16 +618,16 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setEnabled (final IMediaItem item, final boolean value) throws DbException {
+	public void setEnabled (final MediaItem item, final boolean value) throws DbException {
 		_setEnabled(item, value, true, null);
 	}
 
 	@Override
-	public void setEnabled (final IMediaItem item, final boolean value, final Date lastModified) throws DbException {
+	public void setEnabled (final MediaItem item, final boolean value, final Date lastModified) throws DbException {
 		_setEnabled(item, value, false, lastModified);
 	}
 
-	protected void _setEnabled (final IMediaItem item, final boolean value, final boolean nullIsNow, final Date lastModified) throws DbException {
+	protected void _setEnabled (final MediaItem item, final boolean value, final boolean nullIsNow, final Date lastModified) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETENABLED)) {
 			ps.setInt(1, value ? 1 : 0);
 
@@ -653,7 +653,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setMissing (final IMediaItem item, final boolean value) throws DbException {
+	public void setMissing (final MediaItem item, final boolean value) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMISSING)) {
 			ps.setInt(1, value ? 1 : 0);
 			ps.setString(2, item.getFilepath());
@@ -667,7 +667,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setRemoteLocation (final IMediaItem item, final String remoteLocation) throws DbException {
+	public void setRemoteLocation (final MediaItem item, final String remoteLocation) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETREMLOC)) {
 			ps.setString(1, remoteLocation);
 			ps.setString(2, item.getFilepath());
@@ -681,7 +681,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws DbException {
+	public void setItemMediaType (final MediaItem item, final MediaType newType) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETTYPE)) {
 			ps.setInt(1, newType.getN());
 			ps.setString(2, item.getFilepath());
@@ -695,7 +695,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setItemMimeType (final IMediaItem item, final String newType) throws DbException {
+	public void setItemMimeType (final MediaItem item, final String newType) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMIMETYPE)) {
 			ps.setString(1, newType);
 			ps.setString(2, item.getFilepath());
@@ -709,11 +709,11 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void incTrackPlayed (final IMediaItem item) throws DbException {
+	public void incTrackPlayed (final MediaItem item) throws DbException {
 		_trackPlayed(item, 1, new Date());
 	}
 
-	protected void _trackPlayed (final IMediaItem item, final long x, final Date date) throws DbException {
+	protected void _trackPlayed (final MediaItem item, final long x, final Date date) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_TRACKPLAYED)) {
 			ps.setLong(1, x);
 			ps.setDate(2, new java.sql.Date(date.getTime()));
@@ -728,7 +728,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem item, final long x) throws DbException {
+	public void incTrackStartCnt (final MediaItem item, final long x) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART)) {
 			ps.setLong(1, x);
 			ps.setString(2, item.getFilepath());
@@ -742,7 +742,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setTrackStartCnt (final IMediaItem item, final long x) throws DbException {
+	public void setTrackStartCnt (final MediaItem item, final long x) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETSTART)) {
 			ps.setLong(1, x);
 			ps.setString(2, item.getFilepath());
@@ -756,7 +756,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setDateLastPlayed (final IMediaItem item, final Date date) throws DbException {
+	public void setDateLastPlayed (final MediaItem item, final Date date) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATELASTPLAYED)) {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setString(2, item.getFilepath());
@@ -770,16 +770,16 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void incTrackFinished (final IMediaItem item) throws DbException {
+	public void incTrackFinished (final MediaItem item) throws DbException {
 		_incTrackEndCnt(item, 1);
 	}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem item, final long n) throws DbException {
+	public void incTrackEndCnt (final MediaItem item, final long n) throws DbException {
 		_incTrackEndCnt(item, n);
 	}
 
-	protected void _incTrackEndCnt (final IMediaItem item, final long x) throws DbException {
+	protected void _incTrackEndCnt (final MediaItem item, final long x) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND)) {
 			ps.setLong(1, x);
 			ps.setString(2, item.getFilepath());
@@ -793,7 +793,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setTrackEndCnt (final IMediaItem item, final long x) throws DbException {
+	public void setTrackEndCnt (final MediaItem item, final long x) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETEND);) {
 			ps.setLong(1, x);
 			ps.setString(2, item.getFilepath());
@@ -807,7 +807,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setTrackDuration (final IMediaItem item, final int duration) throws DbException {
+	public void setTrackDuration (final MediaItem item, final int duration) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDURATION)) {
 			ps.setInt(1, duration);
 			ps.setString(2, item.getFilepath());
@@ -821,7 +821,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public void setDimensions (final IMediaItem item, final int width, final int height) throws DbException {
+	public void setDimensions (final MediaItem item, final int width, final int height) throws DbException {
 		try (PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDIMENSIONS)) {
 			ps.setInt(1, width);
 			ps.setInt(2, height);
@@ -837,7 +837,7 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 	}
 
 	@Override
-	public IMediaItem getNewT (final String filePath) {
+	public MediaItem getNewT (final String filePath) {
 		return this.itemFactory.getNewMediaItem(filePath);
 	}
 
@@ -883,8 +883,8 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 		}
 	}
 
-	protected static List<IMediaItem> local_parseRecordSet (final ResultSet rs, final DefaultMediaItemFactory itemFactory) throws SQLException {
-		final List<IMediaItem> ret = new ArrayList<>();
+	protected static List<MediaItem> local_parseRecordSet (final ResultSet rs, final DefaultMediaItemFactory itemFactory) throws SQLException {
+		final List<MediaItem> ret = new ArrayList<>();
 		if (rs.next()) {
 			final ColumnIndexes indexes = new ColumnIndexes(rs);
 			do {
@@ -895,9 +895,9 @@ public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMed
 		return ret;
 	}
 
-	protected static IMediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final DefaultMediaItemFactory itemFactory) throws SQLException {
+	protected static MediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final DefaultMediaItemFactory itemFactory) throws SQLException {
 		final String filePath = rs.getString(indexes.colFile);
-		final IMediaItem mi = itemFactory.getNewMediaItem(filePath);
+		final MediaItem mi = itemFactory.getNewMediaItem(filePath);
 
 		/* The object returned by the itemFactory may not be fresh.
 		 * It is important that this method call every possible setter.

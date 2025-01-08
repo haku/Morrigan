@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -52,24 +52,24 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 				trans.read();
 				// FIXME add getByMd5() to local DB.
 				// Build list of all hashed local items.
-				final Map<BigInteger, IMediaItem> localItems = new HashMap<>();
-				for (final IMediaItem localItem : trans.getAllDbEntries()) {
+				final Map<BigInteger, MediaItem> localItems = new HashMap<>();
+				for (final MediaItem localItem : trans.getAllDbEntries()) {
 					final BigInteger md5 = localItem.getMd5();
 					if (md5 != null && !BigInteger.ZERO.equals(md5)) localItems.put(md5, localItem);
 				}
 
 				// All remote items.
-				final List<IMediaItem> remoteItems = this.remote.getAllDbEntries();
+				final List<MediaItem> remoteItems = this.remote.getAllDbEntries();
 
 				// Describe what we are doing.
 				final String taskTitle = "Synchronising metadata from " + this.remote.getListName() + " to " + this.local.getListName() + ".";
 				taskEventListener.beginTask(taskTitle, remoteItems.size()); // Work total is number of remote items.
 
 				// For each remote item, see if there is a local item to update.
-				for (final IMediaItem remoteItem : remoteItems) {
+				for (final MediaItem remoteItem : remoteItems) {
 					final BigInteger md5 = remoteItem.getMd5();
 					if (md5 != null && !BigInteger.ZERO.equals(md5)) {
-						final IMediaItem localItem = localItems.get(md5);
+						final MediaItem localItem = localItems.get(md5);
 						if (localItem != null) {
 							taskEventListener.subTask(localItem.getTitle());
 							syncMediaItems(trans, this.remote, remoteItem, localItem);
@@ -103,7 +103,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		return ret;
 	}
 
-	private static void syncMediaItems (final IMediaItemDb ldb, final IRemoteMixedMediaDb rdb, final IMediaItem remoteItem, final IMediaItem localItem) throws MorriganException {
+	private static void syncMediaItems (final IMediaItemDb ldb, final IRemoteMixedMediaDb rdb, final MediaItem remoteItem, final MediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
 			ldb.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}
@@ -167,7 +167,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		}
 	}
 
-	private static void addTag (final IMediaItemDb db, final IMediaItem item, final MediaTag tag) throws MorriganException {
+	private static void addTag (final IMediaItemDb db, final MediaItem item, final MediaTag tag) throws MorriganException {
 		final MediaTagClassification cls = tag.getClassification();
 		final String clsString = cls == null ? null : cls.getClassification();
 		db.addTag(item, tag.getTag(), tag.getType(), clsString, tag.getModified(), tag.isDeleted());

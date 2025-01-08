@@ -88,13 +88,13 @@ public interface MediaFactory {
 	 */
 	MorriganTask getLocalMixedMediaDbUpdateTask (IMediaItemDb library);
 	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
-	MorriganTask getMediaFileCopyTask (IMediaItemList mediaItemList, List<IMediaItem> mediaSelection, File targetDirectory);
-	MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList fromList, Collection<IMediaItem> itemsToCopy, IMediaItemDb toDb);
+	MorriganTask getMediaFileCopyTask (IMediaItemList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
+	MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList fromList, Collection<MediaItem> itemsToCopy, IMediaItemDb toDb);
 	MorriganTask getSyncMetadataRemoteToLocalTask (IMediaItemDb local, IRemoteMixedMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	void readTrackTags (IMediaItemDb itemDb, IMediaItem mlt, File file) throws IOException, MorriganException;
+	void readTrackTags (IMediaItemDb itemDb, MediaItem mlt, File file) throws IOException, MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

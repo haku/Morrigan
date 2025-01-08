@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Objects;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public class DefaultMediaItem implements IMediaItem {
+public class DefaultMediaItem implements MediaItem {
 
 	private static final BigInteger MD5_DEFAULT = null;
 	private static final BigInteger SHA1_DEFAULT = null;
@@ -425,7 +425,7 @@ public class DefaultMediaItem implements IMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaItem(final IMediaItem mi) {
+	public boolean setFromMediaItem(final MediaItem mi) {
 		boolean b = this.setFilepathIfNotSet(mi.getFilepath()) // Do not set it if it is already set.
 				| this.setDateAdded(mi.getDateAdded())
 				| this.setMd5(mi.getMd5())

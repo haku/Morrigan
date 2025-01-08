@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.transcode.TranscodeContext;
@@ -165,7 +165,7 @@ public abstract class AbstractPlayer implements Player {
 		if (asMeasured > 0) return asMeasured;
 
 		final PlayItem item = getCurrentItem();
-		final IMediaItem track = item != null && item.hasTrack() ? item.getTrack() : null;
+		final MediaItem track = item != null && item.hasTrack() ? item.getTrack() : null;
 		final int trackDuration = track != null ? track.getDuration() : -1;
 		if (trackDuration > 0) return trackDuration;
 
@@ -224,7 +224,7 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final IMediaItemList list, final IMediaItem track) {
+	public final void loadAndStartPlaying (final IMediaItemList list, final MediaItem track) {
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
 
@@ -251,7 +251,7 @@ public abstract class AbstractPlayer implements Player {
 				order = PlaybackOrder.RANDOM;
 			}
 
-			final IMediaItem track;
+			final MediaItem track;
 			try {
 				track = pi.getList().chooseItem(order, null);
 			}
@@ -353,7 +353,7 @@ public abstract class AbstractPlayer implements Player {
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
 		if (currentItem != null && currentItem.isComplete()) {
-			final IMediaItem nextTrack = currentItem.getList().chooseItem(pbOrder, currentItem.getTrack());
+			final MediaItem nextTrack = currentItem.getList().chooseItem(pbOrder, currentItem.getTrack());
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
@@ -362,7 +362,7 @@ public abstract class AbstractPlayer implements Player {
 		}
 
 		final IMediaItemList currentList = getCurrentList();
-		final IMediaItem nextTrack = currentList.chooseItem(pbOrder, null);
+		final MediaItem nextTrack = currentList.chooseItem(pbOrder, null);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}

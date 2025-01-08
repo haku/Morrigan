@@ -28,8 +28,8 @@ import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -280,8 +280,8 @@ public class ContentAdaptor {
 		return new ContentNode(c);
 	}
 
-	private void addItemsToContainer (final MediaListReference mlr, final Container c, final IMediaItemDb db, final Collection<IMediaItem> items) throws MorriganException {
-		for (final IMediaItem item : items) {
+	private void addItemsToContainer (final MediaListReference mlr, final Container c, final IMediaItemDb db, final Collection<MediaItem> items) throws MorriganException {
+		for (final MediaItem item : items) {
 			final Item i = makeItem(c, mlr, item);
 			if (i != null) {
 				tagsToDescription(db, item, i);
@@ -291,18 +291,18 @@ public class ContentAdaptor {
 		updateContainer(c);
 	}
 
-	private final Cache<String, List<IMediaItem>> queryCache = new Cache<>(50);
+	private final Cache<String, List<MediaItem>> queryCache = new Cache<>(50);
 
 	public List<Item> queryToItems(final MediaListReference mlr, final IMediaItemDb db, final String term, final Container parentContainer, final int maxResults) throws DbException, MorriganException {
 		final String cacheKey = String.format("%s|%s|%s", term, maxResults, mlr.getIdentifier());
-		List<IMediaItem> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
+		List<MediaItem> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
 		if (results == null) {
 			results = db.search(MediaType.TRACK, term, maxResults);
 			this.queryCache.put(cacheKey, results);
 		}
 
 		final List<Item> ret = new ArrayList<>();
-		for (final IMediaItem item : results) {
+		for (final MediaItem item : results) {
 			final Item i = makeItem(parentContainer, mlr, item);
 			if (i != null) {
 				tagsToDescription(db, item, i);
@@ -312,7 +312,7 @@ public class ContentAdaptor {
 		return ret;
 	}
 
-	private Item makeItem (final Container parentContainer, final MediaListReference mlr, final IMediaItem mediaItem) {
+	private Item makeItem (final Container parentContainer, final MediaListReference mlr, final MediaItem mediaItem) {
 		final File file = new File(mediaItem.getFilepath());
 		final MediaFormat format = MediaFormat.identify(file);
 		if (format == null) {
@@ -356,7 +356,7 @@ public class ContentAdaptor {
 		return item;
 	}
 
-	private static void tagsToDescription (final IMediaItemDb db, final IMediaItem mediaItem, final Item item) throws MorriganException {
+	private static void tagsToDescription (final IMediaItemDb db, final MediaItem mediaItem, final Item item) throws MorriganException {
 		final List<MediaTag> tags = db.getTags(mediaItem);
 		if (tags != null && tags.size() > 0) {
 			StringBuilder s = null;

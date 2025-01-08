@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sqlitewrapper.IGenericDbLayer;
@@ -55,7 +55,7 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	MediaAlbum getAlbum (String name) throws DbException;
 	void removeAlbum (MediaAlbum album) throws DbException;
 	Collection<MediaAlbum> getAlbums () throws DbException;
-	Collection<IMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
+	Collection<MediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
 	/**
 	 * Will have no effect if already in album.
 	 */
@@ -68,16 +68,16 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 
 	List<IDbColumn> getMediaTblColumns ();
 
-	List<IMediaItem> getAllMedia (SortColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (MediaType mediaType, SortColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<IMediaItem> getMedia (MediaType mediaType, SortColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
+	List<MediaItem> getAllMedia (SortColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<MediaItem> getMedia (MediaType mediaType, SortColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<MediaItem> getMedia (MediaType mediaType, SortColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
 
 	FileExistance hasFile (File file) throws DbException;
 	FileExistance hasFile (String filePath) throws DbException;
-	IMediaItem getByFile (File file) throws DbException;
-	IMediaItem getByFile (String filePath) throws DbException;
-	IMediaItem getByMd5 (BigInteger md5) throws DbException;
-	List<IMediaItem> search(MediaType mediaType, String term, int maxResults, SortColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
+	MediaItem getByFile (File file) throws DbException;
+	MediaItem getByFile (String filePath) throws DbException;
+	MediaItem getByMd5 (BigInteger md5) throws DbException;
+	List<MediaItem> search(MediaType mediaType, String term, int maxResults, SortColumn[] columns, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
 	boolean[] addFiles (MediaType mediaType, List<File> files) throws DbException;
 
@@ -101,34 +101,34 @@ public interface IMediaItemStorageLayer extends IGenericDbLayer {
 	int removeFile(String sfile) throws DbException;
 	int removeFile (IDbItem dbItem) throws DbException;
 
-	void setItemMediaType(IMediaItem item, MediaType newType) throws DbException;
-	void setItemMimeType(IMediaItem item, String newType) throws DbException;
-	void setDateAdded(IMediaItem item, Date date) throws DbException;
-	void setMd5(IMediaItem item, BigInteger md5) throws DbException;
-	void setSha1(IMediaItem item, BigInteger sha1) throws DbException;
-	void setDateLastModified(IMediaItem item, Date date) throws DbException;
-	void setEnabled(IMediaItem item, boolean value) throws DbException;
-	void setEnabled(IMediaItem item, boolean value, Date lastModified) throws DbException;
-	void setMissing(IMediaItem item, boolean value) throws DbException;
-	void setRemoteLocation(IMediaItem item, String remoteLocation) throws DbException;
-	void setDimensions (IMediaItem item, int width, int height) throws DbException;
+	void setItemMediaType(MediaItem item, MediaType newType) throws DbException;
+	void setItemMimeType(MediaItem item, String newType) throws DbException;
+	void setDateAdded(MediaItem item, Date date) throws DbException;
+	void setMd5(MediaItem item, BigInteger md5) throws DbException;
+	void setSha1(MediaItem item, BigInteger sha1) throws DbException;
+	void setDateLastModified(MediaItem item, Date date) throws DbException;
+	void setEnabled(MediaItem item, boolean value) throws DbException;
+	void setEnabled(MediaItem item, boolean value, Date lastModified) throws DbException;
+	void setMissing(MediaItem item, boolean value) throws DbException;
+	void setRemoteLocation(MediaItem item, String remoteLocation) throws DbException;
+	void setDimensions (MediaItem item, int width, int height) throws DbException;
 
 	/**
 	 * Inc start count by one and set last played date.
 	 * @param sfile
 	 * @throws DbException
 	 */
-	void incTrackPlayed (IMediaItem item) throws DbException;
+	void incTrackPlayed (MediaItem item) throws DbException;
 
-	void incTrackFinished (IMediaItem item) throws DbException;
-	void incTrackStartCnt (IMediaItem item, long n) throws DbException;
-	void setTrackStartCnt (IMediaItem item, long n) throws DbException;
-	void incTrackEndCnt (IMediaItem item, long n) throws DbException;
-	void setTrackEndCnt (IMediaItem item, long n) throws DbException;
-	void setDateLastPlayed (IMediaItem item, Date date) throws DbException;
-	void setTrackDuration (IMediaItem item, int duration) throws DbException;
+	void incTrackFinished (MediaItem item) throws DbException;
+	void incTrackStartCnt (MediaItem item, long n) throws DbException;
+	void setTrackStartCnt (MediaItem item, long n) throws DbException;
+	void incTrackEndCnt (MediaItem item, long n) throws DbException;
+	void setTrackEndCnt (MediaItem item, long n) throws DbException;
+	void setDateLastPlayed (MediaItem item, Date date) throws DbException;
+	void setTrackDuration (MediaItem item, int duration) throws DbException;
 
-	IMediaItem getNewT(String filePath);
+	MediaItem getNewT(String filePath);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

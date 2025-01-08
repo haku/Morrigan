@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -55,7 +55,7 @@ class IMediaItemStorageLayerChangeListenerAdaptor implements IMediaItemStorageLa
 	}
 
 	@Override
-	public void mediaItemUpdated (final IMediaItem item) {
+	public void mediaItemUpdated (final MediaItem item) {
 		for (IMediaItemStorageLayerChangeListener l : this.changeListeners) {
 			l.mediaItemUpdated(item);
 		}

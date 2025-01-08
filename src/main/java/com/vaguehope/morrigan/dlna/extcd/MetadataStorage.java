@@ -4,8 +4,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -24,7 +24,7 @@ public class MetadataStorage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Writes.
 
-	public void incTrackStartCnt (final IMediaItem item) throws MorriganException {
+	public void incTrackStartCnt (final MediaItem item) throws MorriganException {
 		try {
 			try {
 				this.storage.addFile(MediaType.TRACK, item.getRemoteId(), 0);
@@ -40,7 +40,7 @@ public class MetadataStorage {
 		}
 	}
 
-	public void incTrackEndCnt (final IMediaItem item) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem item) throws MorriganException {
 		try {
 			try {
 				this.storage.incTrackFinished(new ItemWithFilepath(item, item.getRemoteId()));
@@ -60,7 +60,7 @@ public class MetadataStorage {
 
 	private final ConcurrentMap<String, Metadata> cache = new ConcurrentHashMap<>();
 
-	private void uncache (final IMediaItem track) {
+	private void uncache (final MediaItem track) {
 		this.cache.remove(track.getRemoteId());
 	}
 

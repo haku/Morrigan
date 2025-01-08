@@ -5,16 +5,16 @@ import java.util.Date;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 
 public class ItemWithFilepath extends EphemeralItem {
 
-	private final IMediaItem item;
+	private final MediaItem item;
 	private final String filepath;
 	private final File file;
 
-	public ItemWithFilepath (final IMediaItem item, final String filepath) {
+	public ItemWithFilepath (final MediaItem item, final String filepath) {
 		this.item = item;
 		this.filepath = filepath;
 		this.file = new File(filepath);

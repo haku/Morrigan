@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
@@ -52,7 +52,7 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 
 			if (currentState != null) {
 				final PlayItem currentPlayItem = p.getCurrentItem();
-				final IMediaItem track = (currentPlayItem != null ? currentPlayItem.getTrack() : null);
+				final MediaItem track = (currentPlayItem != null ? currentPlayItem.getTrack() : null);
 				if (track != null) return currentState + " " + track + ".";
 				return currentState + ".";
 			}

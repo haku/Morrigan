@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
@@ -254,7 +254,7 @@ public class PlayerStateStorage {
 			}
 		}
 
-		IMediaItem track = list.getByFile(trackFilePath);
+		MediaItem track = list.getByFile(trackFilePath);
 		if (track == null) track = list.getByMd5(new BigInteger(trackMd5, 16));
 		if (track != null) return new PlayItem(list, track);
 

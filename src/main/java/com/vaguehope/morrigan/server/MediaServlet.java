@@ -27,8 +27,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -57,7 +57,7 @@ public class MediaServlet extends HttpServlet {
 	private final Gson gson = new GsonBuilder()
 			.registerTypeHierarchyAdapter(MediaListReference.class, new MediaListReferenceSrl())
 			.registerTypeHierarchyAdapter(MediaNode.class, new MediaNodeSrl())
-			.registerTypeHierarchyAdapter(IMediaItem.class, new MediaItemSrl())
+			.registerTypeHierarchyAdapter(MediaItem.class, new MediaItemSrl())
 			.registerTypeHierarchyAdapter(MediaTag.class, new MediaTagSrl())
 			.create();
 
@@ -147,13 +147,13 @@ public class MediaServlet extends HttpServlet {
 		final SortColumn sortColumns = parseSortColumns(req, SortColumn.FILE_PATH);
 		final SortDirection sortDirections = parseSortOrder(req, SortDirection.ASC);
 		final boolean includeDisabled = ServletHelper.readParamBoolean(req, "includedisabled", false);
-		final List<IMediaItem> items = list.search(MediaType.TRACK, decoded, MAX_RESULTS, sortColumns, sortDirections, includeDisabled);
+		final List<MediaItem> items = list.search(MediaType.TRACK, decoded, MAX_RESULTS, sortColumns, sortDirections, includeDisabled);
 		returnJson(resp, items);
 	}
 
 	private static void serveItemContent(final IMediaItemList list, final String itemId, final HttpServletRequest req, final HttpServletResponse resp)
 			throws IOException, MorriganException {
-		final IMediaItem item = list.getByFile(itemId);
+		final MediaItem item = list.getByFile(itemId);
 		if (item == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -174,7 +174,7 @@ public class MediaServlet extends HttpServlet {
 		returnRemoteFile(list, req, resp, item);
 	}
 
-	private static void returnLocalFile(final HttpServletRequest req, final HttpServletResponse resp, final IMediaItem item, final File file)
+	private static void returnLocalFile(final HttpServletRequest req, final HttpServletResponse resp, final MediaItem item, final File file)
 			throws IOException {
 		// TODO transcodes
 		// TODO resizes
@@ -187,7 +187,7 @@ public class MediaServlet extends HttpServlet {
 			final IMediaItemList list,
 			final HttpServletRequest req,
 			final HttpServletResponse resp,
-			final IMediaItem item) throws MorriganException, IOException {
+			final MediaItem item) throws MorriganException, IOException {
 		final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // TODO this is fake, should use last modified from remote system.
 		if (ServletHelper.checkCanReturn304(lastModified, req, resp)) return;
 		// TODO pass through length and modified date?
@@ -225,9 +225,9 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
-	public class MediaItemSrl implements JsonSerializer<IMediaItem> {
+	public class MediaItemSrl implements JsonSerializer<MediaItem> {
 		@Override
-		public JsonElement serialize(final IMediaItem src, final Type typeOfSrc, final JsonSerializationContext context) {
+		public JsonElement serialize(final MediaItem src, final Type typeOfSrc, final JsonSerializationContext context) {
 			try {
 				final JsonObject j = new JsonObject();
 				j.addProperty("id", StringUtils.firstNonBlank(src.getRemoteId(), src.getFilepath()));

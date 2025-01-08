@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -14,12 +14,12 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 
 	private static final MimeType MIME_TYPE = MimeType.MP4;
 
-	protected Mp4CompatibleTranscode (final TranscodeContext context, final IMediaItem item, final ItemTags tags,
+	protected Mp4CompatibleTranscode (final TranscodeContext context, final MediaItem item, final ItemTags tags,
 			final Transcode transcode) {
 		super(context, item, tags, transcode, MIME_TYPE);
 	}
 
-	protected static File cacheFileMp4 (final TranscodeContext context, final IMediaItem item, final Transcode transcode) {
+	protected static File cacheFileMp4 (final TranscodeContext context, final MediaItem item, final Transcode transcode) {
 		return cacheFile(context, item, transcode, MIME_TYPE);
 	}
 

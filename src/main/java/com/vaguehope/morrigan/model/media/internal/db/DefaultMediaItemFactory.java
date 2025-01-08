@@ -1,7 +1,7 @@
 package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.internal.DefaultMediaItem;
 
@@ -43,7 +43,7 @@ public class DefaultMediaItemFactory {
 		this.list = list;
 	}
 
-	public IMediaItem getNewMediaItem (final String filePath) {
+	public MediaItem getNewMediaItem (final String filePath) {
 		if (filePath == null) return newItem(null); // We can not cache these. :(
 		return this.factory.manufacture(filePath);
 	}

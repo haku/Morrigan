@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.util.FileHelper;
@@ -34,7 +34,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 
 	private final String listId;
 	private final String listName;
-	private final List<IMediaItem> mediaTracks = new CopyOnWriteArrayList<>();
+	private final List<MediaItem> mediaTracks = new CopyOnWriteArrayList<>();
 
 	/**
 	 * listId must be unique. It will be used to identify the matching editor.
@@ -138,7 +138,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		}
 
 		@Override
-		public void mediaItemsAdded (final IMediaItem... items) {
+		public void mediaItemsAdded (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsAdded(items);
@@ -146,7 +146,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		}
 
 		@Override
-		public void mediaItemsRemoved (final IMediaItem... items) {
+		public void mediaItemsRemoved (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsRemoved(items);
@@ -154,7 +154,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		}
 
 		@Override
-		public void mediaItemsUpdated (final IMediaItem... items) {
+		public void mediaItemsUpdated (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsUpdated(items);
@@ -162,7 +162,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		}
 
 		@Override
-		public void mediaItemsForceReadRequired (final IMediaItem... items) {
+		public void mediaItemsForceReadRequired (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsForceReadRequired(items);
@@ -184,13 +184,13 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	 * Returns an unmodifiable list of the playlist items.
 	 */
 	@Override
-	public List<IMediaItem> getMediaItems () {
+	public List<MediaItem> getMediaItems () {
 		synchronized (this.mediaTracks) {
 			return Collections.unmodifiableList(this.mediaTracks);
 		}
 	}
 
-	protected void setMediaTracks (final List<IMediaItem> newMediaTracks) {
+	protected void setMediaTracks (final List<MediaItem> newMediaTracks) {
 		synchronized (this.mediaTracks) {
 			this.mediaTracks.clear();
 			this.mediaTracks.addAll(newMediaTracks);
@@ -204,14 +204,14 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	 * @param newTracks
 	 * @return items that are removed.
 	 */
-	protected List<IMediaItem> replaceListWithoutSetDirty (final List<IMediaItem> newTracks) {
+	protected List<MediaItem> replaceListWithoutSetDirty (final List<MediaItem> newTracks) {
 		synchronized (this.mediaTracks) {
 			return updateList(this.mediaTracks, newTracks, false);
 		}
 	}
 
 	@Override
-	public void addItem (final IMediaItem track) {
+	public void addItem (final MediaItem track) {
 		boolean diritied = false;
 		synchronized (this.mediaTracks) {
 			if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
@@ -224,7 +224,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	}
 
 	@Override
-	public void removeItem (final IMediaItem track) throws MorriganException {
+	public void removeItem (final MediaItem track) throws MorriganException {
 		boolean diritied = false;
 		synchronized (this.mediaTracks) {
 			this.mediaTracks.remove(track);
@@ -239,49 +239,49 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 //	These methods are sub-classed where persistence is needed.
 
 	@Override
-	public void setItemDateAdded (final IMediaItem track, final Date date) throws MorriganException {
+	public void setItemDateAdded (final MediaItem track, final Date date) throws MorriganException {
 		track.setDateAdded(date);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 
 	@Override
-	public void setItemMd5 (final IMediaItem track, final BigInteger md5) throws MorriganException {
+	public void setItemMd5 (final MediaItem track, final BigInteger md5) throws MorriganException {
 		track.setMd5(md5);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 
 	@Override
-	public void setItemSha1 (final IMediaItem track, final BigInteger sha1) throws MorriganException {
+	public void setItemSha1 (final MediaItem track, final BigInteger sha1) throws MorriganException {
 		track.setSha1(sha1);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 
 	@Override
-	public void setItemDateLastModified (final IMediaItem track, final Date date) throws MorriganException {
+	public void setItemDateLastModified (final MediaItem track, final Date date) throws MorriganException {
 		track.setDateLastModified(date);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem track, final boolean value) throws MorriganException {
+	public void setItemEnabled (final MediaItem track, final boolean value) throws MorriganException {
 		track.setEnabled(value);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem track, final boolean value, final Date lastModified) throws MorriganException {
+	public void setItemEnabled (final MediaItem track, final boolean value, final Date lastModified) throws MorriganException {
 		track.setEnabled(value, lastModified);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 
 	@Override
-	public void setItemMissing (final IMediaItem track, final boolean value) throws MorriganException {
+	public void setItemMissing (final MediaItem track, final boolean value) throws MorriganException {
 		track.setMissing(value);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
@@ -291,13 +291,13 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 //	Actions.
 
 	@Override
-	public void copyItemFile (final IMediaItem item, final OutputStream os) throws MorriganException {
+	public void copyItemFile (final MediaItem item, final OutputStream os) throws MorriganException {
 		// TODO implement this when it is needed.
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public File copyItemFile (final IMediaItem mi, final File targetDirectory) throws MorriganException {
+	public File copyItemFile (final MediaItem mi, final File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -340,18 +340,18 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	 * @param freshList
 	 * @return items that were removed from keepList.
 	 */
-	protected static List<IMediaItem> updateList (final List<IMediaItem> keepList, final List<IMediaItem> freshList, final boolean updateKeepList) {
-		final List<IMediaItem> finalList = new ArrayList<>();
+	protected static List<MediaItem> updateList (final List<MediaItem> keepList, final List<MediaItem> freshList, final boolean updateKeepList) {
+		final List<MediaItem> finalList = new ArrayList<>();
 
 		// This block takes no time.
-		Map<String, IMediaItem> keepMap = new HashMap<>(keepList.size());
-		for (final IMediaItem e : keepList) {
+		Map<String, MediaItem> keepMap = new HashMap<>(keepList.size());
+		for (final MediaItem e : keepList) {
 			keepMap.put(e.getFilepath(), e);
 		}
 
 		// This block is very quick.
-		if (freshList != null) for (final IMediaItem newItem : freshList) {
-			final IMediaItem oldItem = keepMap.get(newItem.getFilepath());
+		if (freshList != null) for (final MediaItem newItem : freshList) {
+			final MediaItem oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
 				if (oldItem != newItem) oldItem.setFromMediaItem(newItem);
 				finalList.add(oldItem);
@@ -364,12 +364,12 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		/*
 		 * Create a new list and populate it with the items removed.
 		 */
-		final List<IMediaItem> removedItems = new ArrayList<>();
+		final List<MediaItem> removedItems = new ArrayList<>();
 		keepMap = new HashMap<>(keepList.size());
-		for (final IMediaItem e : finalList) {
+		for (final MediaItem e : finalList) {
 			keepMap.put(e.getFilepath(), e);
 		}
-		for (final IMediaItem e : keepList) {
+		for (final MediaItem e : keepList) {
 			if (!keepMap.containsKey(e.getFilepath())) {
 				removedItems.add(e);
 			}

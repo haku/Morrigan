@@ -5,9 +5,9 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 
-public abstract class EphemeralItem implements IMediaItem {
+public abstract class EphemeralItem implements MediaItem {
 
 	public EphemeralItem () {}
 
@@ -180,7 +180,7 @@ public abstract class EphemeralItem implements IMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaItem (final IMediaItem mt) {
+	public boolean setFromMediaItem (final MediaItem mt) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

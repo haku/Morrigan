@@ -21,8 +21,8 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.FileExistance;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
@@ -185,7 +185,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public List<IMediaItem> getMediaItems () {
+	public List<MediaItem> getMediaItems () {
 		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
 		return super.getMediaItems();
 	}
@@ -242,7 +242,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	protected void doRead () throws MorriganException, DbException {
 //		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 
-		List<IMediaItem> allMedia;
+		List<MediaItem> allMedia;
 		long t0 = System.currentTimeMillis();
 		if (this.searchTerm != null) {
 			allMedia = this.dbLayer.getMedia(
@@ -314,10 +314,10 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public List<IMediaItem> getAllDbEntries () throws DbException {
+	public List<MediaItem> getAllDbEntries () throws DbException {
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.
-		List<IMediaItem> copyOfMainList = new ArrayList<>(getMediaItems());
-		List<IMediaItem> allList = this.dbLayer.getAllMedia(
+		List<MediaItem> copyOfMainList = new ArrayList<>(getMediaItems());
+		List<MediaItem> allList = this.dbLayer.getAllMedia(
 				new SortColumn[] { DEFAULT_SORT_COLUMN },
 				new SortDirection[] { SortDirection.ASC },
 				false);
@@ -427,7 +427,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public IMediaItem chooseItem(final PlaybackOrder order, final IMediaItem previousItem) {
+	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) {
 		return this.orderResolver.getNextTrack(this, previousItem, order);
 	}
 
@@ -445,24 +445,24 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public IMediaItem getByFile (final File file) throws DbException {
+	public MediaItem getByFile (final File file) throws DbException {
 		return this.dbLayer.getByFile(file);
 	}
 
 	@Override
-	public IMediaItem getByFile (final String filepath) throws DbException {
+	public MediaItem getByFile (final String filepath) throws DbException {
 		return this.dbLayer.getByFile(filepath);
 	}
 
 	@Override
-	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
+	public MediaItem getByMd5 (final BigInteger md5) throws DbException {
 		return this.dbLayer.getByMd5(md5);
 	}
 
 	// Search
 
 	@Override
-	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<MediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return getDbLayer().search(mediaType, term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
@@ -488,49 +488,49 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 
 		@Override
 		public void mediaItemAdded (final String filePath) {
-			getChangeEventCaller().mediaItemsAdded((IMediaItem[]) null); // TODO pass-through actual item?
+			getChangeEventCaller().mediaItemsAdded((MediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
 		public void mediaItemsAdded (final List<File> filePaths) {
-			getChangeEventCaller().mediaItemsAdded((IMediaItem[]) null); // TODO pass-through actual item?
+			getChangeEventCaller().mediaItemsAdded((MediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
 		public void mediaItemRemoved (final String filePath) {
-			getChangeEventCaller().mediaItemsRemoved((IMediaItem[]) null); // TODO pass-through actual item?
+			getChangeEventCaller().mediaItemsRemoved((MediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
-		public void mediaItemUpdated (final IMediaItem item) {
+		public void mediaItemUpdated (final MediaItem item) {
 			getChangeEventCaller().mediaItemsUpdated(item);
 		}
 
 		@Override
 		public void mediaItemTagAdded (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) {
 			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
-				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
+				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
 		public void mediaItemTagsMoved (final IDbItem from_item, final IDbItem to_item) {
 			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
-				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
+				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
 		public void mediaItemTagRemoved (final MediaTag tag) {
 			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
-				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
+				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
 		public void mediaItemTagsCleared (final IDbItem item) {
 			if (MediaDb.this.getConfig().getFilter() != null) { // TODO make more specific?
-				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
+				getChangeEventCaller().mediaItemsForceReadRequired((MediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
@@ -540,7 +540,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 //	Updating tracks.
 
 	@Override
-	public void setItemDateAdded (final IMediaItem track, final Date date) throws MorriganException {
+	public void setItemDateAdded (final MediaItem track, final Date date) throws MorriganException {
 		super.setItemDateAdded(track, date);
 		try {
 			this.dbLayer.setDateAdded(track, date);
@@ -551,7 +551,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void removeItem (final IMediaItem track) throws MorriganException {
+	public void removeItem (final MediaItem track) throws MorriganException {
 		try {
 			_removeMediaTrack(track);
 		}
@@ -565,7 +565,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	 * class is sub-classed and removeMediaTrack() overridden.
 	 * @throws DbException
 	 */
-	private void _removeMediaTrack (final IMediaItem track) throws MorriganException, DbException {
+	private void _removeMediaTrack (final MediaItem track) throws MorriganException, DbException {
 		super.removeItem(track);
 
 		// Remove track.
@@ -583,7 +583,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemMd5 (final IMediaItem track, final BigInteger md5) throws MorriganException {
+	public void setItemMd5 (final MediaItem track, final BigInteger md5) throws MorriganException {
 		super.setItemMd5(track, md5);
 		try {
 			this.dbLayer.setMd5(track, md5);
@@ -594,7 +594,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemSha1 (final IMediaItem track, final BigInteger sha1) throws MorriganException {
+	public void setItemSha1 (final MediaItem track, final BigInteger sha1) throws MorriganException {
 		super.setItemSha1(track, sha1);
 		try {
 			this.dbLayer.setSha1(track, sha1);
@@ -605,7 +605,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemDateLastModified (final IMediaItem track, final Date date) throws MorriganException {
+	public void setItemDateLastModified (final MediaItem track, final Date date) throws MorriganException {
 		super.setItemDateLastModified(track, date);
 		try {
 			this.dbLayer.setDateLastModified(track, date);
@@ -616,7 +616,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem track, final boolean value) throws MorriganException {
+	public void setItemEnabled (final MediaItem track, final boolean value) throws MorriganException {
 		super.setItemEnabled(track, value);
 		try {
 			this.dbLayer.setEnabled(track, value);
@@ -627,7 +627,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem track, final boolean value, final Date lastModified) throws MorriganException {
+	public void setItemEnabled (final MediaItem track, final boolean value, final Date lastModified) throws MorriganException {
 		super.setItemEnabled(track, value, lastModified);
 		try {
 			this.dbLayer.setEnabled(track, value, lastModified);
@@ -638,7 +638,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemMissing (final IMediaItem track, final boolean value) throws MorriganException {
+	public void setItemMissing (final MediaItem track, final boolean value) throws MorriganException {
 		super.setItemMissing(track, value);
 		try {
 			this.dbLayer.setMissing(track, value);
@@ -649,7 +649,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setRemoteLocation (final IMediaItem track, final String remoteLocation) throws MorriganException {
+	public void setRemoteLocation (final MediaItem track, final String remoteLocation) throws MorriganException {
 		track.setRemoteLocation(remoteLocation);
 		try {
 			this.dbLayer.setRemoteLocation(track, remoteLocation);
@@ -660,7 +660,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemMimeType(IMediaItem item, String  newType) throws MorriganException {
+	public void setItemMimeType(MediaItem item, String  newType) throws MorriganException {
 		item.setMimeType(newType);
 		try {
 			this.getDbLayer().setItemMimeType(item, newType);
@@ -671,7 +671,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
+	public void setItemMediaType (final MediaItem item, final MediaType newType) throws MorriganException {
 		item.setMediaType(newType);
 		getChangeEventCaller().mediaItemsUpdated(item);
 		this.setDirtyState(DirtyState.METADATA);
@@ -684,7 +684,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem track, final long n) throws MorriganException {
+	public void incTrackStartCnt (final MediaItem track, final long n) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackStartCnt(track, n);
@@ -695,7 +695,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem track, final long n) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem track, final long n) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackEndCnt(track, n);
@@ -706,7 +706,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setTrackDateLastPlayed (final IMediaItem track, final Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (final MediaItem track, final Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 		try {
 			this.getDbLayer().setDateLastPlayed(track, date);
@@ -717,7 +717,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem track) throws MorriganException {
+	public void incTrackStartCnt (final MediaItem track) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track);
 		try {
 			this.getDbLayer().incTrackPlayed(track);
@@ -728,7 +728,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem track) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem track) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 		try {
 			this.getDbLayer().incTrackFinished(track);
@@ -739,7 +739,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setTrackStartCnt (final IMediaItem track, final long n) throws MorriganException {
+	public void setTrackStartCnt (final MediaItem track, final long n) throws MorriganException {
 		MediaTrackListHelper.setTrackStartCnt(this, track, n);
 		try {
 			this.getDbLayer().setTrackStartCnt(track, n);
@@ -750,7 +750,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setTrackEndCnt (final IMediaItem track, final long n) throws MorriganException {
+	public void setTrackEndCnt (final MediaItem track, final long n) throws MorriganException {
 		MediaTrackListHelper.setTrackEndCnt(this, track, n);
 		try {
 			this.getDbLayer().setTrackEndCnt(track, n);
@@ -761,7 +761,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setTrackDuration (final IMediaItem track, final int duration) throws MorriganException {
+	public void setTrackDuration (final MediaItem track, final int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 		try {
 			this.getDbLayer().setTrackDuration(track, duration);
@@ -772,7 +772,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void setPictureWidthAndHeight (final IMediaItem item, final int width, final int height) throws MorriganException {
+	public void setPictureWidthAndHeight (final MediaItem item, final int width, final int height) throws MorriganException {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
 		try {
 			this.getDbLayer().setDimensions(item, width, height);
@@ -783,7 +783,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public void persistTrackData (final IMediaItem item) throws MorriganException {
+	public void persistTrackData (final MediaItem item) throws MorriganException {
 		try {
 			this.dbLayer.setMd5(item, item.getMd5());
 			this.dbLayer.setSha1(item, item.getSha1());
@@ -1084,7 +1084,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public Collection<IMediaItem> getAlbumItems(final MediaType mediaType, final MediaAlbum album) throws MorriganException {
+	public Collection<MediaItem> getAlbumItems(final MediaType mediaType, final MediaAlbum album) throws MorriganException {
 		try {
 			return this.dbLayer.getAlbumItems(mediaType, album);
 		}
@@ -1129,12 +1129,12 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	private static final String TAG_UNREADABLE = "UNREADABLE";
 
 	@Override
-	public boolean isMarkedAsUnreadable (final IMediaItem mi) throws MorriganException {
+	public boolean isMarkedAsUnreadable (final MediaItem mi) throws MorriganException {
 		return hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
 	}
 
 	@Override
-	public void markAsUnreadabled (final IMediaItem mi) throws MorriganException {
+	public void markAsUnreadabled (final MediaItem mi) throws MorriganException {
 		setItemEnabled(mi, false);
 		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassificationImpl) null);
 	}
@@ -1148,9 +1148,9 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	 * @throws DbException
 	 */
 	@Override
-	public IMediaItem addFile (final MediaType mediaType, final File file) throws MorriganException, DbException {
+	public MediaItem addFile (final MediaType mediaType, final File file) throws MorriganException, DbException {
 		boolean added = this.dbLayer.addFile(mediaType, file);
-		IMediaItem track = null;
+		MediaItem track = null;
 		if (added) {
 			track = getDbLayer().getNewT(file.getAbsolutePath());
 			track.reset();
@@ -1164,12 +1164,12 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	 * are ignored.
 	 */
 	@Override
-	public List<IMediaItem> addFiles (final MediaType mediaType, final List<File> files) throws MorriganException, DbException {
-		List<IMediaItem> ret = new ArrayList<>();
+	public List<MediaItem> addFiles (final MediaType mediaType, final List<File> files) throws MorriganException, DbException {
+		List<MediaItem> ret = new ArrayList<>();
 		boolean[] res = this.dbLayer.addFiles(mediaType, files);
 		for (int i = 0; i < files.size(); i++) {
 			if (res[i]) {
-				IMediaItem t = getDbLayer().getNewT(files.get(i).getAbsolutePath());
+				MediaItem t = getDbLayer().getNewT(files.get(i).getAbsolutePath());
 				t.reset();
 				addItem(t);
 				ret.add(t);
@@ -1178,7 +1178,7 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 		return ret;
 	}
 
-	private List<IMediaItem> _changedItems = null;
+	private List<MediaItem> _changedItems = null;
 
 	@Override
 	public void beginBulkUpdate () {
@@ -1197,10 +1197,10 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	@Override
 	public void completeBulkUpdate (final boolean thereWereErrors) throws MorriganException, DbException {
 		try {
-			List<IMediaItem> removed = replaceListWithoutSetDirty(this._changedItems);
+			List<MediaItem> removed = replaceListWithoutSetDirty(this._changedItems);
 			if (!thereWereErrors) {
 				this.logger.fine("completeBulkUpdate() : About to clean " + removed.size() + " items...");
-				for (final IMediaItem i : removed) {
+				for (final MediaItem i : removed) {
 					_removeMediaTrack(i);
 				}
 			}
@@ -1214,12 +1214,12 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 	}
 
 	@Override
-	public IMediaItem updateItem (final IMediaItem mi) throws MorriganException, DbException {
+	public MediaItem updateItem (final MediaItem mi) throws MorriganException, DbException {
 		if (this._changedItems == null) {
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
 		}
 
-		IMediaItem ret;
+		MediaItem ret;
 		boolean added = this.dbLayer.addFile(mi.getMediaType(), mi.getFilepath(), -1);
 		if (added) {
 			addItem(mi);
@@ -1228,8 +1228,8 @@ public abstract class MediaDb extends AbstractMediaList implements IMediaItemDb 
 		}
 		else {
 			// Update item.
-			IMediaItem track = null;
-			List<IMediaItem> mediaTracks = getMediaItems();
+			MediaItem track = null;
+			List<MediaItem> mediaTracks = getMediaItems();
 			int index = mediaTracks.indexOf(mi); // TODO FIXME This REALLY should be a HashMap lookup.
 			if (index >= 0) {
 				track = mediaTracks.get(index);

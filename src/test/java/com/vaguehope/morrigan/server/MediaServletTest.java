@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.vaguehope.common.servlet.MockHttpServletRequest;
 import com.vaguehope.common.servlet.MockHttpServletResponse;
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -67,7 +67,7 @@ public class MediaServletTest {
 	@Test
 	public void itServesRootNode() throws Exception {
 		this.testDb.addNode(new MediaNode("node-id", "node tile", "0"));
-		final IMediaItem track = this.testDb.addTestTrack(new File("/path/file.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890000L, 1234567890000L);
+		final MediaItem track = this.testDb.addTestTrack(new File("/path/file.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890000L, 1234567890000L);
 		this.testDb.addTag(track, "some-tag", MediaTagType.MANUAL, (String) null);
 		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db");
 		this.undertest.service(this.req, this.resp);
@@ -108,8 +108,8 @@ public class MediaServletTest {
 
 	@Test
 	public void itServesSearch() throws Exception {
-		final IMediaItem track1 = this.testDb.addTestTrack(new File("/foo/bar/bat1.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890000L, 1234567890000L);
-		final IMediaItem track2 = this.testDb.addTestTrack(new File("/foo/bar/bat2.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890001L, 1234567890000L);
+		final MediaItem track1 = this.testDb.addTestTrack(new File("/foo/bar/bat1.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890000L, 1234567890000L);
+		final MediaItem track2 = this.testDb.addTestTrack(new File("/foo/bar/bat2.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890001L, 1234567890000L);
 		this.testDb.addTag(track1, "foo", MediaTagType.MANUAL, (String) null);
 		this.testDb.addTag(track2, "foo", MediaTagType.MANUAL, (String) null);
 

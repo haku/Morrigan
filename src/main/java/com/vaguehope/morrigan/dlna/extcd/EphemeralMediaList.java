@@ -15,8 +15,8 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.ItemTags;
@@ -88,17 +88,17 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public IMediaItem chooseItem(final PlaybackOrder order, final IMediaItem previousItem) throws MorriganException {
+	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) throws MorriganException {
 		return null;
 	}
 
 	@Override
-	public void copyItemFile (final IMediaItem item, final OutputStream os) throws MorriganException {
+	public void copyItemFile (final MediaItem item, final OutputStream os) throws MorriganException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public File copyItemFile (final IMediaItem item, final File targetDirectory) throws MorriganException {
+	public File copyItemFile (final MediaItem item, final File targetDirectory) throws MorriganException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
@@ -192,22 +192,22 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	public void removeChangeEventListener (final MediaItemListChangeListener listener) {}
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem item, final long n) throws MorriganException {}
+	public void incTrackStartCnt (final MediaItem item, final long n) throws MorriganException {}
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem item) throws MorriganException {}
+	public void incTrackStartCnt (final MediaItem item) throws MorriganException {}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem item, final long n) throws MorriganException {}
+	public void incTrackEndCnt (final MediaItem item, final long n) throws MorriganException {}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem item) throws MorriganException {}
+	public void incTrackEndCnt (final MediaItem item) throws MorriganException {}
 
 	@Override
-	public void setTrackDuration (final IMediaItem item, final int duration) throws MorriganException {}
+	public void setTrackDuration (final MediaItem item, final int duration) throws MorriganException {}
 
 	@Override
-	public void setTrackDateLastPlayed (final IMediaItem item, final Date date) throws MorriganException {}
+	public void setTrackDateLastPlayed (final MediaItem item, final Date date) throws MorriganException {}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Not supported - throw.
@@ -218,82 +218,82 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public void addItem (final IMediaItem item) {
+	public void addItem (final MediaItem item) {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void removeItem (final IMediaItem item) throws MorriganException {
+	public void removeItem (final MediaItem item) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public IMediaItem getByMd5 (final BigInteger md5) throws DbException {
+	public MediaItem getByMd5 (final BigInteger md5) throws DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMimeType(IMediaItem item, String newType) throws MorriganException {
+	public void setItemMimeType(MediaItem item, String newType) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMediaType (final IMediaItem item, final MediaType newType) throws MorriganException {
+	public void setItemMediaType (final MediaItem item, final MediaType newType) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setTrackStartCnt (final IMediaItem item, final long n) throws MorriganException {
+	public void setTrackStartCnt (final MediaItem item, final long n) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setTrackEndCnt (final IMediaItem item, final long n) throws MorriganException {
+	public void setTrackEndCnt (final MediaItem item, final long n) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemDateAdded (final IMediaItem item, final Date date) throws MorriganException {
+	public void setItemDateAdded (final MediaItem item, final Date date) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMd5 (final IMediaItem item, final BigInteger md5) throws MorriganException {
+	public void setItemMd5 (final MediaItem item, final BigInteger md5) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemSha1(final IMediaItem item, final BigInteger sha1) throws MorriganException {
+	public void setItemSha1(final MediaItem item, final BigInteger sha1) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemDateLastModified (final IMediaItem item, final Date date) throws MorriganException {
+	public void setItemDateLastModified (final MediaItem item, final Date date) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem item, final boolean value) throws MorriganException {
+	public void setItemEnabled (final MediaItem item, final boolean value) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem item, final boolean value, final Date lastModified) throws MorriganException {
+	public void setItemEnabled (final MediaItem item, final boolean value, final Date lastModified) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setItemMissing (final IMediaItem item, final boolean value) throws MorriganException {
+	public void setItemMissing (final MediaItem item, final boolean value) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void setRemoteLocation (final IMediaItem track, final String remoteLocation) throws MorriganException {
+	public void setRemoteLocation (final MediaItem track, final String remoteLocation) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override
-	public void persistTrackData (final IMediaItem track) throws MorriganException {
+	public void persistTrackData (final MediaItem track) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -318,7 +318,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public Collection<IMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
+	public Collection<MediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
 		return Collections.emptyList();
 	}
 
@@ -338,7 +338,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public void setPictureWidthAndHeight (final IMediaItem item, final int width, final int height) throws MorriganException {
+	public void setPictureWidthAndHeight (final MediaItem item, final int width, final int height) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

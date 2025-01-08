@@ -11,7 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.Tag;
@@ -41,8 +41,8 @@ public class MixedMediaDbFeedReaderTest {
 
 		MixedMediaDbFeedReader.read(this.remote, this.eventListener);
 
-		final List<IMediaItem> items = this.remote.getAllDbEntries();
-		final IMediaItem item = items.get(0);
+		final List<MediaItem> items = this.remote.getAllDbEntries();
+		final MediaItem item = items.get(0);
 		assertEquals("Some Artist - Some Track.ogg", item.getTitle());
 //		assertEquals(7575894L, item.getFileSize());
 		assertEquals("/home/media/music/Some Artist - Some Track.ogg", item.getFilepath());
@@ -56,7 +56,7 @@ public class MixedMediaDbFeedReaderTest {
 		assertEquals(49L, item.getStartCount());
 		assertEquals(36L, item.getEndCount());
 		assertEquals(337, item.getDuration());
-		assertEquals(IMediaItem.MediaType.TRACK, item.getMediaType());
+		assertEquals(MediaItem.MediaType.TRACK, item.getMediaType());
 
 		Tag.assertTags(this.remote.getTagsIncludingDeleted(item),
 				new Tag("My Tag", MediaTagType.MANUAL, null, null, false),

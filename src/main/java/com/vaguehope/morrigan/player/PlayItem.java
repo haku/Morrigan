@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.player;
 import java.io.File;
 import java.util.Objects;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 
 /**
@@ -13,14 +13,14 @@ public class PlayItem {
 
 	private final PlayItemType type;
 	private final IMediaItemList list;
-	private final IMediaItem track;
+	private final MediaItem track;
 	private final File altFile;
 	private int id = Integer.MIN_VALUE;
 
 	/**
 	 * Either list or track may be null.
 	 */
-	public PlayItem (final IMediaItemList list, final IMediaItem track) {
+	public PlayItem (final IMediaItemList list, final MediaItem track) {
 		if (list == null && track == null) throw new IllegalArgumentException("At least one of list and track must be specified.");
 		this.type = PlayItemType.PLAYABLE;
 		this.list = list;
@@ -36,7 +36,7 @@ public class PlayItem {
 		this.altFile = null;
 	}
 
-	private PlayItem (final PlayItemType type, final IMediaItemList list, final IMediaItem track, final File altFile) {
+	private PlayItem (final PlayItemType type, final IMediaItemList list, final MediaItem track, final File altFile) {
 		this.type = type;
 		this.list = list;
 		this.track = track;
@@ -70,7 +70,7 @@ public class PlayItem {
 		return this.list;
 	}
 
-	public IMediaItem getTrack () {
+	public MediaItem getTrack () {
 		return this.track;
 	}
 
@@ -102,7 +102,7 @@ public class PlayItem {
 		return new PlayItem(this.type, this.list, this.track, this.altFile);
 	}
 
-	public PlayItem withTrack(final IMediaItem newTrack) {
+	public PlayItem withTrack(final MediaItem newTrack) {
 		if (this.type.isPseudo()) throw new IllegalArgumentException("Can not add track to pseudo item.");
 
 		final PlayItem pi = new PlayItem(this.list, newTrack);

@@ -17,8 +17,8 @@ import org.jupnp.support.model.container.Container;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaNode;
@@ -41,7 +41,7 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 
 	private volatile String title;
 	private volatile List<MediaNode> mediaNodes = Collections.emptyList();
-	private volatile List<IMediaItem> mediaItems = Collections.emptyList();
+	private volatile List<MediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
 
 	public ContentDirectoryDb (
@@ -99,14 +99,14 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	}
 
 	@Override
-	public IMediaItem getByFile (final String remoteId) throws DbException {
-		final IMediaItem item = this.contentDirectory.fetchItemByIdWithRetry(remoteId, MAX_TRIES);
+	public MediaItem getByFile (final String remoteId) throws DbException {
+		final MediaItem item = this.contentDirectory.fetchItemByIdWithRetry(remoteId, MAX_TRIES);
 		if (item == null) throw new IllegalArgumentException("File with ID '" + remoteId + "' not found.");
 		return item;
 	}
 
 	@Override
-	public List<IMediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+	public List<MediaItem> search(final MediaType mediaType, final String term, final int maxResults, final SortColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
 		return this.contentDirectory.searchWithRetry(term, maxResults, MAX_TRIES);
 	}
 
@@ -152,7 +152,7 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 		this.title = cont.getTitle();
 
 		final List<MediaNode> nodes = ContentDirectory.didlContainersToNodes(dcReq.getRef().getContainers());
-		final List<IMediaItem> items = this.contentDirectory.didlItemsToMnItems(dcReq.getRef().getItems());
+		final List<MediaItem> items = this.contentDirectory.didlItemsToMnItems(dcReq.getRef().getItems());
 
 		this.mediaNodes = nodes;
 		this.mediaItems = items;
@@ -184,7 +184,7 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	}
 
 	@Override
-	public List<IMediaItem> getMediaItems() {
+	public List<MediaItem> getMediaItems() {
 		return this.mediaItems;
 	}
 
@@ -199,12 +199,12 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 //	Metadata.
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem item) throws MorriganException {
+	public void incTrackStartCnt (final MediaItem item) throws MorriganException {
 		this.storage.incTrackStartCnt(item);
 	}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem item) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem item) throws MorriganException {
 		this.storage.incTrackEndCnt(item);
 	}
 

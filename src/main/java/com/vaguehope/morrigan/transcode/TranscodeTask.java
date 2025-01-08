@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -42,7 +42,7 @@ public class TranscodeTask implements MorriganTask {
 		try {
 			final List<TranscodeProfile> profiles = new ArrayList<>();
 			this.db.read();
-			for (final IMediaItem item : this.db.getMediaItems()) {
+			for (final MediaItem item : this.db.getMediaItems()) {
 				if (taskEventListener.isCanceled()) break;
 				if (profiles.size() >= this.maxNumber) break;
 				if (!item.isEnabled()) continue;

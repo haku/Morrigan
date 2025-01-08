@@ -19,7 +19,7 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
@@ -247,12 +247,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MorriganTask getMediaFileCopyTask (final IMediaItemList mediaItemList, final List<IMediaItem> mediaSelection, final File targetDirectory) {
+	public MorriganTask getMediaFileCopyTask (final IMediaItemList mediaItemList, final List<MediaItem> mediaSelection, final File targetDirectory) {
 		return new MediaFileCopyTask(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
-	public MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final IMediaItemDb toDb) {
+	public MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb) {
 		return new CopyToLocalMmdbTask(fromList, itemsToCopy, toDb, this.config);
 	}
 
@@ -265,7 +265,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void readTrackTags (final IMediaItemDb itemDb, final IMediaItem mt, final File file) throws IOException, MorriganException {
+	public void readTrackTags (final IMediaItemDb itemDb, final MediaItem mt, final File file) throws IOException, MorriganException {
 		try {
 			TrackTagHelper.readTrackTags(itemDb, mt, file);
 		}

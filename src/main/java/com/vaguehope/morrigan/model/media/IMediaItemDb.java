@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -37,25 +37,25 @@ public interface IMediaItemDb extends IMediaItemList {
 	/**
 	 * Returns a copy of the main list updated with all items from the DB.
 	 */
-	List<IMediaItem> getAllDbEntries () throws DbException;
+	List<MediaItem> getAllDbEntries () throws DbException;
 
-	IMediaItem getByFile (File file) throws DbException;
+	MediaItem getByFile (File file) throws DbException;
 
 	/**
 	 * Note: returned item will be missing DB rowId.
 	 */
-	IMediaItem addFile (MediaType mediaType, File file) throws MorriganException, DbException;
+	MediaItem addFile (MediaType mediaType, File file) throws MorriganException, DbException;
 	FileExistance hasFile (File file) throws MorriganException, DbException;
-	List<IMediaItem> addFiles (MediaType mediaType, List<File> files) throws MorriganException, DbException;
+	List<MediaItem> addFiles (MediaType mediaType, List<File> files) throws MorriganException, DbException;
 
 	void setHideMissing(final boolean v) throws MorriganException;
 
-	boolean isMarkedAsUnreadable (IMediaItem mi) throws MorriganException;
-	void markAsUnreadabled (IMediaItem mi) throws MorriganException;
+	boolean isMarkedAsUnreadable (MediaItem mi) throws MorriganException;
+	void markAsUnreadabled (MediaItem mi) throws MorriganException;
 
 	void beginBulkUpdate ();
 	void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException;
-	IMediaItem updateItem (IMediaItem item) throws MorriganException, DbException;
+	MediaItem updateItem (MediaItem item) throws MorriganException, DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

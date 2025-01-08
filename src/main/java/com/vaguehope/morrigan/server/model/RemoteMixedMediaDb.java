@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.NotImplementedException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
@@ -170,7 +170,7 @@ public class RemoteMixedMediaDb extends MediaDb implements IRemoteMixedMediaDb {
 //	Actions.
 
 	@Override
-	public void copyItemFile (final IMediaItem item, final OutputStream os) throws MorriganException {
+	public void copyItemFile (final MediaItem item, final OutputStream os) throws MorriganException {
 		URL itemUrl = getRemoteItemUrl(this, item);
 		this.logger.fine("Fetching '" + itemUrl + "' to '" + item.getFilepath() + "'...");
 		try {
@@ -193,7 +193,7 @@ public class RemoteMixedMediaDb extends MediaDb implements IRemoteMixedMediaDb {
 	}
 
 	@Override
-	public File copyItemFile (final IMediaItem mlt, final File targetDirectory) throws MorriganException {
+	public File copyItemFile (final MediaItem mlt, final File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -228,7 +228,7 @@ public class RemoteMixedMediaDb extends MediaDb implements IRemoteMixedMediaDb {
 		return targetFile;
 	}
 
-	private static URL getRemoteItemUrl (final RemoteMixedMediaDb rmmdb, final IMediaItem mlt) throws MorriganException {
+	private static URL getRemoteItemUrl (final RemoteMixedMediaDb rmmdb, final MediaItem mlt) throws MorriganException {
 		String serverUrlString;
 		try {
 			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL); // e.g. http://localhost:8080/mlists/REMOTEMMDB/localhost_8080_wui.remote.db3
@@ -260,82 +260,82 @@ public class RemoteMixedMediaDb extends MediaDb implements IRemoteMixedMediaDb {
 //	Item metadata modifiers.
 
 	@Override
-	public void incTrackStartCnt (final IMediaItem track, final long n) throws MorriganException {
+	public void incTrackStartCnt (final MediaItem track, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void incTrackEndCnt (final IMediaItem track, final long n) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem track, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemDateAdded (final IMediaItem track, final Date date) throws MorriganException {
+	public void setItemDateAdded (final MediaItem track, final Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackDateLastPlayed (final IMediaItem track, final Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (final MediaItem track, final Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void removeItem (final IMediaItem track) throws MorriganException {
+	public void removeItem (final MediaItem track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void incTrackStartCnt(final IMediaItem track) throws MorriganException {
+	public void incTrackStartCnt(final MediaItem track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void incTrackEndCnt(final IMediaItem track) throws MorriganException {
+	public void incTrackEndCnt(final MediaItem track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackStartCnt(final IMediaItem item, final long n) throws MorriganException {
+	public void setTrackStartCnt(final MediaItem item, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackEndCnt(final IMediaItem item, final long n) throws MorriganException {
+	public void setTrackEndCnt(final MediaItem item, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackDuration(final IMediaItem track, final int duration) throws MorriganException {
+	public void setTrackDuration(final MediaItem track, final int duration) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemMd5(final IMediaItem track, final BigInteger md5) throws MorriganException {
+	public void setItemMd5(final MediaItem track, final BigInteger md5) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemSha1(IMediaItem item, BigInteger sha1) throws MorriganException {
+	public void setItemSha1(MediaItem item, BigInteger sha1) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemDateLastModified(final IMediaItem track, final Date date) throws MorriganException {
+	public void setItemDateLastModified(final MediaItem track, final Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemEnabled(final IMediaItem track, final boolean value) throws MorriganException {
+	public void setItemEnabled(final MediaItem track, final boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemEnabled (final IMediaItem item, final boolean value, final Date lastModified) throws MorriganException {
+	public void setItemEnabled (final MediaItem item, final boolean value, final Date lastModified) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemMissing(final IMediaItem track, final boolean value) throws MorriganException {
+	public void setItemMissing(final MediaItem track, final boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 

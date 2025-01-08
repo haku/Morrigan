@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
@@ -81,33 +81,33 @@ public class TestMixedMediaDb extends LocalMediaDb {
 		return this.childNodes.get(id);
 	}
 
-	public IMediaItem addTestTrack() throws MorriganException, DbException {
+	public MediaItem addTestTrack() throws MorriganException, DbException {
 		return addTestTrack(MimeType.MP3);
 	}
 
-	public IMediaItem addTestTrack(final MimeType mimeType) throws MorriganException, DbException {
+	public MediaItem addTestTrack(final MimeType mimeType) throws MorriganException, DbException {
 		final int n = getTrackNumber();
 		return addTestTrack(new File(String.format("some_media_file_%s." + mimeType.getExt(), n)),
 				BigInteger.TEN.add(BigInteger.valueOf(2 * n)),
 				BigInteger.TEN.add(BigInteger.valueOf((2 * n) + 1)));
 	}
 
-	public IMediaItem addTestTrack (final File file) throws MorriganException, DbException {
+	public MediaItem addTestTrack (final File file) throws MorriganException, DbException {
 		return addTestTrack(file, new BigInteger(128, RND), new BigInteger(128, RND));
 	}
 
-	public IMediaItem addTestTrack (final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
+	public MediaItem addTestTrack (final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
 		return addTestTrack(new File(String.format("some_media_file_%s.ext", getTrackNumber())), md5, sha1);
 	}
 
-	public IMediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
+	public MediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
 		final long lastPlayed = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(RND.nextInt(144000));
 		return addTestTrack(file, md5, sha1, lastPlayed, System.currentTimeMillis());
 	}
 
-	public IMediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1, final long lastPlayed, final long dateAdded) throws MorriganException, DbException {
+	public MediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1, final long lastPlayed, final long dateAdded) throws MorriganException, DbException {
 		addFile(MediaType.TRACK, file);
-		final IMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
+		final MediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
 		setItemMd5(track, md5);
 		setItemSha1(track, sha1);
 		setTrackDateLastPlayed(track, new Date(lastPlayed));
@@ -117,8 +117,8 @@ public class TestMixedMediaDb extends LocalMediaDb {
 
 	public void printContent(final String prefix) {
 		System.out.println(prefix + ": TestDb " + getListName() + " has " + size() + " items:");
-		final List<IMediaItem> items = getMediaItems();
-		for (final IMediaItem i :  items) {
+		final List<MediaItem> items = getMediaItems();
+		for (final MediaItem i :  items) {
 			System.out.print(i.isMissing() ? "M" : "-");
 			System.out.print(i.isEnabled() ? "-" : "D");
 			System.out.print(" ");

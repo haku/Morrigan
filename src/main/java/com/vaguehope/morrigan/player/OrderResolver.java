@@ -10,8 +10,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -31,7 +31,7 @@ public class OrderResolver {
 
 	private final LimitedRecentSet<String> recentlyFollowedTags = new LimitedRecentSet<>(FOLLOWTAGS_MAX_TAG_HISTORY);
 
-	public IMediaItem getNextTrack (final IMediaItemList list, final IMediaItem track, final PlaybackOrder mode) {
+	public MediaItem getNextTrack (final IMediaItemList list, final MediaItem track, final PlaybackOrder mode) {
 		if (list == null || list.size() <= 0) return null;
 
 		switch (mode) {
@@ -59,9 +59,9 @@ public class OrderResolver {
 		}
 	}
 
-	private static IMediaItem getNextTrackSequencial (final IMediaItemList list, final IMediaItem track) {
-		IMediaItem ret = null;
-		final List<IMediaItem> mediaTracks = list.getMediaItems();
+	private static MediaItem getNextTrackSequencial (final IMediaItemList list, final MediaItem track) {
+		MediaItem ret = null;
+		final List<MediaItem> mediaTracks = list.getMediaItems();
 
 		int i;
 		if (track != null && mediaTracks.contains(track)) {
@@ -97,12 +97,12 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private static IMediaItem getNextTrackRandom (final IMediaItemList list, final IMediaItem current) {
+	private static MediaItem getNextTrackRandom (final IMediaItemList list, final MediaItem current) {
 		final Random generator = new Random();
-		final List<IMediaItem> mediaTracks = list.getMediaItems();
+		final List<MediaItem> mediaTracks = list.getMediaItems();
 
 		int n = 0;
-		for (final IMediaItem i : mediaTracks) {
+		for (final MediaItem i : mediaTracks) {
 			if (validChoice(i, current)) {
 				n++;
 			}
@@ -110,7 +110,7 @@ public class OrderResolver {
 		if (n == 0) return null;
 
 		long x = Math.round(generator.nextDouble() * n);
-		for (final IMediaItem i : mediaTracks) {
+		for (final MediaItem i : mediaTracks) {
 			if (validChoice(i, current)) {
 				x--;
 				if (x <= 0) {
@@ -122,13 +122,13 @@ public class OrderResolver {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 
-	private static IMediaItem getNextTrackByStartCount (final IMediaItemList list, final IMediaItem current) {
-		IMediaItem ret = null;
-		final List<IMediaItem> tracks = list.getMediaItems();
+	private static MediaItem getNextTrackByStartCount (final IMediaItemList list, final MediaItem current) {
+		MediaItem ret = null;
+		final List<MediaItem> tracks = list.getMediaItems();
 
 		// Find highest play count.
 		long maxPlayCount = -1;
-		for (final IMediaItem i : tracks) {
+		for (final MediaItem i : tracks) {
 			if (i.getStartCount() > maxPlayCount && validChoice(i, current)) {
 				maxPlayCount = i.getStartCount();
 			}
@@ -140,7 +140,7 @@ public class OrderResolver {
 
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
-		for (final IMediaItem i : tracks) {
+		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
 				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
 			}
@@ -151,7 +151,7 @@ public class OrderResolver {
 		long targetIndex = Math.round(generator.nextDouble() * selIndexSum);
 
 		// Find the target item.
-		for (final IMediaItem i : tracks) {
+		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
 				targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
 				if (targetIndex <= 0) {
@@ -168,17 +168,17 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private static IMediaItem getNextTrackByLastPlayedDate (final IMediaItemList list, final IMediaItem current) {
+	private static MediaItem getNextTrackByLastPlayedDate (final IMediaItemList list, final MediaItem current) {
 		return getNextTrackByLastPlayedDate(list.getMediaItems(), current);
 	}
 
-	private static IMediaItem getNextTrackByLastPlayedDate (final Collection<IMediaItem> tracks, final IMediaItem current) {
+	private static MediaItem getNextTrackByLastPlayedDate (final Collection<MediaItem> tracks, final MediaItem current) {
 		final Date now = new Date();
 
 		// Find oldest date.
 		Date maxAge = new Date();
 		int n = 0;
-		for (final IMediaItem i : tracks) {
+		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
 					maxAge = i.getDateLastPlayed();
@@ -193,7 +193,7 @@ public class OrderResolver {
 
 		// Build sum of all selection-indicies in units of days.
 		long sumAgeDays = 0;
-		for (final IMediaItem i : tracks) {
+		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
@@ -209,8 +209,8 @@ public class OrderResolver {
 		long targetIndex = Math.round(generator.nextDouble() * sumAgeDays);
 
 		// Find the target item.
-		IMediaItem ret = null;
-		for (final IMediaItem i : tracks) {
+		MediaItem ret = null;
+		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
@@ -232,7 +232,7 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private IMediaItem getNextTrackFollowTags (final IMediaItemList list, final IMediaItem current) {
+	private MediaItem getNextTrackFollowTags (final IMediaItemList list, final MediaItem current) {
 		try {
 			return getNextTrackFollowTagsOrThrow(list, current);
 		}
@@ -241,7 +241,7 @@ public class OrderResolver {
 		}
 	}
 
-	private IMediaItem getNextTrackFollowTagsOrThrow (final IMediaItemList list, final IMediaItem current) throws MorriganException, DbException {
+	private MediaItem getNextTrackFollowTagsOrThrow (final IMediaItemList list, final MediaItem current) throws MorriganException, DbException {
 		// Can not follow tags if no current item.
 		if (current == null) return getNextTrackByLastPlayedDate(list, current);
 
@@ -279,7 +279,7 @@ public class OrderResolver {
 		tagsToSearchForInOrder.addAll(lowPri);
 
 		for (final String tag : tagsToSearchForInOrder) {
-			final List<IMediaItem> itemsWithTag = db.search(
+			final List<MediaItem> itemsWithTag = db.search(
 					MediaType.TRACK,
 					String.format("t=\"%s\"", tag),
 					FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH,
@@ -287,7 +287,7 @@ public class OrderResolver {
 					new SortDirection[] { SortDirection.ASC },
 					false);
 
-			for (final Iterator<IMediaItem> ittr = itemsWithTag.iterator(); ittr.hasNext();) {
+			for (final Iterator<MediaItem> ittr = itemsWithTag.iterator(); ittr.hasNext();) {
 				final Date d = ittr.next().getDateLastPlayed();
 				if (d == null) continue;
 				if (System.currentTimeMillis() - d.getTime() < FOLLOWTAGS_MIN_TIME_SINCE_LAST_PLAYED_MILLIS) ittr.remove();
@@ -295,7 +295,7 @@ public class OrderResolver {
 
 			if (itemsWithTag.size() > 0) {
 				// byLastPlayedDate() handles not selecting current again.
-				final IMediaItem item = getNextTrackByLastPlayedDate(itemsWithTag, current);
+				final MediaItem item = getNextTrackByLastPlayedDate(itemsWithTag, current);
 				if (item != null) {
 					LOG.i("{} => {}", tag, item.getTitle());
 					this.recentlyFollowedTags.push(tag);
@@ -318,11 +318,11 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private static boolean validChoice (final IMediaItem i) {
+	private static boolean validChoice (final MediaItem i) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing();
 	}
 
-	private static boolean validChoice (final IMediaItem i, final IMediaItem current) {
+	private static boolean validChoice (final MediaItem i, final MediaItem current) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing() && !i.equals(current);
 	}
 

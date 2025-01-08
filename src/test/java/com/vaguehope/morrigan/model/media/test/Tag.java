@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 
@@ -33,7 +33,7 @@ public class Tag {
 		this.deleted = deleted;
 	}
 
-	public void addTo (final IMediaItemList list, final IMediaItem item) throws MorriganException {
+	public void addTo (final IMediaItemList list, final MediaItem item) throws MorriganException {
 		final Date date = this.modified == null ? null : new Date(this.modified);
 		list.addTag(item, this.tag, this.type, this.cls, date, this.deleted);
 	}

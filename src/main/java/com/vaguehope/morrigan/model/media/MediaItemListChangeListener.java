@@ -15,10 +15,10 @@ public interface MediaItemListChangeListener {
 	void dirtyStateChanged (DirtyState oldState, DirtyState newState);
 
 	void mediaListRead ();
-	void mediaItemsAdded (IMediaItem... items);
-	void mediaItemsRemoved (IMediaItem... items);
-	void mediaItemsUpdated (IMediaItem... items);
-	void mediaItemsForceReadRequired (IMediaItem... items);
+	void mediaItemsAdded (MediaItem... items);
+	void mediaItemsRemoved (MediaItem... items);
+	void mediaItemsUpdated (MediaItem... items);
+	void mediaItemsForceReadRequired (MediaItem... items);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

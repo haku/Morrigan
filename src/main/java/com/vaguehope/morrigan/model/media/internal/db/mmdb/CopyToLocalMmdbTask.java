@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -23,11 +23,11 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final IMediaItemList fromList;
-	private final Collection<IMediaItem> itemsToCopy;
+	private final Collection<MediaItem> itemsToCopy;
 	private final IMediaItemDb toDb;
 	private final Config config;
 
-	public CopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<IMediaItem> itemsToCopy, final IMediaItemDb toDb, final Config config) {
+	public CopyToLocalMmdbTask (final IMediaItemList fromList, final Collection<MediaItem> itemsToCopy, final IMediaItemDb toDb, final Config config) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
@@ -55,7 +55,7 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 			 * TODO rewrite this using a trans-clone?
 			 */
 
-			for (final IMediaItem item : this.itemsToCopy) {
+			for (final MediaItem item : this.itemsToCopy) {
 				taskEventListener.subTask(item.getTitle());
 
 				final File coItemDir = getCheckoutItemDirectory(coDir, item);
@@ -68,7 +68,7 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 				if (this.toDb.getDbLayer().hasFile(coFile).isKnown()) {
 					this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
 				}
-				final IMediaItem addedItem = this.toDb.addFile(item.getMediaType(), coFile);
+				final MediaItem addedItem = this.toDb.addFile(item.getMediaType(), coFile);
 				addedItem.setFromMediaItem(item);
 				this.toDb.persistTrackData(addedItem);
 
@@ -112,7 +112,7 @@ public class CopyToLocalMmdbTask implements MorriganTask {
 		return dbCoDir;
 	}
 
-	private static File getCheckoutItemDirectory (final File coDir, final IMediaItem item) {
+	private static File getCheckoutItemDirectory (final File coDir, final MediaItem item) {
 		final String srcPath = item.getRemoteLocation();
 
 		final File dir = new File(coDir, ChecksumHelper.md5(srcPath).toString(16));

@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
@@ -101,7 +101,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	private final MediaItemListChangeListener listChangedRunnable = new MediaItemListChangeListener () {
 
 		@Override
-		public void mediaItemsRemoved (final IMediaItem... items) {
+		public void mediaItemsRemoved (final MediaItem... items) {
 			validateHistory(); // TODO should this be scheduled / rate limited?
 		}
 
@@ -112,11 +112,11 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		@Override
 		public void dirtyStateChanged (final DirtyState oldState, final DirtyState newState) { /* Unused. */ }
 		@Override
-		public void mediaItemsAdded (final IMediaItem... items) { /* Unused. */ }
+		public void mediaItemsAdded (final MediaItem... items) { /* Unused. */ }
 		@Override
-		public void mediaItemsUpdated (final IMediaItem... items) { /* Unused. */ }
+		public void mediaItemsUpdated (final MediaItem... items) { /* Unused. */ }
 		@Override
-		public void mediaItemsForceReadRequired(final IMediaItem... items) { /* Unused. */ }
+		public void mediaItemsForceReadRequired(final MediaItem... items) { /* Unused. */ }
 	};
 
 	@Override

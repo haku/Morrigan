@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.Player;
@@ -57,14 +57,14 @@ public class DbHelper {
 		}
 	}
 
-	private void enqueueItems (final WindowBasedTextGUI gui, final IMediaItemList db, final List<IMediaItem> tracks) {
+	private void enqueueItems (final WindowBasedTextGUI gui, final IMediaItemList db, final List<MediaItem> tracks) {
 		final Player player = getPlayer(gui, String.format("Enqueue %s items", tracks.size()));
 		if (player == null) return;
 		PlayerHelper.enqueueAll(db, tracks, player);
 		if (this.lastActionMessage != null) this.lastActionMessage.setLastActionMessage(String.format("Enqueued %s items in %s.", tracks.size(), player.getName()));
 	}
 
-	private void revealItem (final IMediaItemList db, final IMediaItem track) throws MorriganException {
+	private void revealItem (final IMediaItemList db, final MediaItem track) throws MorriganException {
 		if (this.defaultDbFace != null) {
 			this.defaultDbFace.revealItem(track);
 		}
@@ -75,7 +75,7 @@ public class DbHelper {
 		}
 	}
 
-	private void shuffleAndEnqueue (final WindowBasedTextGUI gui, final IMediaItemList db, final List<IMediaItem> tracks) {
+	private void shuffleAndEnqueue (final WindowBasedTextGUI gui, final IMediaItemList db, final List<MediaItem> tracks) {
 		final Player player = getPlayer(gui, "Shuffle and enqueue");
 		if (player != null) PlayerHelper.shuffleAndEnqueue(db, tracks, player);
 	}
