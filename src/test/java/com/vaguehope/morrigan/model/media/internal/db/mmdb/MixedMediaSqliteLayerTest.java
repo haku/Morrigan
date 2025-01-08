@@ -22,16 +22,16 @@ import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayerOuterTest {
+public class MixedMediaSqliteLayerTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	private List<IMediaItem> expectedAllItems;
 
-	private MixedMediaSqliteLayerInner undertest;
+	private MixedMediaSqliteLayer undertest;
 
 	@Before
 	public void before () throws Exception {
-		this.undertest = new MixedMediaSqliteLayerInner(":memory:", true, new DefaultMediaItemFactory(null));
+		this.undertest = new MixedMediaSqliteLayer(":memory:", true, new DefaultMediaItemFactory(null));
 		this.expectedAllItems = new ArrayList<>();
 		addNoiseToDb();
 	}

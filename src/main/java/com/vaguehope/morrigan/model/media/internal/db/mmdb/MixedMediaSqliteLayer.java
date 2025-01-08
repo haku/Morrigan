@@ -29,13 +29,13 @@ import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.GeneratedString;
 
-public class MixedMediaSqliteLayerInner extends MediaSqliteLayer implements IMixedMediaItemStorageLayer {
+public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMediaItemStorageLayer {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayerInner.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayer.class);
 
 	protected final DefaultMediaItemFactory itemFactory;
 
-	public MixedMediaSqliteLayerInner (final String dbFilePath, final boolean autoCommit, final DefaultMediaItemFactory itemFactory) throws DbException {
+	public MixedMediaSqliteLayer (final String dbFilePath, final boolean autoCommit, final DefaultMediaItemFactory itemFactory) throws DbException {
 		super(dbFilePath, autoCommit);
 		this.itemFactory = itemFactory;
 	}

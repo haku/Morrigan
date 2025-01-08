@@ -25,7 +25,7 @@ public class MixedMediaSqliteLayerFactory {
 
 		@Override
 		protected IMediaItemStorageLayer makeNewProduct(final String material, final Cfg cfg) throws DbException {
-			return new MixedMediaSqliteLayerInner(material, cfg.autoCommit, cfg.itemFactory);
+			return new MixedMediaSqliteLayer(material, cfg.autoCommit, cfg.itemFactory);
 		}
 	};
 

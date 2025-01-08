@@ -308,7 +308,7 @@ class SearchParser {
 				if (maxResults > 0) ps.setMaxRows(maxResults);
 				final ResultSet rs = ps.executeQuery();
 				try {
-					return MixedMediaSqliteLayerInner.local_parseRecordSet(rs, itemFactory);
+					return MixedMediaSqliteLayer.local_parseRecordSet(rs, itemFactory);
 				}
 				finally {
 					rs.close();
