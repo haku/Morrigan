@@ -13,13 +13,11 @@ import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
-
 /**
  * Generic media item, be it music, video, image, etc...
  */
 public abstract class DefaultMediaItem implements IMediaItem {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constructors.
+	//	Constructors.
 
 	private static final BigInteger MD5_DEFAULT = null;
 	private static final BigInteger SHA1_DEFAULT = null;
@@ -29,13 +27,12 @@ public abstract class DefaultMediaItem implements IMediaItem {
 
 	private final IMediaItemList list;
 
-	public DefaultMediaItem (final String filePath, final IMediaItemList list) {
+	public DefaultMediaItem(final String filePath, final IMediaItemList list) {
 		this.list = list;
 		setFilepath(filePath);
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Attributes.
+	//	Attributes.
 
 	private String filepath = null;
 	private Date dateAdded = null;
@@ -47,11 +44,12 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	private boolean missing = MISSING_DEFAULT;
 
 	@Override
-	public String getFilepath () {
+	public String getFilepath() {
 		return this.filepath;
 	}
+
 	@Override
-	public boolean setFilepath (final String filepath) {
+	public boolean setFilepath(final String filepath) {
 		if (this.filepath == null && filepath != null) {
 			return setFilepathIfNotSet(filepath);
 		}
@@ -59,14 +57,14 @@ public abstract class DefaultMediaItem implements IMediaItem {
 			return false;
 		}
 		else {
-			throw new IllegalStateException("filepath can not be modified once set.  Current='"+this.filepath+"' proposed='"+filepath+"'.");
+			throw new IllegalStateException("filepath can not be modified once set.  Current='" + this.filepath + "' proposed='" + filepath + "'.");
 		}
 	}
 
 	/**
 	 * This will silently fail if filepath is already set.
 	 */
-	private boolean setFilepathIfNotSet (final String filepath) {
+	private boolean setFilepathIfNotSet(final String filepath) {
 		if (this.filepath == null && !Objects.equals(this.filepath, filepath)) {
 			this.filepath = filepath;
 			updateFilepathBasedThings();
@@ -79,6 +77,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public Date getDateAdded() {
 		return this.dateAdded;
 	}
+
 	@Override
 	public boolean setDateAdded(final Date dateAdded) {
 		if (!Objects.equals(this.dateAdded, dateAdded)) {
@@ -92,6 +91,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public BigInteger getMd5() {
 		return this.md5;
 	}
+
 	@Override
 	public boolean setMd5(final BigInteger newMd5) {
 		if (!Objects.equals(this.md5, newMd5)) {
@@ -105,6 +105,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public BigInteger getSha1() {
 		return this.sha1;
 	}
+
 	@Override
 	public boolean setSha1(final BigInteger newSha1) {
 		if (!Objects.equals(this.sha1, newSha1)) {
@@ -118,6 +119,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public Date getDateLastModified() {
 		return this.dateLastModified;
 	}
+
 	@Override
 	public boolean setDateLastModified(final Date lastModified) {
 		if (!Objects.equals(this.dateLastModified, lastModified)) {
@@ -131,10 +133,12 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public boolean isEnabled() {
 		return this.enabled;
 	}
+
 	@Override
-	public Date enabledLastModified () {
+	public Date enabledLastModified() {
 		return this.enabledLastModified;
 	}
+
 	@Override
 	public boolean setEnabled(final boolean enabled) {
 		if (this.enabled != enabled) {
@@ -143,8 +147,9 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		}
 		return false;
 	}
+
 	@Override
-	public boolean setEnabled (final boolean enabled, final Date lastModified) {
+	public boolean setEnabled(final boolean enabled, final Date lastModified) {
 		if (this.enabled != enabled || !Objects.equals(this.enabledLastModified, lastModified)) {
 			this.enabled = enabled;
 			this.enabledLastModified = lastModified;
@@ -157,6 +162,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public boolean isMissing() {
 		return this.missing;
 	}
+
 	@Override
 	public boolean setMissing(final boolean missing) {
 		if (this.missing != missing) {
@@ -166,7 +172,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		return false;
 	}
 
-//	-  -  -  -  -  -  -  -
+	//	-  -  -  -  -  -  -  -
 
 	private long dbRowId = DBROWID_DEFAULT;
 	private String remoteLocation;
@@ -175,9 +181,11 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public long getDbRowId() {
 		return this.dbRowId;
 	}
+
 	@Override
 	public boolean setDbRowId(final long dbRowId) {
-		/* Sqlite ROWID starts at 1, so if something tries to set it
+		/*
+		 * Sqlite ROWID starts at 1, so if something tries to set it
 		 * less than this, don't let them clear it.
 		 * This is most likely when fetching a remote list over HTTP.
 		 */
@@ -197,6 +205,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	public String getRemoteLocation() {
 		return this.remoteLocation;
 	}
+
 	@Override
 	public boolean setRemoteLocation(final String remoteLocation) {
 		if (!Objects.equals(this.remoteLocation, remoteLocation)) {
@@ -207,7 +216,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	}
 
 	@Override
-	public String getRemoteId () {
+	public String getRemoteId() {
 		return null;
 	}
 
@@ -216,15 +225,14 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		return this.list.getTags(this);
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Secondary attributes.
+	//	Secondary attributes.
 
 	private File file = null;
 	private long fileSize = -1;
 	private String title = null;
 	private String mimeType = null;
 
-	private void updateFilepathBasedThings () {
+	private void updateFilepathBasedThings() {
 		this.file = new File(this.filepath);
 		this.fileSize = -1;
 
@@ -238,18 +246,18 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	}
 
 	@Override
-	public File getFile () {
+	public File getFile() {
 		return this.file;
 	}
 
 	@Override
-	public long getFileSize () {
+	public long getFileSize() {
 		if (this.fileSize < 0) this.fileSize = getFile().length();
 		return this.fileSize;
 	}
 
 	@Override
-	public String getTitle () {
+	public String getTitle() {
 		return this.title;
 	}
 
@@ -259,7 +267,7 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	}
 
 	@Override
-	public String getMimeType () {
+	public String getMimeType() {
 		if (this.mimeType == null) {
 			final MimeType id = MimeType.identify(this.filepath);
 			if (id != null) return id.getMimeType();
@@ -272,12 +280,10 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		this.mimeType = newType;
 	}
 
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Mass setter.
+	//	Mass setter.
 
 	@Override
-	public void reset () {
+	public void reset() {
 		this.setDateAdded(null);
 		this.setMd5(MD5_DEFAULT);
 		this.setSha1(SHA1_DEFAULT);
@@ -289,21 +295,18 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaItem (final IMediaItem mi) {
-		boolean b =
-    		  this.setFilepathIfNotSet(mi.getFilepath()) // Do not set it if it is already set.
-    		| this.setDateAdded(mi.getDateAdded())
-    		| this.setMd5(mi.getMd5())
-    		| this.setSha1(mi.getSha1())
-    		| this.setDateLastModified(mi.getDateLastModified())
-    		| this.setEnabled(mi.isEnabled(), mi.enabledLastModified())
-    		| this.setMissing(mi.isMissing())
-    		| this.setDbRowId(mi.getDbRowId())
-    		| this.setRemoteLocation(mi.getRemoteLocation());
-    	return b;
+	public boolean setFromMediaItem(final IMediaItem mi) {
+		boolean b = this.setFilepathIfNotSet(mi.getFilepath()) // Do not set it if it is already set.
+				| this.setDateAdded(mi.getDateAdded())
+				| this.setMd5(mi.getMd5())
+				| this.setSha1(mi.getSha1())
+				| this.setDateLastModified(mi.getDateLastModified())
+				| this.setEnabled(mi.isEnabled(), mi.enabledLastModified())
+				| this.setMissing(mi.isMissing())
+				| this.setDbRowId(mi.getDbRowId())
+				| this.setRemoteLocation(mi.getRemoteLocation());
+		return b;
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public boolean equals(final Object aThat) {
@@ -320,12 +323,9 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		return getFilepath().hashCode();  // FIXME what if filepath is null?
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	@Override
-	public String toString () {
+	public String toString() {
 		return getTitle();
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
