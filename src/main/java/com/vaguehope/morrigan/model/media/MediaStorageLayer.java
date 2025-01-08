@@ -15,11 +15,11 @@ import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sqlitewrapper.IGenericDbLayer;
 
-public interface IMediaItemStorageLayer extends IGenericDbLayer {
+public interface MediaStorageLayer extends IGenericDbLayer {
 
-	void addChangeListener (IMediaItemStorageLayerChangeListener listener);
-	void removeChangeListener (IMediaItemStorageLayerChangeListener listener);
-	IMediaItemStorageLayerChangeListener getChangeEventCaller ();
+	void addChangeListener (MediaStorageLayerChangeListener listener);
+	void removeChangeListener (MediaStorageLayerChangeListener listener);
+	MediaStorageLayerChangeListener getChangeEventCaller ();
 
 	void setProp (String key, String value) throws DbException;
 	String getProp (String key) throws DbException;

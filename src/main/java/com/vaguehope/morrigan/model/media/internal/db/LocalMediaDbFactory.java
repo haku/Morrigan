@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class LocalMediaDbFactory extends RecyclingFactory2<MediaDb, MediaDbConfig, DbException> {
@@ -25,7 +25,7 @@ public class LocalMediaDbFactory extends RecyclingFactory2<MediaDb, MediaDbConfi
 	protected MediaDb makeNewProduct (MediaDbConfig material) throws DbException {
 		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getMmdbTitle(material), material);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
-		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
+		final MediaStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
 		db.setDbLayer(dbLayer);
 		return db;
 	}
@@ -57,7 +57,7 @@ public class LocalMediaDbFactory extends RecyclingFactory2<MediaDb, MediaDbConfi
 		final MediaDbConfig config = new MediaDbConfig(fullFilePath, null);
 		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getMmdbTitle(config), config);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
-		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getTransactional(fullFilePath, itemFactory);
+		final MediaStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getTransactional(fullFilePath, itemFactory);
 		db.setDbLayer(dbLayer);
 		return db;
 	}

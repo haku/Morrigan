@@ -22,7 +22,7 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -181,7 +181,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IMediaItemStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
+	public MediaStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(null);
 		return MixedMediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
 	}

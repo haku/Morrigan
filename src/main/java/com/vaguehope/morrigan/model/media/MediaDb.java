@@ -23,7 +23,7 @@ public interface MediaDb extends MediaList {
 	void rollback () throws DbException;
 
 	String getDbPath ();
-	IMediaItemStorageLayer getDbLayer();
+	MediaStorageLayer getDbLayer();
 
 	List<String> getSources () throws MorriganException;
 	void addSource (String source) throws MorriganException;

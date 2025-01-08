@@ -1,7 +1,7 @@
 package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerFactory {
@@ -16,23 +16,23 @@ public class MixedMediaSqliteLayerFactory {
 		}
 	}
 
-	private static final RecyclingFactory<IMediaItemStorageLayer, String, Cfg, DbException> INSTANCE = new RecyclingFactory<>(true) {
+	private static final RecyclingFactory<MediaStorageLayer, String, Cfg, DbException> INSTANCE = new RecyclingFactory<>(true) {
 		@Override
-		protected boolean isValidProduct(final IMediaItemStorageLayer product) {
+		protected boolean isValidProduct(final MediaStorageLayer product) {
 			return true;
 		}
 
 		@Override
-		protected IMediaItemStorageLayer makeNewProduct(final String material, final Cfg cfg) throws DbException {
+		protected MediaStorageLayer makeNewProduct(final String material, final Cfg cfg) throws DbException {
 			return new MixedMediaSqliteLayer(material, cfg.autoCommit, cfg.itemFactory);
 		}
 	};
 
-	public static IMediaItemStorageLayer getAutocommit(final String filepath, final DefaultMediaItemFactory itemFactory) throws DbException {
+	public static MediaStorageLayer getAutocommit(final String filepath, final DefaultMediaItemFactory itemFactory) throws DbException {
 		return INSTANCE.manufacture(filepath, new Cfg(true, itemFactory), false);
 	}
 
-	public static IMediaItemStorageLayer getTransactional(final String filepath, final DefaultMediaItemFactory itemFactory) throws DbException {
+	public static MediaStorageLayer getTransactional(final String filepath, final DefaultMediaItemFactory itemFactory) throws DbException {
 		return INSTANCE.manufacture(filepath, new Cfg(false, itemFactory), true);
 	}
 

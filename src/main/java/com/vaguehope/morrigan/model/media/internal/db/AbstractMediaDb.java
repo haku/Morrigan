@@ -24,8 +24,8 @@ import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -56,7 +56,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	private final MediaDbConfig config;
 	private final String searchTerm;
 
-	private IMediaItemStorageLayer dbLayer;
+	private MediaStorageLayer dbLayer;
 	private SortColumn librarySort;
 	private SortDirection librarySortDirection;
 	private boolean hideMissing;
@@ -109,7 +109,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 		return this.config.hashCode();
 	}
 
-	public void setDbLayer(final IMediaItemStorageLayer dbLayer) throws DbException {
+	public void setDbLayer(final MediaStorageLayer dbLayer) throws DbException {
 		if (this.dbLayer != null) throw new IllegalStateException("dbLayer already set: " + this.dbLayer);
 		this.dbLayer = dbLayer;
 
@@ -153,7 +153,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public IMediaItemStorageLayer getDbLayer() {
+	public MediaStorageLayer getDbLayer() {
 		if (this.dbLayer == null) throw new IllegalStateException("dbLayer not set.");
 		return this.dbLayer;
 	}
@@ -407,7 +407,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 		String sortcol = getDbLayer().getProp(KEY_SORTCOL);
 		String sortdir = getDbLayer().getProp(KEY_SORTDIR);
 		if (sortcol != null && sortdir != null) {
-			SortColumn col = IMediaItemStorageLayer.parseOldColName(sortcol);
+			SortColumn col = MediaStorageLayer.parseOldColName(sortcol);
 			if (col == null) col = SortColumn.valueOf(sortcol);
 			SortDirection dir = SortDirection.parseN(Integer.parseInt(sortdir));
 			this.librarySort = col;
@@ -473,7 +473,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB events.
 
-	private final IMediaItemStorageLayerChangeListener storageChangeListener = new IMediaItemStorageLayerChangeListener() {
+	private final MediaStorageLayerChangeListener storageChangeListener = new MediaStorageLayerChangeListener() {
 
 		@Override
 		public void eventMessage (final String msg) {

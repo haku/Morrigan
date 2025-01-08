@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.engines.playback.NotImplementedException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.AbstractMediaDb;
@@ -50,7 +50,7 @@ public class RemoteMixedMediaDb extends AbstractMediaDb implements RemoteMediaDb
 	}
 
 	@Override
-	public void setDbLayer(IMediaItemStorageLayer dbLayer) throws DbException {
+	public void setDbLayer(MediaStorageLayer dbLayer) throws DbException {
 		super.setDbLayer(dbLayer);
 
 		// Create a fresh DB.

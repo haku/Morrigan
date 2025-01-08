@@ -6,7 +6,7 @@ import java.util.List;
 import com.vaguehope.morrigan.model.db.IDbItem;
 
 
-public interface IMediaItemStorageLayerChangeListener {
+public interface MediaStorageLayerChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void eventMessage (String msg);
