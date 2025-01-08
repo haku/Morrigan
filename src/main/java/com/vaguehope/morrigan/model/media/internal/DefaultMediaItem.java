@@ -17,7 +17,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 /**
  * Generic media item, be it music, video, image, etc...
  */
-public abstract class MediaItem implements IMediaItem {
+public abstract class DefaultMediaItem implements IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 
@@ -29,7 +29,7 @@ public abstract class MediaItem implements IMediaItem {
 
 	private final IMediaItemList list;
 
-	public MediaItem (final String filePath, final IMediaItemList list) {
+	public DefaultMediaItem (final String filePath, final IMediaItemList list) {
 		this.list = list;
 		setFilepath(filePath);
 	}
@@ -309,8 +309,8 @@ public abstract class MediaItem implements IMediaItem {
 	public boolean equals(final Object aThat) {
 		if (aThat == null) return false;
 		if (this == aThat) return true;
-		if (!(aThat instanceof MediaItem)) return false;
-		final MediaItem that = (MediaItem) aThat;
+		if (!(aThat instanceof DefaultMediaItem)) return false;
+		final DefaultMediaItem that = (DefaultMediaItem) aThat;
 
 		return Objects.equals(getFilepath(), that.getFilepath());  // FIXME what if filepath is null?
 	}

@@ -7,9 +7,9 @@ import java.util.Objects;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
-import com.vaguehope.morrigan.model.media.internal.MediaItem;
+import com.vaguehope.morrigan.model.media.internal.DefaultMediaItem;
 
-public class MixedMediaItem extends MediaItem implements IMediaItem {
+public class MixedMediaItem extends DefaultMediaItem implements IMediaItem {
 
 	protected MixedMediaItem (final String filePath, final IMediaItemList list) {
 		super(filePath, list);
