@@ -148,6 +148,15 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 				case DURATION:
 					req.addSortBy(SortBy.newBuilder().setSortField(SortField.DURATION).setDirection(dir).build());
 					break;
+				case DATE_LAST_PLAYED:
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.LAST_PLAYED).setDirection(dir).build());
+					break;
+				case START_COUNT:
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.PLAYBACK_STARTED).setDirection(dir).build());
+					break;
+				case END_COUNT:
+				req.addSortBy(SortBy.newBuilder().setSortField(SortField.PLAYBACK_COMPLETED).setDirection(dir).build());
+				break;
 				default:
 					throw new DbException("Unsupported sort column: " + sortColumns[i]);
 				}
