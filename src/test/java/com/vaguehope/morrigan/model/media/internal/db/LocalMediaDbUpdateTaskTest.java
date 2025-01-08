@@ -28,12 +28,11 @@ import org.mockito.stubbing.Answer;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -42,7 +41,7 @@ import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
 import com.vaguehope.morrigan.util.FileSystem;
 
-public class LocalMixedMediaDbUpdateTaskTest {
+public class LocalMediaDbUpdateTaskTest {
 
 	private TestMixedMediaDb testDb;
 	private PlaybackEngineFactory playbackEngineFactory;
@@ -62,7 +61,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		when(this.mediaFactory.getLocalMixedMediaDbTransactional(this.testDb)).thenAnswer(new Answer<MediaDb>() {
 			@Override
 			public MediaDb answer(final InvocationOnMock invocation) throws Throwable {
-				return new TestMixedMediaDb(LocalMixedMediaDbUpdateTaskTest.this.testDb.getListName(), false);
+				return new TestMixedMediaDb(LocalMediaDbUpdateTaskTest.this.testDb.getListName(), false);
 			}
 		});
 
