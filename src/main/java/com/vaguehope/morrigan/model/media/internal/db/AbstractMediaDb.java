@@ -26,7 +26,6 @@ import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
@@ -408,7 +407,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 		String sortcol = getDbLayer().getProp(KEY_SORTCOL);
 		String sortdir = getDbLayer().getProp(KEY_SORTDIR);
 		if (sortcol != null && sortdir != null) {
-			SortColumn col = IMixedMediaItemStorageLayer.parseOldColName(sortcol);
+			SortColumn col = IMediaItemStorageLayer.parseOldColName(sortcol);
 			if (col == null) col = SortColumn.valueOf(sortcol);
 			SortDirection dir = SortDirection.parseN(Integer.parseInt(sortdir));
 			this.librarySort = col;

@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
@@ -93,7 +93,7 @@ class SearchParser {
 			sql.append(" ORDER BY ");
 			for (int i = 0; i < sorts.length; i++) {
 				if (i > 0) sql.append(",");
-				final IDbColumn dbCol = IMixedMediaItemStorageLayer.columnFromEnum(sorts[i]);
+				final IDbColumn dbCol = IMediaItemStorageLayer.columnFromEnum(sorts[i]);
 				sql.append(dbCol.getName()).append(directions[i].getSql());
 			}
 		}

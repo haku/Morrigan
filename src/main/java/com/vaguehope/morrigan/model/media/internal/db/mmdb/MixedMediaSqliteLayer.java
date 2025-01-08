@@ -17,10 +17,9 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
@@ -29,7 +28,7 @@ import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.GeneratedString;
 
-public class MixedMediaSqliteLayer extends MediaSqliteLayer implements IMixedMediaItemStorageLayer {
+public class MixedMediaSqliteLayer extends MediaSqliteLayer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayer.class);
 
