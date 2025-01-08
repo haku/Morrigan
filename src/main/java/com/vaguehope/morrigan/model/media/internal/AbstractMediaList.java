@@ -21,7 +21,7 @@ import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
+import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.util.FileHelper;
 
 public abstract class AbstractMediaList extends AbstractList<AbstractItem> implements MediaList {
@@ -82,7 +82,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 //	Dirty state and event listeners.
 
 	private volatile DirtyState dirtyState = DirtyState.CLEAN;
-	protected final List<MediaItemListChangeListener> changeEventListeners = Collections.synchronizedList(new ArrayList<MediaItemListChangeListener>());
+	protected final List<MediaListChangeListener> changeEventListeners = Collections.synchronizedList(new ArrayList<MediaListChangeListener>());
 
 	public abstract boolean isCanBeDirty ();
 
@@ -101,22 +101,22 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	}
 
 	@Override
-	public void addChangeEventListener (final MediaItemListChangeListener listener) {
+	public void addChangeEventListener (final MediaListChangeListener listener) {
 		// TODO rewrite this to use a map instead?
 		if (!this.changeEventListeners.contains(listener)) this.changeEventListeners.add(listener);
 	}
 
 	@Override
-	public void removeChangeEventListener (final MediaItemListChangeListener listener) {
+	public void removeChangeEventListener (final MediaListChangeListener listener) {
 		this.changeEventListeners.remove(listener);
 	}
 
-	private final MediaItemListChangeListener changeCaller = new MediaItemListChangeListener() {
+	private final MediaListChangeListener changeCaller = new MediaListChangeListener() {
 
 		@Override
 		public void eventMessage (final String msg) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " eventMessage=" + msg);
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.eventMessage(msg);
 			}
 		}
@@ -124,7 +124,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		@Override
 		public void dirtyStateChanged (final DirtyState oldState, final DirtyState newState) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " oldState=" + oldState + " newState=" + newState);
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.dirtyStateChanged(oldState, newState);
 			}
 		}
@@ -132,7 +132,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		@Override
 		public void mediaListRead () {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName());
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaListRead();
 			}
 		}
@@ -140,7 +140,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		@Override
 		public void mediaItemsAdded (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsAdded(items);
 			}
 		}
@@ -148,7 +148,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		@Override
 		public void mediaItemsRemoved (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsRemoved(items);
 			}
 		}
@@ -156,7 +156,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		@Override
 		public void mediaItemsUpdated (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsUpdated(items);
 			}
 		}
@@ -164,7 +164,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		@Override
 		public void mediaItemsForceReadRequired (final MediaItem... items) {
 			if (AbstractMediaList.this.logger.isLoggable(Level.FINEST)) AbstractMediaList.this.logger.finest(getListName() + " " + Arrays.toString(items));
-			for (final MediaItemListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
+			for (final MediaListChangeListener listener : AbstractMediaList.this.changeEventListeners) {
 				listener.mediaItemsForceReadRequired(items);
 			}
 		}
@@ -172,7 +172,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	};
 
 	@Override
-	public MediaItemListChangeListener getChangeEventCaller () {
+	public MediaListChangeListener getChangeEventCaller () {
 		return this.changeCaller;
 	}
 

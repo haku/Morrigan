@@ -7,7 +7,7 @@ package com.vaguehope.morrigan.model.media;
  * the event is fired.
  * A null argument does not mean no event as occurred.
  */
-public interface MediaItemListChangeListener {
+public interface MediaListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void eventMessage (String msg);

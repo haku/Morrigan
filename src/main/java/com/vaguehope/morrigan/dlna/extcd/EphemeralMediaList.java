@@ -22,7 +22,7 @@ import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
-import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
+import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -186,10 +186,10 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 // Not supported - ignore.
 
 	@Override
-	public void addChangeEventListener (final MediaItemListChangeListener listener) {}
+	public void addChangeEventListener (final MediaListChangeListener listener) {}
 
 	@Override
-	public void removeChangeEventListener (final MediaItemListChangeListener listener) {}
+	public void removeChangeEventListener (final MediaListChangeListener listener) {}
 
 	@Override
 	public void incTrackStartCnt (final MediaItem item, final long n) throws MorriganException {}
@@ -213,7 +213,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 // Not supported - throw.
 
 	@Override
-	public MediaItemListChangeListener getChangeEventCaller () {
+	public MediaListChangeListener getChangeEventCaller () {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

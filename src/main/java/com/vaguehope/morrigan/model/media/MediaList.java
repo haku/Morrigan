@@ -43,9 +43,9 @@ public interface MediaList extends List<AbstractItem> {
 	/**
 	 * A change event will occur every time the state might have changed.
 	 */
-	void addChangeEventListener (MediaItemListChangeListener listener);
-	void removeChangeEventListener (MediaItemListChangeListener listener);
-	MediaItemListChangeListener getChangeEventCaller ();
+	void addChangeEventListener (MediaListChangeListener listener);
+	void removeChangeEventListener (MediaListChangeListener listener);
+	MediaListChangeListener getChangeEventCaller ();
 
 	List<MediaItem> getMediaItems();
 

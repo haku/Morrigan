@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
+import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
@@ -98,7 +98,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		}
 	}
 
-	private final MediaItemListChangeListener listChangedRunnable = new MediaItemListChangeListener () {
+	private final MediaListChangeListener listChangedRunnable = new MediaListChangeListener () {
 
 		@Override
 		public void mediaItemsRemoved (final MediaItem... items) {

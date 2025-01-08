@@ -29,7 +29,7 @@ import com.vaguehope.morrigan.model.media.MediaStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
-import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
+import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -130,13 +130,13 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	 */
 
 	@Override
-	public void addChangeEventListener (final MediaItemListChangeListener listener) {
+	public void addChangeEventListener (final MediaListChangeListener listener) {
 		if (this.changeEventListeners.size() == 0) this.dbLayer.addChangeListener(this.storageChangeListener);
 		super.addChangeEventListener(listener);
 	}
 
 	@Override
-	public void removeChangeEventListener (final MediaItemListChangeListener listener) {
+	public void removeChangeEventListener (final MediaListChangeListener listener) {
 		super.removeChangeEventListener(listener);
 		if (this.changeEventListeners.size() == 0) this.dbLayer.removeChangeListener(this.storageChangeListener);
 	}
