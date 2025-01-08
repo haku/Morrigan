@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
@@ -31,7 +31,7 @@ public final class RemoteMixedMediaDbHelper {
 		return file;
 	}
 
-	public static IRemoteMixedMediaDb createRemoteMmdb (final Config config, final String mmdbUrl, final String pass) throws MorriganException, URISyntaxException {
+	public static RemoteMediaDb createRemoteMmdb (final Config config, final String mmdbUrl, final String pass) throws MorriganException, URISyntaxException {
 		final URI uri = new URI(mmdbUrl);
 		// FIXME better naming?
 		final String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");

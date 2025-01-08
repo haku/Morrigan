@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
@@ -164,17 +164,17 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public IRemoteMixedMediaDb createRemoteMixedMediaDb (final String mmdbUrl) {
+	public RemoteMediaDb createRemoteMixedMediaDb (final String mmdbUrl) {
 		throw new IllegalArgumentException("See server package.");
 	}
 
 	@Override
-	public IRemoteMixedMediaDb getRemoteMixedMediaDb (final String dbName) {
+	public RemoteMediaDb getRemoteMixedMediaDb (final String dbName) {
 		throw new IllegalArgumentException("See server package.");
 	}
 
 	@Override
-	public IRemoteMixedMediaDb getRemoteMixedMediaDb (final String dbName, final URL url) {
+	public RemoteMediaDb getRemoteMixedMediaDb (final String dbName, final URL url) {
 		throw new IllegalArgumentException("See server package.");
 	}
 
@@ -242,7 +242,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MorriganTask getRemoteMixedMediaDbUpdateTask (final IRemoteMixedMediaDb library) {
+	public MorriganTask getRemoteMixedMediaDbUpdateTask (final RemoteMediaDb library) {
 		return RemoteMediaDbUpdateTask.FACTORY.manufacture(library, null);
 	}
 
@@ -257,7 +257,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MorriganTask getSyncMetadataRemoteToLocalTask (final MediaDb local, final IRemoteMixedMediaDb remote) {
+	public MorriganTask getSyncMetadataRemoteToLocalTask (final MediaDb local, final RemoteMediaDb remote) {
 		// TODO FIXME use a factory to prevent duplicates.
 		return new SyncMetadataRemoteToLocalTask(local, remote, this);
 	}

@@ -9,7 +9,7 @@ import java.util.Objects;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -23,12 +23,12 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final MediaDb local;
-	private final IRemoteMixedMediaDb remote;
+	private final RemoteMediaDb remote;
 	private final MediaFactory mediaFactory;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public SyncMetadataRemoteToLocalTask (final MediaDb local, final IRemoteMixedMediaDb remote, final MediaFactory mediaFactory) {
+	public SyncMetadataRemoteToLocalTask (final MediaDb local, final RemoteMediaDb remote, final MediaFactory mediaFactory) {
 		this.local = local;
 		this.remote = remote;
 		this.mediaFactory = mediaFactory;
@@ -103,7 +103,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		return ret;
 	}
 
-	private static void syncMediaItems (final MediaDb ldb, final IRemoteMixedMediaDb rdb, final MediaItem remoteItem, final MediaItem localItem) throws MorriganException {
+	private static void syncMediaItems (final MediaDb ldb, final RemoteMediaDb rdb, final MediaItem remoteItem, final MediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
 			ldb.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}

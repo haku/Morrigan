@@ -15,7 +15,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -24,11 +24,11 @@ import com.vaguehope.morrigan.util.StringHelper;
 public class MixedMediaDbFeedParser extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final IRemoteMixedMediaDb rmmdb;
+	private final RemoteMediaDb rmmdb;
 	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
 
-	MixedMediaDbFeedParser(final IRemoteMixedMediaDb rmmdb, final TaskEventListener taskEventListener) {
+	MixedMediaDbFeedParser(final RemoteMediaDb rmmdb, final TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 		this.stack = new Stack<>();
 		this.rmmdb = rmmdb;

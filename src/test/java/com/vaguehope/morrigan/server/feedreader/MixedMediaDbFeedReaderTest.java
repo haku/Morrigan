@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.Tag;
 import com.vaguehope.morrigan.model.media.test.TestRemoteDb;
@@ -23,7 +23,7 @@ public class MixedMediaDbFeedReaderTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 
-	private IRemoteMixedMediaDb remote;
+	private RemoteMediaDb remote;
 	private AsyncTaskEventListener eventListener;
 
 	@Before

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.MultitaskEventListener;
@@ -46,7 +46,7 @@ public class PullRemoteToLocal implements MorriganTask {
 			taskEventListener.subTask("Fetching metadata");
 			final String file = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, uuid.toString());
 			final RemoteHostDetails details = new RemoteHostDetails(this.remoteUri);
-			final IRemoteMixedMediaDb rdb = RemoteMixedMediaDbFactory.getNew(file, details);
+			final RemoteMediaDb rdb = RemoteMixedMediaDbFactory.getNew(file, details);
 
 			taskEventListener.subTask("Fetching DB");
 			rdb.setTaskEventListener(taskEventListener.newSubTaskListener(50));

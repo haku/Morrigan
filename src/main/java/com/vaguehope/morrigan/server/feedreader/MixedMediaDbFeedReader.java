@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -38,7 +38,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 	 * TODO report progress to taskEventListener.
 	 * TODO support event cancellation.
 	 */
-	public static void read (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
+	public static void read (final RemoteMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
 		if (taskEventListener != null) taskEventListener.onStart();
 		if (taskEventListener != null) taskEventListener.beginTask("Updating " + mmdb.getListName(), 100);
 
@@ -78,7 +78,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		if (taskEventListener != null) taskEventListener.done(TaskOutcome.SUCCESS);
 	}
 
-	private static void readHttp (final IRemoteMixedMediaDb mmdb, final URI uri, final HttpStreamHandler feedReader) throws DbException, IOException, HttpStreamHandlerException, MalformedURLException, MorriganException {
+	private static void readHttp (final RemoteMediaDb mmdb, final URI uri, final HttpStreamHandler feedReader) throws DbException, IOException, HttpStreamHandlerException, MalformedURLException, MorriganException {
 		final Map<String, String> headers = new HashMap<>();
 		Auth.addTo(headers, uri, mmdb.getPass());
 		final HttpResponse response = HttpClient.doHttpRequest(uri.toURL(), headers, feedReader);
@@ -104,12 +104,12 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final IRemoteMixedMediaDb mmdb;
+	private final RemoteMediaDb mmdb;
 	private final TaskEventListener taskEventListener;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private MixedMediaDbFeedReader (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) {
+	private MixedMediaDbFeedReader (final RemoteMediaDb mmdb, final TaskEventListener taskEventListener) {
 		this.mmdb = mmdb;
 		this.taskEventListener = taskEventListener;
 	}
@@ -119,7 +119,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 	@Override
 	public void handleStream(final InputStream is) throws IOException, HttpStreamHandlerException {
 		boolean thereWereErrors = true;
-		IRemoteMixedMediaDb transClone = null;
+		RemoteMediaDb transClone = null;
 		try {
 			transClone = RemoteMixedMediaDbFactory.getTransactionalClone(this.mmdb);
 			transClone.readFromCache();

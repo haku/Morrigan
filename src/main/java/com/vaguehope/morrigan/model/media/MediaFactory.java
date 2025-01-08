@@ -63,9 +63,9 @@ public interface MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
-	IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
-	IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName);
-	IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName, URL url);
+	RemoteMediaDb createRemoteMixedMediaDb (String mmdbUrl);
+	RemoteMediaDb getRemoteMixedMediaDb (String dbName);
+	RemoteMediaDb getRemoteMixedMediaDb (String dbName, URL url);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -87,10 +87,10 @@ public interface MediaFactory {
 	 * TODO merge these next two methods?
 	 */
 	MorriganTask getLocalMixedMediaDbUpdateTask (MediaDb library);
-	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
+	MorriganTask getRemoteMixedMediaDbUpdateTask (RemoteMediaDb library);
 	MorriganTask getMediaFileCopyTask (MediaList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
 	MorriganTask getNewCopyToLocalMmdbTask (MediaList fromList, Collection<MediaItem> itemsToCopy, MediaDb toDb);
-	MorriganTask getSyncMetadataRemoteToLocalTask (MediaDb local, IRemoteMixedMediaDb remote);
+	MorriganTask getSyncMetadataRemoteToLocalTask (MediaDb local, RemoteMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

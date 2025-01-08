@@ -3,11 +3,11 @@ package com.vaguehope.morrigan.model.media.test;
 import java.net.URI;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
-public class TestRemoteDb extends TestMixedMediaDb implements IRemoteMixedMediaDb {
+public class TestRemoteDb extends TestMixedMediaDb implements RemoteMediaDb {
 
 	private URI uri;
 	private String pass;

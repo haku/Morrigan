@@ -17,7 +17,7 @@ import com.vaguehope.morrigan.engines.playback.NotImplementedException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.AbstractMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
-public class RemoteMixedMediaDb extends AbstractMediaDb implements IRemoteMixedMediaDb {
+public class RemoteMixedMediaDb extends AbstractMediaDb implements RemoteMediaDb {
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
