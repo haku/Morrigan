@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItem;
 
 public class CoverArtHelperTest {
 
@@ -158,7 +157,7 @@ public class CoverArtHelperTest {
 		return this.tmp.newFile("something.jpg");
 	}
 
-	private static class TestItem extends MixedMediaItem {
+	private static class TestItem extends DefaultMediaItem {
 
 		public TestItem (final String filePath) {
 			super(filePath, null);

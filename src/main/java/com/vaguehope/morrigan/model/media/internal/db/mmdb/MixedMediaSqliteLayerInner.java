@@ -21,6 +21,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayer;
 import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -30,11 +31,11 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 
 	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayerInner.class);
 
-	protected final MixedMediaItemFactory itemFactory;
+	protected final DefaultMediaItemFactory itemFactory;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected MixedMediaSqliteLayerInner (final String dbFilePath, final boolean autoCommit, final MixedMediaItemFactory itemFactory) throws DbException {
+	protected MixedMediaSqliteLayerInner (final String dbFilePath, final boolean autoCommit, final DefaultMediaItemFactory itemFactory) throws DbException {
 		super(dbFilePath, autoCommit);
 		this.itemFactory = itemFactory;
 	}
@@ -902,7 +903,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		}
 	}
 
-	protected static List<IMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
+	protected static List<IMediaItem> local_parseRecordSet (final ResultSet rs, final DefaultMediaItemFactory itemFactory) throws SQLException {
 		final List<IMediaItem> ret = new ArrayList<>();
 		if (rs.next()) {
 			final ColumnIndexes indexes = new ColumnIndexes(rs);
@@ -914,7 +915,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer implem
 		return ret;
 	}
 
-	protected static IMediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final MixedMediaItemFactory itemFactory) throws SQLException {
+	protected static IMediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final DefaultMediaItemFactory itemFactory) throws SQLException {
 		String filePath = rs.getString(indexes.colFile);
 		IMediaItem mi = itemFactory.getNewMediaItem(filePath);
 

@@ -16,9 +16,9 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaNode;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerOuter;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.MimeType;
@@ -48,7 +48,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 
 	public TestMixedMediaDb (final String name, final boolean autoCommit) throws DbException, MorriganException {
 		super(name, new MediaItemDbConfig(name, null));
-		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(this);
+		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(this);
 		setDbLayer(new MixedMediaSqliteLayerOuter("file:" + name + "?mode=memory&cache=shared", autoCommit, itemFactory));
 		read();
 	}

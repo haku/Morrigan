@@ -19,6 +19,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerOuterTest {
@@ -30,7 +31,7 @@ public class MixedMediaSqliteLayerOuterTest {
 
 	@Before
 	public void before () throws Exception {
-		this.undertest = new MixedMediaSqliteLayerOuter(":memory:", true, new MixedMediaItemFactory(null));
+		this.undertest = new MixedMediaSqliteLayerOuter(":memory:", true, new DefaultMediaItemFactory(null));
 		this.expectedAllItems = new ArrayList<>();
 		addNoiseToDb();
 	}

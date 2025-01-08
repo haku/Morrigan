@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -23,7 +24,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner {
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-	public MixedMediaSqliteLayerOuter (final String dbFilePath, final boolean autoCommit, final MixedMediaItemFactory itemFactory) throws DbException {
+	public MixedMediaSqliteLayerOuter (final String dbFilePath, final boolean autoCommit, final DefaultMediaItemFactory itemFactory) throws DbException {
 		super(dbFilePath, autoCommit, itemFactory);
 	}
 

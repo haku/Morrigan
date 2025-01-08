@@ -135,11 +135,6 @@ public abstract class EphemeralItem implements IMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaTrack (final IMediaItem mt) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
 	public boolean setFilepath (final String filePath) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
@@ -205,22 +200,12 @@ public abstract class EphemeralItem implements IMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaPicture (final IMediaItem mp) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
 	public void setMimeType(String newType) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public boolean setMediaType (final MediaType newType) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public boolean setFromMediaMixedItem (final IMediaItem mmi) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

@@ -4,8 +4,8 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -32,7 +32,7 @@ public final class RemoteMixedMediaDbFactory {
 		protected IRemoteMixedMediaDb makeNewProduct (final MediaItemDbConfig material, final RemoteHostDetails config) throws MorriganException {
 			try {
 				final RemoteMixedMediaDb db = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), material, config);
-				final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(db);
+				final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 				final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
 				db.setDbLayer(dbLayer);
 				return db;
@@ -70,7 +70,7 @@ public final class RemoteMixedMediaDbFactory {
 		final MediaItemDbConfig config = new MediaItemDbConfig(rmmdb.getDbPath(), null);
 		final RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUri(), rmmdb.getPass());
 		final RemoteMixedMediaDb db = new RemoteMixedMediaDb(title, config, details);
-		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(db);
+		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 		final IMediaItemStorageLayer dbLayer = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath(), itemFactory);
 		db.setDbLayer(dbLayer);
 		return db;

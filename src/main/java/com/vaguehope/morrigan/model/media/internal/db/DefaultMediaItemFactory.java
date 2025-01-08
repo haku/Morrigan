@@ -1,12 +1,13 @@
-package com.vaguehope.morrigan.model.media.internal.db.mmdb;
+package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.internal.DefaultMediaItem;
 
 /**
  * 2025-01-07: this is awful, but really annoying to get rid of right now.
- * 
+ *
  * This object will be responsible for all caching of item instances
  * so that we don't have to have complex stuff in other parts of the
  * model.
@@ -22,23 +23,23 @@ import com.vaguehope.morrigan.model.media.IMediaItemList;
  * IMediaItemDb.getTransactionalClone ()
  *
  */
-public class MixedMediaItemFactory {
+public class DefaultMediaItemFactory {
 
-	private final RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<>(true) {
+	private final RecyclingFactory2<DefaultMediaItem, String, RuntimeException> factory = new RecyclingFactory2<>(true) {
 		@Override
-		protected boolean isValidProduct (final MixedMediaItem product) {
+		protected boolean isValidProduct (final DefaultMediaItem product) {
 			return true;
 		}
 
 		@Override
-		protected MixedMediaItem makeNewProduct (final String material) {
+		protected DefaultMediaItem makeNewProduct (final String material) {
 			return newItem(material);
 		}
 	};
 
 	private final IMediaItemList list;
 
-	public MixedMediaItemFactory (final IMediaItemList list) {
+	public DefaultMediaItemFactory (final IMediaItemList list) {
 		this.list = list;
 	}
 
@@ -47,8 +48,8 @@ public class MixedMediaItemFactory {
 		return this.factory.manufacture(filePath);
 	}
 
-	MixedMediaItem newItem (final String filePath) {
-		return new MixedMediaItem(filePath, this.list);
+	DefaultMediaItem newItem (final String filePath) {
+		return new DefaultMediaItem(filePath, this.list);
 	}
 
 }

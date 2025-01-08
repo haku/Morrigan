@@ -83,9 +83,6 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 	Date getDateLastPlayed();
 	boolean setDateLastPlayed(Date dateLastPlayed);
 
-	@Deprecated
-	boolean setFromMediaTrack (IMediaItem mt);
-
 	/**
 	 * @return File path to cover art or null.
 	 */
@@ -106,9 +103,6 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 
 	int getHeight();
 	boolean setHeight(int height);
-
-	@Deprecated
-	boolean setFromMediaPicture (IMediaItem mp);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // mixed
@@ -151,9 +145,6 @@ public interface IMediaItem extends AbstractItem, IDbItem {
 
 	MediaType getMediaType ();
 	boolean setMediaType (MediaType newType);
-
-	@Deprecated
-	boolean setFromMediaMixedItem (IMediaItem mmi);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

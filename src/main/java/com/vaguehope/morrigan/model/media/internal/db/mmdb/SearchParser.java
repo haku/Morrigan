@@ -12,6 +12,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.util.QuerySplitter;
 import com.vaguehope.morrigan.util.QuoteRemover;
@@ -273,11 +274,11 @@ class SearchParser {
 			}
 		}
 
-		public List<IMediaItem> execute (final Connection con, final MixedMediaItemFactory itemFactory) throws SQLException {
+		public List<IMediaItem> execute (final Connection con, final DefaultMediaItemFactory itemFactory) throws SQLException {
 			return execute(con, itemFactory, -1);
 		}
 
-		public List<IMediaItem> execute (final Connection con, final MixedMediaItemFactory itemFactory, final int maxResults) throws SQLException {
+		public List<IMediaItem> execute (final Connection con, final DefaultMediaItemFactory itemFactory, final int maxResults) throws SQLException {
 			final PreparedStatement ps = prepare(con);
 			try {
 				int parmIn = 1;

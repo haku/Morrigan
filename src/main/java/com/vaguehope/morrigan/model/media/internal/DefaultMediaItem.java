@@ -13,11 +13,7 @@ import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
-/**
- * Generic media item, be it music, video, image, etc...
- */
-public abstract class DefaultMediaItem implements IMediaItem {
-	//	Constructors.
+public class DefaultMediaItem implements IMediaItem {
 
 	private static final BigInteger MD5_DEFAULT = null;
 	private static final BigInteger SHA1_DEFAULT = null;
@@ -42,6 +38,12 @@ public abstract class DefaultMediaItem implements IMediaItem {
 	private boolean enabled = ENABLED_DEFAULT;
 	private Date enabledLastModified = null;
 	private boolean missing = MISSING_DEFAULT;
+
+	private MediaType type;
+	private int duration;
+	private long startCount;
+	private long endCount;
+	private Date dateLastPlayed;
 
 	@Override
 	public String getFilepath() {
@@ -280,6 +282,127 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		this.mimeType = newType;
 	}
 
+	@Override
+	public MediaType getMediaType () {
+		return this.type;
+	}
+
+	@Override
+	public boolean setMediaType (final MediaType newType) {
+		if (this.type != newType) {
+			this.type = newType;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isPlayable () {
+		return (getMediaType() == MediaType.TRACK);
+	}
+
+	@Override
+	public int getDuration () {
+		return this.duration;
+	}
+
+	@Override
+	public boolean setDuration (final int duration) {
+		if (this.duration != duration) {
+			this.duration = duration;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public long getStartCount () {
+		return this.startCount;
+	}
+
+	@Override
+	public boolean setStartCount (final long startCount) {
+		if (this.startCount != startCount) {
+			this.startCount = startCount;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public long getEndCount () {
+		return this.endCount;
+	}
+
+	@Override
+	public boolean setEndCount (final long endCount) {
+		if (this.endCount != endCount) {
+			this.endCount = endCount;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Date getDateLastPlayed () {
+		return this.dateLastPlayed;
+	}
+
+	@Override
+	public boolean setDateLastPlayed (final Date dateLastPlayed) {
+		if (!Objects.equals(this.dateLastPlayed, dateLastPlayed)) {
+			this.dateLastPlayed = dateLastPlayed;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public File findCoverArt () {
+		return CoverArtHelper.findCoverArt(this);
+	}
+
+	@Override
+	public String getCoverArtRemoteLocation () {
+		return null;
+	}
+
+	@Override
+	public boolean isPicture () {
+		return (getMediaType() == MediaType.PICTURE);
+	}
+
+	private int width;
+	private int height;
+
+	@Override
+	public int getWidth () {
+		return this.width;
+	}
+
+	@Override
+	public boolean setWidth (final int width) {
+		if (this.width != width) {
+			this.width = width;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int getHeight () {
+		return this.height;
+	}
+
+	@Override
+	public boolean setHeight (final int height) {
+		if (this.height != height) {
+			this.height = height;
+			return true;
+		}
+		return false;
+	}
+
 	//	Mass setter.
 
 	@Override
@@ -292,6 +415,13 @@ public abstract class DefaultMediaItem implements IMediaItem {
 		this.setMissing(MISSING_DEFAULT);
 		this.setDbRowId(DBROWID_DEFAULT);
 		this.setRemoteLocation(null);
+
+		this.setDuration(0);
+		this.setStartCount(0);
+		this.setEndCount(0);
+		this.setDateLastPlayed(null);
+		this.setWidth(0);
+		this.setHeight(0);
 	}
 
 	@Override
@@ -304,7 +434,14 @@ public abstract class DefaultMediaItem implements IMediaItem {
 				| this.setEnabled(mi.isEnabled(), mi.enabledLastModified())
 				| this.setMissing(mi.isMissing())
 				| this.setDbRowId(mi.getDbRowId())
-				| this.setRemoteLocation(mi.getRemoteLocation());
+				| this.setRemoteLocation(mi.getRemoteLocation())
+				| this.setDuration(mi.getDuration())
+				| this.setStartCount(mi.getStartCount())
+				| this.setEndCount(mi.getEndCount())
+				| this.setDateLastPlayed(mi.getDateLastPlayed())
+				| this.setWidth(mi.getWidth())
+				| this.setHeight(mi.getHeight())
+				| this.setMediaType(mi.getMediaType());
 		return b;
 	}
 

@@ -27,11 +27,11 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.CopyToLocalMmdbTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
@@ -182,7 +182,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public IMediaItemStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
-		final MixedMediaItemFactory itemFactory = new MixedMediaItemFactory(null);
+		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(null);
 		return MixedMediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
 	}
 
