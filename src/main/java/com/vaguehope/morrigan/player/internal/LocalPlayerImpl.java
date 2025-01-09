@@ -290,19 +290,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	}
 
 	@Override
-	public void nextTrack () {
-		try {
-			final PlayItem nextItemToPlay = findNextItemToPlay();
-			if (nextItemToPlay != null) {
-				loadAndStartPlaying(nextItemToPlay);
-			}
-		}
-		catch (final MorriganException e) {
-			getListeners().onException(e);
-		}
-	}
-
-	@Override
 	public PlayState getEnginePlayState () {
 		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {

@@ -20,7 +20,6 @@ import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -158,19 +157,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	@Override
 	public void nextTrack () {
 		checkAlive();
-		try {
-			final PlayItem nextItemToPlay = findNextItemToPlay();
-			if (nextItemToPlay != null) {
-				loadAndStartPlaying(nextItemToPlay);
-			}
-			else {
-				stopPlaying();
-			}
-		}
-		catch (final MorriganException e) {
-			getListeners().onException(e);
-		}
-
+		super.nextTrack();
 	}
 
 	@Override

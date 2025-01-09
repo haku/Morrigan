@@ -245,23 +245,8 @@ public abstract class AbstractPlayer implements Player {
 
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
-			PlaybackOrder order = getPlaybackOrder();
-			if (order == PlaybackOrder.MANUAL && pi.hasId()) {
-				// For a queue item we need to find a track, even if in MANUAL mode.
-				order = PlaybackOrder.RANDOM;
-			}
-
-			final MediaItem track;
-			try {
-				track = pi.getList().chooseItem(order, null);
-			}
-			catch (final MorriganException e) {
-				this.listeners.onException(e);
-				return;
-			}
-			if (track == null) {
-				return;
-			}
+			final MediaItem track = findTrackForListOnlyPlayItem(pi);
+			if (track == null) return;
 			pi = pi.withTrack(track);
 		}
 
@@ -338,6 +323,39 @@ public abstract class AbstractPlayer implements Player {
 		getQueue().addToQueueTop(item.withoutId());
 	}
 
+	@Override
+	public void nextTrack () {
+		checkAlive();
+		try {
+			final PlayItem nextItemToPlay = findNextItemToPlay();
+			if (nextItemToPlay != null) {
+				loadAndStartPlaying(nextItemToPlay);
+			}
+			else {
+				stopPlaying();
+			}
+		}
+		catch (final MorriganException e) {
+			getListeners().onException(e);
+		}
+	}
+
+	private MediaItem findTrackForListOnlyPlayItem(final PlayItem pi) {
+		PlaybackOrder order = getPlaybackOrder();
+		if (order == PlaybackOrder.MANUAL && pi.hasId()) {
+			// For a queue item we need to find a track, even if in MANUAL mode.
+			// And since there is no UI to specify anything else, default to RANDOM.
+			order = PlaybackOrder.RANDOM;
+		}
+		try {
+			return callChooseItemOnList(pi.getList(), order, null);
+		}
+		catch (final MorriganException e) {
+			this.listeners.onException(e);
+			return null;
+		}
+	}
+
 	/**
 	 * Clients must not call this method.
 	 * Already synchronised.
@@ -353,23 +371,25 @@ public abstract class AbstractPlayer implements Player {
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
 		if (currentItem != null && currentItem.isComplete()) {
-			final MediaItem nextTrack = currentItem.getList().chooseItem(pbOrder, currentItem.getTrack());
+			final MediaItem nextTrack = callChooseItemOnList(currentItem.getList(), pbOrder, currentItem.getTrack());
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
-			LOG.i("chooseItem({},{},{}) == null.",
-					currentItem.getList(), currentItem.getTrack(), pbOrder);
 		}
 
 		final MediaList currentList = getCurrentList();
-		final MediaItem nextTrack = currentList.chooseItem(pbOrder, null);
+		final MediaItem nextTrack = callChooseItemOnList(currentList, pbOrder, null);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}
-		LOG.i("chooseItem({},{},{}) == null.",
-				currentList, null, pbOrder);
 
 		return null;
+	}
+
+	private static MediaItem callChooseItemOnList(final MediaList list, final PlaybackOrder order, MediaItem item) throws MorriganException {
+		if (list == null) return null;
+		if (order == PlaybackOrder.MANUAL) return null;  // do this here so list impls do not have to.
+		return list.chooseItem(order, item);
 	}
 
 }
