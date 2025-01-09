@@ -90,7 +90,7 @@ public class OrderResolver {
 			i++;
 		}
 
-		if (i > 0) {
+		if (i >= 0) {
 			ret = mediaTracks.get(i);
 		}
 

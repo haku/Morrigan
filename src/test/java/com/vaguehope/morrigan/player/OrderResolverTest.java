@@ -29,6 +29,16 @@ public class OrderResolverTest {
 	}
 
 	@Test
+	public void itPicksBySequential() throws Exception {
+		final MediaItem t1 = this.testDb.addTestTrack();
+		final MediaItem t2 = this.testDb.addTestTrack();
+		final MediaItem t3 = this.testDb.addTestTrack();
+
+		assertEquals(t3, this.undertest.getNextTrack(this.testDb, t2, PlaybackOrder.SEQUENTIAL));
+		assertEquals(t1, this.undertest.getNextTrack(this.testDb, t3, PlaybackOrder.SEQUENTIAL));
+	}
+
+	@Test
 	public void itPicksTheOnlyTrackWhenByLastPlayed () throws Exception {
 		final MediaItem other = this.testDb.addTestTrack();
 		final MediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.BYLASTPLAYED);
