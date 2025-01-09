@@ -153,6 +153,9 @@ public class RpcMediaSearchList extends RpcMediaList {
 			case LESS_RECENT:
 				ret.add(PlaybackOrder.BYLASTPLAYED);
 				break;
+			case LESS_PLAYED:
+				ret.add(PlaybackOrder.BYSTARTCOUNT);
+				break;
 			default:
 			}
 		}
@@ -172,6 +175,9 @@ public class RpcMediaSearchList extends RpcMediaList {
 			break;
 		case BYLASTPLAYED:
 			req.setMethod(ChooseMethod.LESS_RECENT);
+			break;
+		case BYSTARTCOUNT:
+			req.setMethod(ChooseMethod.LESS_PLAYED);
 			break;
 		default:
 			throw new IllegalArgumentException("Unsupported method: " + order);
