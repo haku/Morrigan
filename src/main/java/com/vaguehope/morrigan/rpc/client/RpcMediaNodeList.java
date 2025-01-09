@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.rpc.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaNode;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 
 public class RpcMediaNodeList extends RpcMediaList {
 
@@ -106,6 +108,37 @@ public class RpcMediaNodeList extends RpcMediaList {
 		final int i = this.mediaNodes.indexOf(o);
 		if (i >= 0) return i;
 		return this.mediaItems.indexOf(o);
+	}
+
+	@Override
+	public List<PlaybackOrder> getSupportedChooseMethods() {
+		return Arrays.asList(PlaybackOrder.SEQUENTIAL);
+	}
+
+	@Override
+	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) throws MorriganException {
+		switch (order) {
+		case SEQUENTIAL:
+			return chooseSequential(previousItem);
+		default:
+			throw new IllegalArgumentException("Unsupported choose method.");
+		}
+	}
+
+	private MediaItem chooseSequential(final MediaItem previousItem) {
+		if (this.mediaItems.size() < 1) return null;
+
+		int prevIndex = -1;
+		for (int i = 0; i < this.mediaItems.size(); i++) {
+			if (this.mediaItems.get(i).getRemoteId().equals(previousItem.getRemoteId())) {
+				prevIndex = i;
+				break;
+			}
+		}
+
+		if (prevIndex < 0) return null;
+		final int i = prevIndex < this.mediaItems.size() - 1 ? prevIndex + 1: 0;
+		return this.mediaItems.get(i);
 	}
 
 }
