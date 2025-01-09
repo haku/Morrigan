@@ -7,18 +7,19 @@ import com.vaguehope.morrigan.player.PlayerContainer;
 public class ServerPlayerContainer implements PlayerContainer {
 
 	private final String name;
+	private final ServerPlayerEventHandler serverPlayerEventHandler;
 
 	private LocalPlayer player;
-	private ServerPlayerEventHandler localPlayerSupport;
 
 	public ServerPlayerContainer (final String name) {
 		this.name = name;
+		this.serverPlayerEventHandler = new ServerPlayerEventHandler(this);
 	}
 
 	public void dispose () {
 		LocalPlayer p = this.player;
 		if (p != null) p.dispose();
-		if (this.localPlayerSupport != null) this.localPlayerSupport.dispose();
+		this.serverPlayerEventHandler.dispose();
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class ServerPlayerContainer implements PlayerContainer {
 	public void setPlayer (final Player player) {
 		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
 		this.player = (LocalPlayer) player;
-		this.player.addEventListener(this.localPlayerSupport);
+		this.player.addEventListener(this.serverPlayerEventHandler);
 	}
 
 	public LocalPlayer getLocalPlayer () {
