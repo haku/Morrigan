@@ -101,6 +101,7 @@ public interface MediaList extends List<AbstractItem> {
 	}
 
 	List<PlaybackOrder> getSupportedChooseMethods();
+	PlaybackOrder getDefaultChooseMethod();
 	MediaItem chooseItem(PlaybackOrder order, MediaItem previousItem) throws MorriganException;
 
 	void addItem (MediaItem item);

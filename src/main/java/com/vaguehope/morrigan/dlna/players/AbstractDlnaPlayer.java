@@ -155,12 +155,6 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public void nextTrack () {
-		checkAlive();
-		super.nextTrack();
-	}
-
-	@Override
 	protected void loadAndPlay (final PlayItem item) throws DlnaException, IOException {
 		final DlnaPlayingParams playingParams = this.dlnaPlayingParamsFactory.make(item);
 		dlnaPlay(item, playingParams);

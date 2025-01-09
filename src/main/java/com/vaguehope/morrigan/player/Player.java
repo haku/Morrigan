@@ -85,6 +85,7 @@ public interface Player {
 	void seekTo(double d);
 
 	PlaybackOrder getPlaybackOrder();
+	PlaybackOrder getPlaybackOrderOverride();
 	void setPlaybackOrder(PlaybackOrder order);
 
 	/**

@@ -37,6 +37,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	private final MetadataStorage metadataStorage;
 	private final RpcContentServlet rpcContentServer;
 
+	private volatile boolean neverRead = true;
+
 	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage metadataStorage) {
 		this.ri = ri;
 		this.rpcClient = rpcClient;
@@ -90,7 +92,12 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public void read() throws MorriganException {
-		forceRead();  // TODO check if this needs optimising.
+		if (this.neverRead) forceRead();
+	}
+
+	@Override
+	public void forceRead() throws MorriganException {
+		this.neverRead = false;
 	}
 
 	@Override

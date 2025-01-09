@@ -64,6 +64,7 @@ MnApi = {};
 
     player.playOrderId = node.find('playorderid').text();
     player.playOrderTitle = node.find('playordertitle').text();
+    player.playOrderOverrideId = node.find('playorderoverrideid').text();
 
     player.transcode = node.find('transcode').text();
     player.transcodeTitle = node.find('transcodetitle').text();

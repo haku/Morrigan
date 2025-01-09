@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
@@ -23,12 +26,11 @@ import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
-import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class AbstractPlayer implements Player {
 
-	private static final MnLogger LOG = MnLogger.make(AbstractPlayer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractPlayer.class);
 
 	private final String id;
 	private final String name;
@@ -44,6 +46,7 @@ public abstract class AbstractPlayer implements Player {
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<>(PlaybackOrder.MANUAL);
+	private volatile PlaybackOrder playbackOrderOverride = null;
 
 	private final AtomicReference<Transcode> transcode = new AtomicReference<>(Transcode.NONE);
 	private final Transcoder transcoder;
@@ -114,7 +117,7 @@ public abstract class AbstractPlayer implements Player {
 			this.playerStateStorage.writeState(this);
 		}
 		else {
-			LOG.i("Not saving player state as a restore has not yet been attempted.");
+			LOG.info("Not saving player state as a restore has not yet been attempted.");
 		}
 	}
 
@@ -188,6 +191,11 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public PlaybackOrder getPlaybackOrder () {
 		return this.playbackOrder.get();
+	}
+
+	@Override
+	public PlaybackOrder getPlaybackOrderOverride() {
+		return this.playbackOrderOverride;
 	}
 
 	@Override
@@ -386,10 +394,16 @@ public abstract class AbstractPlayer implements Player {
 		return null;
 	}
 
-	private static MediaItem callChooseItemOnList(final MediaList list, final PlaybackOrder order, MediaItem item) throws MorriganException {
+	private MediaItem callChooseItemOnList(final MediaList list, final PlaybackOrder order, MediaItem item) throws MorriganException {
 		if (list == null) return null;
 		if (order == PlaybackOrder.MANUAL) return null;  // do this here so list impls do not have to.
-		return list.chooseItem(order, item);
+
+		final PlaybackOrder orderToUse = list.getSupportedChooseMethods().contains(order) ? order : list.getDefaultChooseMethod();
+		this.playbackOrderOverride = orderToUse != order ? orderToUse : null;
+
+		final MediaItem ret = list.chooseItem(orderToUse, item);
+		LOG.info("list {} choose using {}: {}", list, orderToUse, ret);
+		return ret;
 	}
 
 }

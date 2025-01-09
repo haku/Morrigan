@@ -426,6 +426,11 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
+	public PlaybackOrder getDefaultChooseMethod() {
+		return PlaybackOrder.RANDOM;
+	}
+
+	@Override
 	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) {
 		return this.orderResolver.getNextTrack(this, previousItem, order);
 	}

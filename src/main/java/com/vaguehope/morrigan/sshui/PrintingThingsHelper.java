@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerQueue;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -83,11 +84,20 @@ public final class PrintingThingsHelper {
 	}
 
 	public static String listTitleAndOrder(final Player p) {
+		final StringBuilder s = new StringBuilder();
+
 		final PlayItem currentItem = p.getCurrentItem();
 		if (currentItem != null && currentItem.hasList()) {
-			return String.format("%s %s", currentItem.getList().getListName(), p.getPlaybackOrder());
+			s.append(currentItem.getList().getListName());
 		}
-		return String.valueOf(p.getPlaybackOrder());
+
+		if (s.length() > 0) s.append(" ");
+		s.append(p.getPlaybackOrder());
+
+		PlaybackOrder override = p.getPlaybackOrderOverride();
+		if (override != null) s.append(" (").append(override).append(")");
+
+		return s.toString();
 	}
 
 	public static String summariseItemWithPlayCounts (final MediaList list, final MediaItem item, final DateFormat dateFormat) throws MorriganException {

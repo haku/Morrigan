@@ -46,7 +46,6 @@ public class RpcMediaNodeListTest {
 		final MediaToadProto.MediaItem i3 = MediaToadProto.MediaItem.newBuilder().setId("item 3").build();
 		when(this.blockingStub.listNode(any(ListNodeRequest.class))).thenReturn(ListNodeReply.newBuilder()
 				.addItem(i1).addItem(i2).addItem(i3).build());
-		this.undertest.read();
 
 		final MediaItem prevItem = mock(MediaItem.class);
 		when(prevItem.getRemoteId()).thenReturn(i2.getId());
@@ -54,6 +53,8 @@ public class RpcMediaNodeListTest {
 
 		when(prevItem.getRemoteId()).thenReturn(i3.getId());
 		assertEquals(i1.getId(), this.undertest.chooseItem(PlaybackOrder.SEQUENTIAL, prevItem).getRemoteId());
+
+		assertEquals(i1.getId(), this.undertest.chooseItem(PlaybackOrder.SEQUENTIAL, null).getRemoteId());
 	}
 
 }

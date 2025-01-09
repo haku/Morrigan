@@ -88,6 +88,11 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
+	public PlaybackOrder getDefaultChooseMethod() {
+		return PlaybackOrder.MANUAL;
+	}
+
+	@Override
 	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) throws MorriganException {
 		return null;
 	}

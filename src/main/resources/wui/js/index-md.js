@@ -446,10 +446,14 @@
       selectedPlayer = player;
     }
 
+    var playorder = MnApi.playbackOrderFromId(player.playOrderId)['title'];
+    if (player.playOrderOverrideId) playorder += ' (' +
+      MnApi.playbackOrderFromId(player.playOrderOverrideId)['title'] + ')';
+    $('#subtitle_playback_order').updateText(playorder);
+
     $('#player_name').updateText(player.name + ' (' + HOST_NAME + ')');
     $('#queue_tab_icon').updateText(player.stateIcon);
     $('#subtitle_list_name').updateText(player.listTitle);
-    $('#subtitle_playback_order').updateText(MnApi.playbackOrderFromId(player.playOrderId)['title']);
     $('#subtitle_transcode').updateText(player.transcodeTitle);
     $('#track_title').updateText(player.trackTitle);
     $('#track_tags').updateText(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');

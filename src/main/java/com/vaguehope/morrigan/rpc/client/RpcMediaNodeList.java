@@ -66,6 +66,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 		this.mediaNodes = nodes;
 		this.mediaItems = items;
 		this.durationOfLastRead = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+		super.forceRead();
 	}
 
 	@Override
@@ -116,6 +117,11 @@ public class RpcMediaNodeList extends RpcMediaList {
 	}
 
 	@Override
+	public PlaybackOrder getDefaultChooseMethod() {
+		return PlaybackOrder.SEQUENTIAL;
+	}
+
+	@Override
 	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) throws MorriganException {
 		switch (order) {
 		case SEQUENTIAL:
@@ -125,8 +131,10 @@ public class RpcMediaNodeList extends RpcMediaList {
 		}
 	}
 
-	private MediaItem chooseSequential(final MediaItem previousItem) {
+	private MediaItem chooseSequential(final MediaItem previousItem) throws MorriganException {
+		read();
 		if (this.mediaItems.size() < 1) return null;
+		if (previousItem == null) return this.mediaItems.get(0);
 
 		int prevIndex = -1;
 		for (int i = 0; i < this.mediaItems.size(); i++) {
@@ -137,7 +145,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 		}
 
 		if (prevIndex < 0) return null;
-		final int i = prevIndex < this.mediaItems.size() - 1 ? prevIndex + 1: 0;
+		final int i = prevIndex < this.mediaItems.size() - 1 ? prevIndex + 1 : 0;
 		return this.mediaItems.get(i);
 	}
 

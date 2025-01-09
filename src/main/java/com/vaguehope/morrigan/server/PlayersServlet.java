@@ -464,6 +464,7 @@ public class PlayersServlet extends HttpServlet {
 		if (volumeMaxValue != null) FeedHelper.addElement(dw, "volumemaxvalue", volumeMaxValue);
 		FeedHelper.addElement(dw, "playorderid", p.getPlaybackOrder().name());
 		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
+		if (p.getPlaybackOrderOverride() != null) FeedHelper.addElement(dw, "playorderoverrideid", p.getPlaybackOrderOverride().name());
 		FeedHelper.addElement(dw, "transcode", p.getTranscode().getSymbolicName());
 		FeedHelper.addElement(dw, "transcodetitle", p.getTranscode().toString());
 		FeedHelper.addElement(dw, "queueversion", queueVersion);

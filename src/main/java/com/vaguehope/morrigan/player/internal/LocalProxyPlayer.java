@@ -227,6 +227,13 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
+	public PlaybackOrder getPlaybackOrderOverride() {
+		final Player p = getRef();
+		if (p == null) return null;
+		return p.getPlaybackOrderOverride();
+	}
+
+	@Override
 	public void setPlaybackOrder (final PlaybackOrder order) {
 		final Player p = getRef();
 		if (p == null) return;

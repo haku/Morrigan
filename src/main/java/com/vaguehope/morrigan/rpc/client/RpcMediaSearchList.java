@@ -117,6 +117,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 				new SortDirection[] { this.sortDirection },
 				false);
 		this.durationOfLastRead = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+		super.forceRead();
 	}
 
 	@Override
@@ -162,6 +163,11 @@ public class RpcMediaSearchList extends RpcMediaList {
 		if (ret.size() < 1) ret.add(PlaybackOrder.UNSPECIFIED);
 		this.supportChooseMethods = ret;
 		return ret;
+	}
+
+	@Override
+	public PlaybackOrder getDefaultChooseMethod() {
+		return PlaybackOrder.RANDOM;
 	}
 
 	@Override
