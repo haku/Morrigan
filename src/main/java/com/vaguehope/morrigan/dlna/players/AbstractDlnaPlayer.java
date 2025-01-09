@@ -158,21 +158,19 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	@Override
 	public void nextTrack () {
 		checkAlive();
-
-		PlayItem nextItemToPlay = null;
 		try {
-			nextItemToPlay = findNextItemToPlay();
+			final PlayItem nextItemToPlay = findNextItemToPlay();
+			if (nextItemToPlay != null) {
+				loadAndStartPlaying(nextItemToPlay);
+			}
+			else {
+				stopPlaying();
+			}
 		}
 		catch (final MorriganException e) {
 			getListeners().onException(e);
 		}
 
-		if (nextItemToPlay != null) {
-			loadAndStartPlaying(nextItemToPlay);
-		}
-		else {
-			stopPlaying();
-		}
 	}
 
 	@Override

@@ -6,16 +6,14 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.LocalPlayer;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.transcode.Transcode;
 
-class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSupport {
+class ServerPlayerEventHandler implements PlayerEventListener {
 
 	private static final Logger logger = Logger.getLogger(ServerPlayerEventHandler.class.getName());
 
@@ -100,13 +98,5 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 		// TODO propagate to the UI!
 		logger.log(Level.WARNING, "asyncThrowable", e);
 	}
-
-	@Override
-	public MediaList getCurrentList () {
-		return null;
-	}
-
-	@Override
-	public void historyChanged () {/* UNUSED */}
 
 }

@@ -21,7 +21,6 @@ import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
@@ -33,7 +32,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	private static final MnLogger LOG = MnLogger.make(LocalPlayerImpl.class);
 
-	final LocalPlayerSupport localPlayerSupport;
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ContentProxy contentProxy;
 	private final ExecutorService executorService;
@@ -44,7 +42,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	public LocalPlayerImpl(
 			final String id,
 			final String name,
-			final LocalPlayerSupport localPlayerSupport,
 			final PlayerRegister register,
 			final PlaybackEngineFactory playbackEngineFactory,
 			final ContentProxy contentProxy,
@@ -52,7 +49,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
 		super(id, name, register, playerStateStorage, config);
-		this.localPlayerSupport = localPlayerSupport;
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.contentProxy = contentProxy;
 		this.executorService = executorService;
@@ -127,17 +123,8 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	@Override
 	public MediaList getCurrentList () {
-		MediaList ret = null;
-
-		final PlayItem currentItem = getCurrentItem();
-		if (currentItem != null && currentItem.hasList()) {
-			ret = currentItem.getList();
-		}
-		else {
-			ret = this.localPlayerSupport.getCurrentList();
-		}
-
-		return ret;
+		final PlayItem item = getCurrentItem();
+		return item == null ? null : item.getList();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -161,23 +148,15 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			if (this._history.size() > HISTORY_LENGTH) {
 				this._history.remove(this._history.size()-1);
 			}
-			this.localPlayerSupport.historyChanged();
 		}
 	}
 
 	void validateHistory () {
 		synchronized (this._history) {
-			boolean changed = false;
-
 			for (int i = this._history.size() - 1; i >= 0; i--) {
 				if (!this._history.get(i).getList().getMediaItems().contains(this._history.get(i).getTrack())) {
 					this._history.remove(this._history.get(i));
-					changed = true;
 				}
-			}
-
-			if (changed) {
-				this.localPlayerSupport.historyChanged();
 			}
 		}
 	}

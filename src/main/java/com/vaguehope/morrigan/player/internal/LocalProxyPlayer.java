@@ -9,7 +9,6 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.LocalPlayer;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
@@ -27,15 +26,12 @@ public class LocalProxyPlayer implements LocalPlayer {
 	private final String refName;
 	private final AtomicReference<Player> ref = new AtomicReference<>();
 	private final List<Runnable> onDisposeListener = new ArrayList<>();
-	private final LocalPlayerSupport localPlayerSupport;
 
-	public LocalProxyPlayer (final Player player, final LocalPlayerSupport eventHandler) {
+	public LocalProxyPlayer (final Player player) {
 		if (player == null) throw new IllegalArgumentException("Player can not be null.");
 		this.refId = player.getId();
 		this.refName = player.getName();
 		this.ref.set(player);
-		this.localPlayerSupport = eventHandler;
-		this.localPlayerSupport.historyChanged(); // undefined --> empty list.
 	}
 
 	@Override

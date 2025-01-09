@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.server.boot;
 
 import com.vaguehope.morrigan.player.LocalPlayer;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
 
@@ -30,14 +29,6 @@ public class ServerPlayerContainer implements PlayerContainer {
 	@Override
 	public String getName () {
 		return this.name;
-	}
-
-	@Override
-	public LocalPlayerSupport getLocalPlayerSupport () {
-		if (this.localPlayerSupport == null) {
-			this.localPlayerSupport = new ServerPlayerEventHandler(this);
-		}
-		return this.localPlayerSupport;
 	}
 
 	@Override

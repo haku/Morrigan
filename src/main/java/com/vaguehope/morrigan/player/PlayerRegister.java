@@ -14,8 +14,8 @@ public interface PlayerRegister extends Register<Player>, PlayerReader {
 	/**
 	 * Note: playbackEngineFactory will be disposed with player shutdown.
 	 */
-	LocalPlayer makeLocal (String prefix, String name, PlaybackEngineFactory playbackEngineFactory, LocalPlayerSupport localPlayerSupport);
+	LocalPlayer makeLocal(String prefix, String name, PlaybackEngineFactory playbackEngineFactory);
 
-	LocalPlayer makeLocalProxy(Player player, LocalPlayerSupport localPlayerSupport);
+	LocalPlayer makeLocalProxy(Player player);
 
 }

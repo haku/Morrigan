@@ -143,7 +143,7 @@ public final class Main {
 			LOG.info("Making local player '{}' with vlc args: {}", a.getName(), a.getVlcArgs());
 			final ServerPlayerContainer pc = new ServerPlayerContainer(a.getName());
 			final VlcEngineFactory engineFactory = new VlcEngineFactory(args.isVerboseLog(), a.getVlcArgs());
-			pc.setPlayer(playerRegister.makeLocal(pc.getPrefix(), pc.getName(), engineFactory, pc.getLocalPlayerSupport()));
+			pc.setPlayer(playerRegister.makeLocal(pc.getPrefix(), pc.getName(), engineFactory));
 		}
 	}
 
