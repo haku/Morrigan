@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.engines.common.ImplException;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
@@ -338,7 +337,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements Player {
 	 * @throws ImplException
 	 * @throws PlaybackException
 	 */
-	private void internal_stopPlaying () throws ImplException, PlaybackException {
+	private void internal_stopPlaying () throws PlaybackException {
 		/* Don't go and make a player engine instance
 		 * just to call stop on it.
 		 */
