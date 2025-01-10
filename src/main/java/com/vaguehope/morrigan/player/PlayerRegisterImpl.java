@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.player.internal;
+package com.vaguehope.morrigan.player;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,10 +14,6 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
-import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.player.PlayerRegister;
-import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 
 public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {

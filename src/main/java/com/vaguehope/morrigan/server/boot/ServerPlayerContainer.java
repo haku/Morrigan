@@ -1,8 +1,8 @@
 package com.vaguehope.morrigan.server.boot;
 
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
-import com.vaguehope.morrigan.player.internal.LocalPlayer;
 
 public class ServerPlayerContainer implements PlayerContainer {
 

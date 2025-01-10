@@ -1,9 +1,8 @@
-package com.vaguehope.morrigan.player.internal;
+package com.vaguehope.morrigan.player;
 
 import java.util.Comparator;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.player.Player;
 
 public enum PlayerSorter implements Comparator<Player> {
 	ID {

@@ -50,10 +50,10 @@ import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory;
 import com.vaguehope.morrigan.dlna.players.PlayerControlBridgeFactory;
 import com.vaguehope.morrigan.dlna.players.PlayerHolder;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
-import com.vaguehope.morrigan.player.internal.LocalPlayer;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 

@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.player.internal;
+package com.vaguehope.morrigan.player;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.player.Player;
 
 public class PlayerSorterTest {
 

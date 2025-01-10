@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerQueue;
-import com.vaguehope.morrigan.player.internal.PlayerSorter;
+import com.vaguehope.morrigan.player.PlayerSorter;
 
 public final class PlayerHelper {
 

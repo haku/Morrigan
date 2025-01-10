@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.player.internal;
+package com.vaguehope.morrigan.player;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -11,11 +11,6 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.player.AbstractPlayer;
-import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerRegister;
-import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.util.MnLogger;
 
