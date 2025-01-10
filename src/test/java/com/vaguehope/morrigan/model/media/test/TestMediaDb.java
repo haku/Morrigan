@@ -53,11 +53,6 @@ public class TestMediaDb extends LocalMediaDb {
 		read();
 	}
 
-	@Override
-	public String getListId() {
-		return getListName();
-	}
-
 	public void addNode(final MediaNode node) {
 		this.nodes.add(node);
 	}

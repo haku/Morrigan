@@ -2,13 +2,13 @@ package com.vaguehope.morrigan.model.media.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
@@ -19,14 +19,15 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRef.ListType;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MediaDb;
+import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
-import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.CopyToLocalMmdbTask;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbFactory;
@@ -41,36 +42,83 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class MediaFactoryImpl implements MediaFactory {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Config config;
 	private final LocalMediaDbUpdateTask.Factory localMixedMediaDbUpdateTaskFactory;
+	private final Map<ListRef, MediaDb> addedLocals = new ConcurrentHashMap<>();
+	private final Map<ListRef, MediaList> externalListsByListRef = new ConcurrentSkipListMap<>();
 
 	public MediaFactoryImpl (final Config config, final PlaybackEngineFactory playbackEngineFactoryTracker) {
 		this.config = config;
 		this.localMixedMediaDbUpdateTaskFactory = new LocalMediaDbUpdateTask.Factory(playbackEngineFactoryTracker, this);
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private final Map<String, MediaDb> addedLocals = new ConcurrentHashMap<>();
-
 	@Override
-	public Collection<MediaListReference> getAllLocalMixedMediaDbs () {
-		final List<MediaListReference> real = LocalMediaDbHelper.getAllMmdb(this.config);
-		if (this.addedLocals.size() < 1) return real;
+	public Collection<ListRefWithTitle> allLists() {
+		final Collection<ListRefWithTitle> ret = new ArrayList<>();
 
-		final Collection<MediaListReference> ret = new ArrayList<>();
-		ret.addAll(real);
+		ret.addAll(LocalMediaDbHelper.getAllLocalDbs(this.config));
 		for (final MediaDb db : this.addedLocals.values()) {
-			ret.add(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName(), false));
+			ret.add(new ListRefWithTitle(db.getListRef(), db.getListName()));
 		}
+
+		for (final MediaList list : this.externalListsByListRef.values()) {
+			ret.add(new ListRefWithTitle(list.getListRef(), list.getListName()));
+		}
+
 		return ret;
 	}
 
 	@Override
+	public Collection<ListRefWithTitle> allListsOfType(final ListType type) {
+		return allLists().stream().filter(l -> l.getListRef().getType() == type).collect(Collectors.toList());
+	}
+
+	@Override
+	public MediaList getList(final ListRef listRef) throws MorriganException {
+		switch (listRef.getType()) {
+		case LOCAL:
+			final MediaDb local = this.addedLocals.get(listRef);
+			if (local != null) return local;
+
+			final String localFile = LocalMediaDbHelper.getFullPathToLocalDb(this.config, listRef.getListId());
+			if (StringUtils.isBlank(listRef.getSearch())) return getLocalMixedMediaDb(localFile);
+			return LocalMediaDbFactory.getView(localFile, listRef.getSearch());
+
+		case REMOTE:
+			final String remoteFile = RemoteMediaDbHelper.getFullPathToMmdb(this.config, listRef.getListId());
+			return RemoteMediaDbFactory.getExisting(remoteFile, listRef.getSearch());
+
+		case RPC:
+		case DLNA:
+			return this.externalListsByListRef.get(listRef);
+
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/**
+	 * For testing use only.  Can use to add in mock implementations.
+	 */
+	public void addLocalMixedMediaDb (final MediaDb db) {
+		if (db.getListRef().getType() != ListType.LOCAL) throw new IllegalArgumentException();
+		this.addedLocals.put(db.getListRef(), db);
+	}
+
+	@Override
+	public void addExternalList (final MediaList db) {
+		this.externalListsByListRef.put(db.getListRef(), db);
+	}
+
+	@Override
+	public MediaList removeExternalList (final ListRef listRef) {
+		return this.externalListsByListRef.remove(listRef);
+	}
+
+	@Override
 	public MediaDb createLocalMixedMediaDb (final String name) throws MorriganException {
-		return LocalMediaDbHelper.createMmdb(this.config, name);
+		return LocalMediaDbHelper.createLocalDb(this.config, name);
 	}
 
 	@Override
@@ -87,62 +135,6 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MediaDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
-		return LocalMediaDbFactory.getMainBySerial(serial);
-	}
-
-	/**
-	 * Examples of MID:
-	 * mid=LOCALMMDB/test.local.db3/query/*
-	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/*
-	 * mid=EXTMMDB/abcdefgh-444c-164e-9d41-ijklmnopqrst/query/id%3D0
-	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/id%3D1fcee07abcdefghiujklmnopqrstuvwxyz810c6e-foo_bar
-	 */
-	@Override
-	public MediaList getMediaListByMid(final String mid, final String filter) throws DbException, MorriganException {
-		final String[] parts = mid.split(":|/");
-		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
-
-		final String type = parts[0];
-		final String name = parts[1];
-
-		if (type.equals(MediaListType.LOCALMMDB.toString())) {
-			final MediaDb local = this.addedLocals.get(StringUtils.removeEndIgnoreCase(name, Config.MMDB_LOCAL_FILE_EXT));
-			if (local != null) return local;
-
-			final String f = LocalMediaDbHelper.getFullPathToMmdb(this.config, name);
-			return getLocalMixedMediaDb(f, filter);
-		}
-		else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
-			final String f = RemoteMediaDbHelper.getFullPathToMmdb(this.config, name);
-			return RemoteMediaDbFactory.getExisting(f, filter);
-		}
-		else if (type.equals(MediaListType.EXTMMDB.toString())) {
-			return getExternalList(name, filter);
-		}
-		throw new IllegalArgumentException("Invalid MID: " + mid);
-	}
-
-	@Override
-	public MediaList getMediaListByRef(final MediaListReference ref) throws DbException, MorriganException {
-		return getMediaListByMid(ref.getMid(), null);
-	}
-
-	@Override
-	public MediaList getMediaListByRef(final MediaListReference ref, final String filter) throws DbException, MorriganException {
-		return getMediaListByMid(ref.getMid(), filter);
-	}
-
-	/**
-	 * For testing use only.  Can use to add in mock implementations.
-	 */
-	public void addLocalMixedMediaDb (final MediaDb db) {
-		this.addedLocals.put(db.getListId(), db);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	@Override
 	public MediaDb getLocalMixedMediaDbTransactional (final MediaDb lmmdb) throws DbException {
 		return LocalMediaDbFactory.getTransactional(lmmdb.getDbPath());
 	}
@@ -150,35 +142,11 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public MediaDb getMediaItemDbTransactional (final MediaDb db) throws DbException {
-		if (MediaListType.LOCALMMDB.toString().equals(db.getType())) {
+		if (db.getListRef().getType() == ListType.LOCAL) {
 			return LocalMediaDbFactory.getTransactional(db.getDbPath());
 		}
-		throw new IllegalArgumentException("Can't create transactional connection to DB of type '" + db.getType() + "'.");
+		throw new IllegalArgumentException("Can't create transactional connection to DB: " + db.getListRef());
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	@Override
-	public Collection<MediaListReference> getAllRemoteMixedMediaDbs () {
-		throw new IllegalArgumentException("See server package.");
-	}
-
-	@Override
-	public RemoteMediaDb createRemoteMixedMediaDb (final String mmdbUrl) {
-		throw new IllegalArgumentException("See server package.");
-	}
-
-	@Override
-	public RemoteMediaDb getRemoteMixedMediaDb (final String dbName) {
-		throw new IllegalArgumentException("See server package.");
-	}
-
-	@Override
-	public RemoteMediaDb getRemoteMixedMediaDb (final String dbName, final URL url) {
-		throw new IllegalArgumentException("See server package.");
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public MediaStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
@@ -186,55 +154,10 @@ public class MediaFactoryImpl implements MediaFactory {
 		return MediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private final Map<String, MediaList> externalListsByListId = new ConcurrentSkipListMap<>();
-
-	@Override
-	public Collection<MediaListReference> getExternalLists () {
-		final List<MediaListReference> ret = new ArrayList<>();
-		for (final MediaList list : this.externalListsByListId.values()) {
-			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, list.getListId(), list.getListName(), list.hasNodes()));
-		}
-		return ret;
-	}
-
-	@Override
-	public MediaList getExternalListBySerial(final String serial) {
-		// FIXME this is slow and brittle, eg if json serials are formatted differently.
-		for (final MediaList list : this.externalListsByListId.values()) {
-			if (serial.equals(list.getSerial())) return list;
-		}
-		return null;
-	}
-
-	@Override
-	public MediaList getExternalList (final String id, final String filter) throws MorriganException {
-		MediaList list = this.externalListsByListId.get(id);
-		if (list == null) return null;
-
-		if (StringUtils.isBlank(filter)) return list;
-		return list.makeView(filter);
-	}
-
-	@Override
-	public void addExternalList (final MediaList db) {
-		this.externalListsByListId.put(db.getListId(), db);
-	}
-
-	@Override
-	public MediaList removeExternalList (final String id) {
-		return this.externalListsByListId.remove(id);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	@Override
 	public DurationData getNewDurationData (final long duration, final boolean complete) {
 		return new DurationDataImpl(duration, complete);
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public MorriganTask getLocalMixedMediaDbUpdateTask (final MediaDb library) {

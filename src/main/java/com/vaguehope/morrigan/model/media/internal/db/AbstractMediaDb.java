@@ -21,23 +21,24 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.FileExistance;
-import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaStorageLayer;
-import com.vaguehope.morrigan.model.media.MediaStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.ItemTags;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.MediaDb;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaListChangeListener;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaStorageLayerChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
+import com.vaguehope.morrigan.model.media.internal.AbstractMediaList;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
-import com.vaguehope.morrigan.model.media.internal.AbstractMediaList;
 import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
@@ -65,8 +66,8 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	 * TODO FIXME merge libraryName and searchTerm to match return value of
 	 * getSerial().
 	 */
-	protected AbstractMediaDb (final String listName, final MediaDbConfig config) {
-		super(config.getFilePath(), listName);
+	protected AbstractMediaDb (final ListRef listRef, final String listName, final MediaDbConfig config) {
+		super(listRef, listName);
 		this.config = config;
 
 		this.librarySort = DEFAULT_SORT_COLUMN;
@@ -143,11 +144,6 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	@Override
-	public String getSerial () {
-		return this.config.getSerial();
-	}
-
 	public MediaDbConfig getConfig () {
 		return this.config;
 	}
@@ -158,12 +154,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 		return this.dbLayer;
 	}
 
-	@Override
-	public String getSearchTerm () {
-		return this.searchTerm;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public boolean isCanBeDirty () {

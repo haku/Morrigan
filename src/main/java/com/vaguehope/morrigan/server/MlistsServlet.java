@@ -39,10 +39,12 @@ import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRef.ListType;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -245,13 +247,15 @@ public class MlistsServlet extends HttpServlet {
 		else {
 			final String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
 			if (path.length() > 0) {
-				final String[] pathParts = path.split(":|/");
+				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {
 					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
-					final MediaList mmdb = this.mediaFactory.getMediaListByMid(path, filter);
+					ListRef ref = ListRef.fromUrlForm(pathParts[0]);
+					if (filter != null) ref = ref.withSearch(filter);
+					final MediaList mmdb = this.mediaFactory.getList(ref);
 					mmdb.read();
-					final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-					final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
+					final String subPath = pathParts.length >= 2 ? pathParts[1] : null;
+					final String afterSubPath = pathParts.length >= 3 ? pathParts[2] : null;
 					if (verb == Verb.POST) {
 						postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
 					}
@@ -506,21 +510,10 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "title", "Morrigan media lists desu~");
 		FeedHelper.addLink(dw, REL_CONTEXTPATH, "self", "text/xml");
 
-		for (final MediaListReference listRef : this.mediaFactory.getAllLocalMixedMediaDbs()) {
-			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "local" } });
-			printMlistShort(dw, listRef);
-			dw.endElement("entry");
-		}
+		for (final ListRefWithTitle listRef : this.mediaFactory.allLists()) {
+			if (listRef.getListRef().getType() == ListType.REMOTE) continue;  // TODO decided what to do about these.
 
-		// TODO decided what to do about these.
-//		for (final MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
-//			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "remote" } });
-//			printMlistShort(dw, listRef, players);
-//			dw.endElement("entry");
-//		}
-
-		for (final MediaListReference listRef : this.mediaFactory.getExternalLists()) {
-			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "ext" } });
+			FeedHelper.startElement(dw, "entry", new String[][] { { "type", listRef.getListRef().getType().toString() } });
 			printMlistShort(dw, listRef);
 			dw.endElement("entry");
 		}
@@ -586,7 +579,7 @@ public class MlistsServlet extends HttpServlet {
 					}
 				}
 				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '" + filepath + "' is not in '" + mmdb.getListId() + "' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '" + filepath + "' is not in '" + mmdb.getListRef() + "' desu~");
 				}
 			}
 			else {
@@ -718,9 +711,9 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static void printMlistShort (final DataWriter dw, final MediaListReference listRef) throws SAXException {
+	private static void printMlistShort (final DataWriter dw, final ListRefWithTitle listRef) throws SAXException {
 		FeedHelper.addElement(dw, "title", listRef.getTitle());
-		FeedHelper.addLink(dw, REL_CONTEXTPATH + "/" + listRef.getMid(), "self", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH + "/" + listRef.getListRef().toUrlForm(), "self", "text/xml");
 	}
 
 	private enum IncludeSrcs {
@@ -760,14 +753,6 @@ public class MlistsServlet extends HttpServlet {
 			items = ml.getMediaItems();
 		}
 
-		String listFile;
-		try {
-			listFile = URLEncoder.encode(FeedHelper.filenameFromPath(ml.getListId()), "UTF-8");
-		}
-		catch (final UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-
 		dw.dataElement("title", ml.getListName());
 		dw.dataElement("uuid", ml.getUuid().toString());
 		if (queryString != null) dw.dataElement("query", queryString);
@@ -786,7 +771,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 
-		final String pathToSelf = REL_CONTEXTPATH + "/" + ml.getType().toString() + "/" + listFile;
+		final String pathToSelf = REL_CONTEXTPATH + "/" + ml.getListRef().toUrlForm();
 		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
 		if (includeItems == IncludeItems.NO) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");

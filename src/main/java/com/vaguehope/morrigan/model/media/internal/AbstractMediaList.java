@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListChangeListener;
@@ -32,7 +33,7 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors and parameters.
 
-	private final String listId;
+	private final ListRef listRef;
 	private final String listName;
 	private final List<MediaItem> mediaTracks = new CopyOnWriteArrayList<>();
 
@@ -43,11 +44,11 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	 * @param listName
 	 *            a human-readable title for this list.
 	 */
-	protected AbstractMediaList (final String listId, final String listName) {
-		if (listId == null) throw new IllegalArgumentException("listId can not be null.");
+	protected AbstractMediaList (final ListRef listRef, final String listName) {
+		if (listRef == null) throw new IllegalArgumentException("listRef can not be null.");
 		if (listName == null) throw new IllegalArgumentException("listName can not be null.");
 
-		this.listId = listId;
+		this.listRef = listRef;
 		this.listName = listName;
 	}
 
@@ -59,20 +60,11 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 		}
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	/**
-	 * A unique identifier.
-	 */
 	@Override
-	public String getListId () {
-		return this.listId;
+	public ListRef getListRef() {
+		return this.listRef;
 	}
 
-	/**
-	 * A human readable name for the GUI.
-	 * @return
-	 */
 	@Override
 	public String getListName () {
 		return this.listName;

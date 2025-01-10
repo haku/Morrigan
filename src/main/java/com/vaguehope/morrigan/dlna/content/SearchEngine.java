@@ -26,9 +26,10 @@ import com.vaguehope.cdsc.CDSCLexer;
 import com.vaguehope.cdsc.CDSCParser;
 import com.vaguehope.cdsc.CDSCParser.RelExpContext;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.MediaDb;
+import com.vaguehope.morrigan.model.media.ListRef.ListType;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.Cache;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -55,13 +56,13 @@ public class SearchEngine {
 		if (term == null) throw new ContentDirectoryException(ContentDirectoryErrorCodes.UNSUPPORTED_SEARCH_CRITERIA, "Do not know how to parse: " + searchCriteria);
 
 		final List<Item> ret = new ArrayList<>();
-		for (final MediaListReference mlr : this.mediaFactory.getAllLocalMixedMediaDbs()) {
-			final MediaDb db = this.mediaFactory.getLocalMixedMediaDb(mlr.getIdentifier());
+		for (final ListRefWithTitle mlr : this.mediaFactory.allListsOfType(ListType.LOCAL)) {
+			final MediaList db = this.mediaFactory.getList(mlr.getListRef());
 			if (db.size() > 0) { // Only search loaded DBs.
-				final String cacheKey = String.format("%s|%s|%s", term, contentNode.getContainer().getId(), mlr.getIdentifier());
+				final String cacheKey = String.format("%s|%s|%s", term, contentNode.getContainer().getId(), mlr.getListRef().getListId());
 				List<Item> results = this.queryCache.getFresh(cacheKey, 1, TimeUnit.MINUTES);
 				if (results == null) {
-					results = this.contentAdaptor.queryToItems(mlr, db, term, contentNode.getContainer(), MAX_RESULTS);
+					results = this.contentAdaptor.queryToItems(mlr.getListRef(), db, term, contentNode.getContainer(), MAX_RESULTS);
 					this.queryCache.put(cacheKey, results);
 				}
 				ret.addAll(results);

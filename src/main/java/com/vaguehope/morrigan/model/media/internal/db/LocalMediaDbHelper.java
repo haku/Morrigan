@@ -5,41 +5,37 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
-import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public final class LocalMediaDbHelper {
 
 	private LocalMediaDbHelper () {}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static String listIdForFilepath(final String filepath) {
+		return StringUtils.removeEnd(FilenameUtils.getName(filepath), Config.MMDB_LOCAL_FILE_EXT);
+	}
 
-	public static String getFullPathToMmdb (final Config config, final String fileName) {
+	public static String getFullPathToLocalDb (final Config config, final String fileName) {
 		String file = new File(config.getMmdbDir(), fileName).getAbsolutePath();
-
 		if (!file.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT)) {
 			file = file.concat(Config.MMDB_LOCAL_FILE_EXT);
 		}
-
 		return file;
 	}
 
-	public static MediaDb createMmdb (final Config config, final String name) throws MorriganException {
-		final String file = getFullPathToMmdb(config, name);
-		try {
-			return LocalMediaDbFactory.getMain(file);
-		}
-		catch (final DbException e) {
-			throw new MorriganException(e);
-		}
+	public static MediaDb createLocalDb (final Config config, final String name) throws MorriganException {
+		final String file = getFullPathToLocalDb(config, name);
+		return LocalMediaDbFactory.getMain(file);
 	}
 
-	public static boolean isMmdbFile (final Config config, final String filePath) {
+	public static boolean isLocalDbFile (final Config config, final String filePath) {
 		if (filePath.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT)) {
 			File file = new File(filePath);
 			if (file.exists()) return true;
@@ -49,30 +45,26 @@ public final class LocalMediaDbHelper {
 		return false;
 	}
 
-	public static List<MediaListReference> getAllMmdb (final Config config) {
-		final List<MediaListReference> ret = new ArrayList<>();
-
+	public static List<ListRefWithTitle> getAllLocalDbs (final Config config) {
 		final File dir = config.getMmdbDir();
 		final File[] files = dir.listFiles();
+		if (files == null || files.length < 1) return Collections.emptyList();
 
-		// empty dir?
-		if (files == null || files.length < 1) return ret;
-
+		final List<ListRefWithTitle> ret = new ArrayList<>();
 		for (final File file : files) {
-			final String absolutePath = file.getAbsolutePath();
-			if (isMmdbFile(config, absolutePath)) {
-				final MediaListReference newItem = new MediaListReferenceImpl(MediaListType.LOCALMMDB, absolutePath, getMmdbFileTitle(absolutePath), false);
-				ret.add(newItem);
+			if (isLocalDbFile(config, file.getAbsolutePath())) {
+				ret.add(new ListRefWithTitle(
+						ListRef.forLocal(listIdForFilepath(file.getName())),
+						getDbFileTitle(file.getName())));
 			}
 		}
 
 		Collections.sort(ret);
-
 		return ret;
 	}
 
-	public static String getMmdbTitle (final MediaDbConfig config) {
-		String ret = getMmdbFileTitle(config.getFilePath());
+	public static String getDbTitle (final MediaDbConfig config) {
+		String ret = getDbFileTitle(config.getFilePath());
 
 		if (config.getFilter() != null) {
 			ret = ret + "{" + config.getFilter() + "}";
@@ -81,7 +73,7 @@ public final class LocalMediaDbHelper {
 		return ret;
 	}
 
-	private static String getMmdbFileTitle (final String filePath) {
+	private static String getDbFileTitle (final String filePath) {
 		String ret = filePath;
 		int x;
 

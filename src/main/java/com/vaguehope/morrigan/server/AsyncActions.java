@@ -3,10 +3,10 @@ package com.vaguehope.morrigan.server;
 import java.net.URI;
 
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.model.media.ListRef.ListType;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
+import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.AsyncTask;
@@ -33,7 +33,7 @@ public class AsyncActions {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public AsyncTask scheduleMmdbScan (final MediaDb mmdb) {
-		if (mmdb.getType() == MediaListType.LOCALMMDB) {
+		if (mmdb.getListRef().getType() == ListType.LOCAL) {
 			return scheduleLocalMmdbScan(mmdb);
 		}
 		else if (mmdb instanceof RemoteMediaDb) {

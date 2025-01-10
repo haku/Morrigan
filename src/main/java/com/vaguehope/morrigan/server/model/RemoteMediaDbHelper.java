@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
-import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 import com.vaguehope.morrigan.model.media.internal.db.MediaDbConfig;
 
 
@@ -19,7 +22,9 @@ public final class RemoteMediaDbHelper {
 
 	private RemoteMediaDbHelper () {}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static String listIdForFilepath(final String filepath) {
+		return StringUtils.removeEnd(FilenameUtils.getName(filepath), Config.MMDB_REMOTE_FILE_EXT);
+	}
 
 	public static String getFullPathToMmdb (final Config config, final String fileName) {
 		String file = new File(config.getMmdbDir(), fileName).getAbsolutePath();
@@ -44,8 +49,8 @@ public final class RemoteMediaDbHelper {
 		return (filePath.toLowerCase().endsWith(Config.MMDB_REMOTE_FILE_EXT));
 	}
 
-	public static List<MediaListReference> getAllRemoteMmdb (final Config config) {
-		final ArrayList<MediaListReference> ret = new ArrayList<>();
+	public static List<ListRefWithTitle> getAllRemoteMmdb (final Config config) {
+		final ArrayList<ListRefWithTitle> ret = new ArrayList<>();
 
 		final File dir = config.getMmdbDir();
 		final File [] files = dir.listFiles();
@@ -56,9 +61,9 @@ public final class RemoteMediaDbHelper {
 		for (final File file : files) {
 			final String absolutePath = file.getAbsolutePath();
 			if (isRemoteMmdbFile(absolutePath)) {
-				final MediaListReference newItem = new MediaListReferenceImpl(
-						MediaListReference.MediaListType.REMOTEMMDB, absolutePath, getRemoteMmdbTitle(absolutePath), false);
-				ret.add(newItem);
+				ret.add(new ListRefWithTitle(
+						ListRef.forRemote(listIdForFilepath(file.getName())),
+						getRemoteMmdbTitle(file.getName())));
 			}
 		}
 

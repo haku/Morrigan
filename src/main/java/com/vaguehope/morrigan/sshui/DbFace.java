@@ -120,10 +120,10 @@ public class DbFace extends DefaultFace {
 	public void restoreSavedScroll () throws MorriganException {
 		try {
 			final int limit = Math.max(this.list.size() - 1, 0);
-			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.list.getSerial(), this.scrollTop);
+			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.list.getListRef().toUrlForm(), this.scrollTop);
 			this.scrollTop = Math.max(Math.min(limit, scrollTopToRestore), 0);
 
-			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.list.getSerial(),
+			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.list.getListRef().toUrlForm(),
 					this.scrollTop > 0 ? this.scrollTop : this.selectedItemIndex);
 			setSelectedItem(selectedItemIndexToRestore);
 
@@ -137,8 +137,8 @@ public class DbFace extends DefaultFace {
 	private void saveScrollIfRequired () throws MorriganException {
 		if (!this.saveScrollOnClose) return;
 		try {
-			this.mnContext.getUserPrefs().putValue(PREF_SCROLL_INDEX, this.list.getSerial(), this.scrollTop);
-			this.mnContext.getUserPrefs().putValue(PREF_SELECTED_INDEX, this.list.getSerial(), this.selectedItemIndex);
+			this.mnContext.getUserPrefs().putValue(PREF_SCROLL_INDEX, this.list.getListRef().toUrlForm(), this.scrollTop);
+			this.mnContext.getUserPrefs().putValue(PREF_SELECTED_INDEX, this.list.getListRef().toUrlForm(), this.selectedItemIndex);
 		}
 		catch (final IOException e) {
 			throw new MorriganException("Failed to save scroll position.", e);
@@ -539,7 +539,7 @@ public class DbFace extends DefaultFace {
 	private void writeDbToScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		int l = top;
 
-		String summary = String.format("%s: %s", this.list.getType().uiString(), this.list.getListName());
+		String summary = String.format("%s: %s", this.list.getListRef().getType().getUiTitle(), this.list.getListName());
 		if (this.lastRefreshError != null) {
 			summary += ": " + this.lastRefreshError;
 		}

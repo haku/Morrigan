@@ -1,18 +1,13 @@
 package com.vaguehope.morrigan.model.media.internal.db;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 
 public class LocalMediaDb extends AbstractMediaDb {
 
 	protected LocalMediaDb (final String listName, final MediaDbConfig config) {
-		super(listName, config);
-	}
-
-	@Override
-	public MediaListType getType () {
-		return MediaListType.LOCALMMDB;
+		super(ListRef.forLocal(LocalMediaDbHelper.listIdForFilepath(config.getFilePath())), listName, config);
 	}
 
 	@Override

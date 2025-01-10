@@ -21,10 +21,10 @@ import com.vaguehope.morrigan.dlna.extcd.EphemeralMediaList;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.FileExistance;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
@@ -32,6 +32,7 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public abstract class RpcMediaList extends EphemeralMediaList {
 
+	protected final ListRef listRef;
 	protected final RemoteInstance ri;
 	private final RpcClient rpcClient;
 	private final MetadataStorage metadataStorage;
@@ -39,7 +40,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	private volatile boolean neverRead = true;
 
-	public RpcMediaList(final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage metadataStorage) {
+	public RpcMediaList(final ListRef listRef, final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage metadataStorage) {
+		this.listRef = listRef;
 		this.ri = ri;
 		this.rpcClient = rpcClient;
 		this.rpcContentServer = rpcContentServer;
@@ -47,18 +49,18 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public String getListId() {
-		return this.ri.getLocalIdentifier();
+	public ListRef getListRef() {
+		return this.listRef;
 	}
 
 	@Override
 	public String getListName() {
-		return this.ri.getLocalIdentifier();
+		return this.listRef.getListId();
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s{%s, %s}", getClass().getSimpleName(), getListId(), getListName());
+		return String.format("%s{%s, %s}", getClass().getSimpleName(), this.listRef, getListName());
 	}
 
 	@Override
@@ -67,13 +69,9 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public MediaListType getType() {
-		return MediaListType.EXTMMDB;
-	}
-
-	@Override
-	public MediaList makeNode(final String id, final String title) throws MorriganException {
-		return new RpcMediaNodeList(id, title, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
+	public MediaList makeNode(final String nodeId, final String title) throws MorriganException {
+		final ListRef ref = ListRef.forRpcNode(this.listRef.getListId(), nodeId);
+		return new RpcMediaNodeList(ref, title, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
 	}
 
 	@Override
@@ -83,7 +81,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public MediaList makeView(final String filter) throws MorriganException {
-		return new RpcMediaSearchList(filter, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
+		final ListRef ref = ListRef.forRpcSearch(this.listRef.getListId(), filter);
+		return new RpcMediaSearchList(ref, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
 	}
 
 	protected MediaBlockingStub blockingStub() {

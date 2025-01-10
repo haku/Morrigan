@@ -370,7 +370,7 @@ public class JumpToDialog extends DialogWindow {
 			return;
 		}
 
-		final String dbSearch = this.db.getSearchTerm();
+		final String dbSearch = this.db.getListRef().getSearch();
 		if (StringHelper.notBlank(dbSearch)) {
 			setResult(new JumpResult(JumpType.OPEN_VIEW, dbSearch));
 		}

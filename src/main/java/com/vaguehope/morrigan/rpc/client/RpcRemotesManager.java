@@ -8,8 +8,9 @@ import com.vaguehope.morrigan.Args.ArgsException;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.MediaStorageLayer;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 
 public class RpcRemotesManager {
 
@@ -41,9 +42,10 @@ public class RpcRemotesManager {
 		this.rpcClient.start();
 
 		for (final RemoteInstance ri : this.rpcClient.getRemoteInstances()) {
+			final ListRef ref = ListRef.forRpcNode(ri.getLocalIdentifier(), ROOT_NODE_ID);
 			final MediaStorageLayer storageLayer = this.mediaFactory.getStorageLayerWithNewItemFactory(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
 			final MetadataStorage storage = new MetadataStorage(storageLayer);
-			this.mediaFactory.addExternalList(new RpcMediaNodeList(ROOT_NODE_ID, "", ri, this.rpcClient, this.rpcContentServer, storage));
+			this.mediaFactory.addExternalList(new RpcMediaNodeList(ref, "", ri, this.rpcClient, this.rpcContentServer, storage));
 		}
 	}
 

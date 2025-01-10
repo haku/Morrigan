@@ -14,6 +14,7 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -24,8 +25,6 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 	private static final int MAX_VIEW_SIZE = 10000;  // this is just a guess.
 
-	private final String searchTerm;
-
 	private volatile List<MediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
 	private volatile SortColumn sortColumn = null;
@@ -34,28 +33,17 @@ public class RpcMediaSearchList extends RpcMediaList {
 	private volatile List<PlaybackOrder> supportChooseMethods = null;
 
 	public RpcMediaSearchList(
-			final String searchTerm,
+			final ListRef listRef,
 			final RemoteInstance ri,
 			final RpcClient rpcClient,
 			final RpcContentServlet rpcContentServer,
 			final MetadataStorage metadataStorage) {
-		super(ri, rpcClient, rpcContentServer, metadataStorage);
-		this.searchTerm = searchTerm;
-	}
-
-	@Override
-	public String getSerial() {
-		return new RpcListSerial(this.ri.getLocalIdentifier(), this.searchTerm).serialise();
-	}
-
-	@Override
-	public String getSearchTerm() {
-		return this.searchTerm;
+		super(listRef, ri, rpcClient, rpcContentServer, metadataStorage);
 	}
 
 	@Override
 	public String getListName() {
-		return super.getListName() + "{" + this.searchTerm + "}";
+		return super.getListName() + "{" + this.listRef.getSearch() + "}";
 	}
 
 	@Override
@@ -112,7 +100,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 	@Override
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
-		this.mediaItems = search(MediaType.TRACK, this.searchTerm, MAX_VIEW_SIZE,
+		this.mediaItems = search(MediaType.TRACK, this.listRef.getSearch(), MAX_VIEW_SIZE,
 				new SortColumn[] { getSortColumn() },
 				new SortDirection[] { this.sortDirection },
 				false);
@@ -173,7 +161,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 	@Override
 	public MediaItem chooseItem(final PlaybackOrder order, final MediaItem previousItem) throws MorriganException {
 		final ChooseMediaRequest.Builder req = ChooseMediaRequest.newBuilder()
-				.setQuery(this.searchTerm)
+				.setQuery(this.listRef.getSearch())
 				.setCount(1);
 		switch (order) {
 		case RANDOM:

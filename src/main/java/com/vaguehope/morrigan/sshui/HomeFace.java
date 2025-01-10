@@ -15,9 +15,10 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.config.SavedView;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -58,8 +59,7 @@ public class HomeFace extends MenuFace {
 	private long lastDataRefresh = 0;
 	private List<Player> players;
 	private List<AsyncTask> tasks;
-	private List<MediaListReference> dbs;
-	private List<MediaListReference> externalLibs;
+	private List<ListRefWithTitle> mediaLists;
 	private List<SavedView> savedViews;
 
 	public HomeFace (final FaceNavigation actions, SessionState sessionState, final MnContext mnContext) {
@@ -79,11 +79,8 @@ public class HomeFace extends MenuFace {
 				.addHeading("Players")
 				.addList(this.players, " (no players)", PLAYER_TO_STRING)
 				.addSubmenu(this.lastActionMessage)
-				.addHeading("DBs")
-				.addList(this.dbs, " (no DBs)", d -> " " + d.getTitle())
-				.addHeading("")
-				.addHeading("External Libraries")
-				.addList(this.externalLibs, " (no external libs)", d -> " " + d.getTitle())
+				.addHeading("Media Lists")
+				.addList(this.mediaLists, " (no media lists)", d -> " " + d.getTitle())
 				.addHeading("")
 				.addHeading("Saved Views")
 				.addList(this.savedViews, " (no saved views)", v -> " " + v.getName())
@@ -108,8 +105,7 @@ public class HomeFace extends MenuFace {
 
 	@Override
 	public void onFocus() throws Exception {
-		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
-		this.externalLibs = asList(this.mnContext.getMediaFactory().getExternalLists());
+		this.mediaLists = asList(this.mnContext.getMediaFactory().allLists());
 		this.savedViews = this.mnContext.getConfig().getSavedViews();
 	}
 
@@ -158,10 +154,10 @@ public class HomeFace extends MenuFace {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
 			((Player) this.selectionAndScroll.selectedItem).pausePlaying();
 		}
-		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final Player player = getPlayer(gui, "Play DB");
+		else if (this.selectionAndScroll.selectedItem instanceof ListRef) {
+			final Player player = getPlayer(gui, "Play List");
 			if (player != null) {
-				final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+				final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
 				playPlayItem(new PlayItem(db, null), player);
 			}
 		}
@@ -181,16 +177,18 @@ public class HomeFace extends MenuFace {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
 			this.navigation.startFace(new PlayerFace(this.navigation, this.mnContext, this.sessionState, (Player) this.selectionAndScroll.selectedItem));
 		}
-		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+		else if (this.selectionAndScroll.selectedItem instanceof ListRefWithTitle) {
+			final ListRefWithTitle withTitle = (ListRefWithTitle) this.selectionAndScroll.selectedItem;
+			final MediaList db = this.dbHelper.resolveReference(withTitle.getListRef());
 			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
 			final SavedView sv = (SavedView) this.selectionAndScroll.selectedItem;
-			final MediaList db = this.mnContext.getMediaFactory().getMediaListByMid(sv.getDbmid(), sv.getQuery());
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
+			final MediaList list = this.mnContext.getMediaFactory().getList(ListRef.fromUrlForm(sv.getListRef()));
+			final MediaList view = list.makeView(sv.getQuery());
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, view, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
@@ -216,10 +214,10 @@ public class HomeFace extends MenuFace {
 	}
 
 	private void enqueueDb (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
+		if (this.selectionAndScroll.selectedItem instanceof ListRef) {
 			final Player player = getPlayer(gui, "Enqueue DB");
 			if (player != null) {
-				final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+				final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
 				enqueuePlayItem(new PlayItem(db, null), player);
 			}
 		}
@@ -232,15 +230,15 @@ public class HomeFace extends MenuFace {
 				this.dbHelper.askSearch(gui, list);
 			}
 		}
-		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+		else if (this.selectionAndScroll.selectedItem instanceof ListRef) {
+			final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
 			this.dbHelper.askSearch(gui, db);
 		}
 	}
 
 	private void showProperties (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
-			final MediaList db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+		if (this.selectionAndScroll.selectedItem instanceof ListRef) {
+			final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
 			if (db instanceof MediaDb) {
 				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (MediaDb) db));
 			}

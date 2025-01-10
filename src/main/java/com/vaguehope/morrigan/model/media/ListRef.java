@@ -3,11 +3,12 @@ package com.vaguehope.morrigan.model.media;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class ListRef {
+public class ListRef implements Comparable<ListRef> {
 
 	public static ListRef fromUrlForm(final String urlFrom) {
 		if (urlFrom == null) return null;
@@ -35,11 +36,35 @@ public class ListRef {
 				search = val;
 				break;
 			default:
-				 throw new IllegalArgumentException("Invalid:" + urlFrom);
+				throw new IllegalArgumentException("Invalid:" + urlFrom);
 			}
 		}
 
 		return new ListRef(type, listId, nodeId, search);
+	}
+
+	public static ListRef forLocal(final String dbFilePath) {
+		return new ListRef(ListType.LOCAL, dbFilePath, null, null);
+	}
+
+	public static ListRef forLocalSearch(final String dbFilePath, final String search) {
+		return new ListRef(ListType.LOCAL, dbFilePath, null, search);
+	}
+
+	public static ListRef forRemote(final String dbFilePath) {
+		return new ListRef(ListType.REMOTE, dbFilePath, null, null);
+	}
+
+	public static ListRef forDlnaNode(final String listId, final String nodeId) {
+		return new ListRef(ListType.DLNA, listId, nodeId, null);
+	}
+
+	public static ListRef forRpcNode(final String listId, final String nodeId) {
+		return new ListRef(ListType.RPC, listId, nodeId, null);
+	}
+
+	public static ListRef forRpcSearch(final String listId, final String search) {
+		return new ListRef(ListType.RPC, listId, null, search);
 	}
 
 	private final ListType type;
@@ -47,7 +72,7 @@ public class ListRef {
 	private final String nodeId;
 	private final String search;
 
-	public ListRef(final ListType type, final String listId, final String nodeId, final String search) {
+	private ListRef(final ListType type, final String listId, final String nodeId, final String search) {
 		if (type == null) throw new IllegalArgumentException("type can not be null.");
 		if (StringUtils.isBlank(listId)) throw new IllegalArgumentException("listId can not be null or empty.");
 		this.type = type;
@@ -81,6 +106,14 @@ public class ListRef {
 		return this.search;
 	}
 
+	public ListRef withSearch(String newSearch) {
+		return new ListRef(this.type, this.listId, this.nodeId, newSearch);
+	}
+
+	public boolean isHasRootNodes() {
+		return this.type == ListType.RPC || this.type == ListType.DLNA;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("ListRef{%s, %s, %s, %s}", this.type, this.listId, this.nodeId, this.search);
@@ -106,17 +139,60 @@ public class ListRef {
 	public enum ListType {
 		LOCAL("Local"),
 		REMOTE("Remote"),
-		DLNA("DLNA"),
-		GRPC("GRPC");
+		RPC("RPC"),
+		DLNA("DLNA");
 
-		private final String uiName;
+		private final String uiTitle;
 
-		ListType(final String uiName) {
-			this.uiName = uiName;
+		ListType(final String uiTitle) {
+			this.uiTitle = uiTitle;
 		}
 
-		public String getUiName() {
-			return this.uiName;
+		public String getUiTitle() {
+			return this.uiTitle;
+		}
+	}
+
+	@Override
+	public int compareTo(ListRef o) {
+		return Order.ASC.compare(this, o);
+	}
+
+	public enum Order implements Comparator<ListRef> {
+		ASC {
+			@Override
+			public int compare (final ListRef a, final ListRef b) {
+				final int c = Integer.compare(a.type.ordinal(), b.type.ordinal());
+				if (c != 0) return c;
+				return LIST_ID.compare(a, b);
+			}
+		},
+		LIST_ID {
+			@Override
+			public int compare(final ListRef a, final ListRef b) {
+				return compareWithFallThrough(a, b, a.listId, b.listId, NODE_ID);
+			}
+		},
+		NODE_ID {
+			@Override
+			public int compare(final ListRef a, final ListRef b) {
+				return compareWithFallThrough(a, b, a.nodeId, b.nodeId, SEARCH);
+			}
+		},
+		SEARCH {
+			@Override
+			public int compare(final ListRef a, final ListRef b) {
+				return compareWithFallThrough(a, b, a.search, b.search, null);
+			}
+		};
+
+		@Override
+		public abstract int compare (ListRef a, ListRef b);
+
+		int compareWithFallThrough(final ListRef ar, final ListRef br, final String a, final String b, final Order fallthrough) {
+			final int c = (a != null ? (b != null ? a.compareTo(b) : 1) : 0);
+			if (c != 0 || fallthrough == null) return c;
+			return fallthrough.compare(ar, br);
 		}
 	}
 

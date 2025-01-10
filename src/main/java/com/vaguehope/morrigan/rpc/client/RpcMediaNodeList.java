@@ -14,28 +14,22 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeRequest;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 
 public class RpcMediaNodeList extends RpcMediaList {
 
-	private final String nodeId;
 	private final String title;
 
 	private volatile List<MediaNode> mediaNodes = Collections.emptyList();
 	private volatile List<MediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
 
-	public RpcMediaNodeList(final String nodeId, final String title, final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage storage) {
-		super(ri, rpcClient, rpcContentServer, storage);
-		this.nodeId = nodeId;
+	public RpcMediaNodeList(final ListRef listRef, final String title, final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage storage) {
+		super(listRef, ri, rpcClient, rpcContentServer, storage);
 		this.title = title;
-	}
-
-	@Override
-	public String getSerial() {
-		return new RpcListSerial(this.ri.getLocalIdentifier(), null).serialise();  // TODO include nodeId
 	}
 
 	@Override
@@ -45,17 +39,17 @@ public class RpcMediaNodeList extends RpcMediaList {
 
 	@Override
 	public String getNodeId() {
-		return this.nodeId;
+		return this.listRef.getNodeId();
 	}
 
 	@Override
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
-		final ListNodeReply resp = blockingStub().listNode(ListNodeRequest.newBuilder().setNodeId(this.nodeId).build());
+		final ListNodeReply resp = blockingStub().listNode(ListNodeRequest.newBuilder().setNodeId(this.listRef.getNodeId()).build());
 
 		final List<MediaNode> nodes = new ArrayList<>(resp.getChildCount());
 		for (final MediaToadProto.MediaNode n : resp.getChildList()) {
-			nodes.add(new MediaNode(n.getId(), n.getTitle(), this.nodeId));
+			nodes.add(new MediaNode(n.getId(), n.getTitle(), this.listRef.getNodeId()));
 		}
 
 		final List<MediaItem> items = new ArrayList<>(resp.getItemCount());

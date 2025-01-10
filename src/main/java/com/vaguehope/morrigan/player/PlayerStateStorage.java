@@ -21,8 +21,8 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -33,7 +33,7 @@ public class PlayerStateStorage {
 	private static final String DIR_NAME = "playerstate";
 	private static final Logger LOG = Logger.getLogger(PlayerStateStorage.class.getName());
 
-	private final Map<String, MediaList> listCache = new ConcurrentHashMap<>();
+	private final Map<ListRef, MediaList> listCache = new ConcurrentHashMap<>();
 	private final MediaFactory mf;
 	private final ScheduledExecutorService schEx;
 	private Config config;
@@ -172,7 +172,7 @@ public class PlayerStateStorage {
 		}
 		else {
 			if (item.hasList()) {
-				w.append(item.getList().getType().toString()).append("|").append(item.getList().getSerial());
+				w.append(item.getList().getListRef().toUrlForm());
 			}
 			w.append("\n");
 			if (item.hasTrack()) {
@@ -204,54 +204,28 @@ public class PlayerStateStorage {
 	private PlayItem readPlayItem (final String[] lines) throws DbException, MorriganException {
 		if (lines == null) return null;
 
-		final String listTypeAndSerialOrPseudoType = lines[0];
+		final String listRefOrPseudoType = lines[0];
 		final String trackFilePath = lines[1];
 		final String trackMd5 = lines[2];
 
-		if (StringHelper.blank(listTypeAndSerialOrPseudoType)) return null;
+		if (StringHelper.blank(listRefOrPseudoType)) return null;
 
-		final PlayItemType type = PlayItemType.parse(listTypeAndSerialOrPseudoType);
+		final PlayItemType type = PlayItemType.parse(listRefOrPseudoType);
 		if (type != null) return new PlayItem(type);
 
-		final String listTypeAndSerial = listTypeAndSerialOrPseudoType;
+		final String listRefUrlFrom = listRefOrPseudoType;
 		if (StringHelper.blank(trackFilePath) && StringHelper.blank(trackMd5)) return null;
 
-		final MediaListType listType;
-		final String listSerial;
-		if (listTypeAndSerial.contains("|")) {
-			final String[] split = listTypeAndSerial.split("\\|", 2);
-			listType = MediaListType.valueOf(split[0]);
-			listSerial = split[1];
-		}
-		else {
-			listType = MediaListType.LOCALMMDB;
-			listSerial = listTypeAndSerial;
-		}
-
-		MediaList list = this.listCache.get(listSerial);
+		final ListRef listRef = ListRef.fromUrlForm(listRefUrlFrom);
+		MediaList list = this.listCache.get(listRef);
 		if (list == null) {
-			switch (listType) {
-				case LOCALMMDB:
-					list = this.mf.getLocalMixedMediaDbBySerial(listSerial);
-					if (list == null) {
-						LOG.warning("Unknown list: " + listSerial);
-						return null;
-					}
-					list.read();
-					this.listCache.put(listSerial, list);
-					break;
-				case EXTMMDB:
-					list = this.mf.getExternalListBySerial(listSerial);
-					if (list == null) {
-						LOG.warning("Unknown list: " + listSerial);
-						return null;
-					}
-					this.listCache.put(listSerial, list);
-					break;
-				default:
-					LOG.warning("Unsupported list type: " + listType);
-					return null;
+			list = this.mf.getList(listRef);
+			if (list == null) {
+				LOG.warning("Unknown list: " + listRef);
+				return null;
 			}
+			list.read();
+			this.listCache.put(listRef, list);
 		}
 
 		MediaItem track = list.getByFile(trackFilePath);

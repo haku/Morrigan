@@ -16,8 +16,8 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef.ListType;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
@@ -211,7 +211,7 @@ public class DbPropertiesFace extends MenuFace {
 
 	// TODO replace with AsyncActions() ?
 	private void rescanSources () {
-		if (this.db.getType() == MediaListType.LOCALMMDB) {
+		if (this.db.getListRef().getType() == ListType.LOCAL) {
 			final MorriganTask task = this.mnContext.getMediaFactory().getLocalMixedMediaDbUpdateTask(this.db);
 			if (task != null) {
 				this.mnContext.getAsyncTasksRegister().scheduleTask(task);

@@ -20,6 +20,7 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.SortColumn;
 
 public class RpcMediaSearchListTest {
@@ -29,7 +30,7 @@ public class RpcMediaSearchListTest {
 
 	@Before
 	public void before() throws Exception {
-		final String searchTerm = "my search";
+		final ListRef ref = ListRef.forRpcSearch("target", "my search");
 		final RemoteInstance ri = mock(RemoteInstance.class);
 		final RpcClient rpcClient = mock(RpcClient.class);
 		final RpcContentServlet contentServer = mock(RpcContentServlet.class);
@@ -37,7 +38,7 @@ public class RpcMediaSearchListTest {
 		this.blockingStub = mock(MediaBlockingStub.class);
 		when(ri.getLocalIdentifier()).thenReturn("target");
 		when(rpcClient.getMediaBlockingStub("target")).thenReturn(this.blockingStub);
-		this.undertest = new RpcMediaSearchList(searchTerm, ri, rpcClient, contentServer, metadataStorage);
+		this.undertest = new RpcMediaSearchList(ref, ri, rpcClient, contentServer, metadataStorage);
 	}
 
 	@Test

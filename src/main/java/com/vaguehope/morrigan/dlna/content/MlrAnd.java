@@ -1,20 +1,20 @@
 package com.vaguehope.morrigan.dlna.content;
 
-import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 
 public class MlrAnd<T> {
 
-	private final MediaListReference mlr;
+	private final ListRefWithTitle listRef;
 
 	private final T obj;
 
-	public MlrAnd (final MediaListReference mlr, final T obj) {
-		this.mlr = mlr;
+	public MlrAnd (final ListRefWithTitle mlr, final T obj) {
+		this.listRef = mlr;
 		this.obj = obj;
 	}
 
-	public MediaListReference getMlr () {
-		return this.mlr;
+	public ListRefWithTitle getMlr () {
+		return this.listRef;
 	}
 
 	public T getObj () {
@@ -23,14 +23,14 @@ public class MlrAnd<T> {
 
 	@Override
 	public String toString () {
-		return String.format("MlrAnd{%s, %s}", this.mlr, this.obj);
+		return String.format("MlrAnd{%s, %s}", this.listRef, this.obj);
 	}
 
 	@Override
 	public int hashCode () {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.mlr == null) ? 0 : this.mlr.hashCode());
+		result = prime * result + ((this.listRef == null) ? 0 : this.listRef.hashCode());
 		result = prime * result + ((this.obj == null) ? 0 : this.obj.hashCode());
 		return result;
 	}
@@ -42,10 +42,10 @@ public class MlrAnd<T> {
 		if (!(other instanceof MlrAnd<?>)) return false;
 		final MlrAnd<?> that = (MlrAnd<?>) other;
 
-		if (this.mlr == null) {
-			if (that.mlr != null) return false;
+		if (this.listRef == null) {
+			if (that.listRef != null) return false;
 		}
-		else if (!this.mlr.equals(that.mlr)) {
+		else if (!this.listRef.equals(that.listRef)) {
 			return false;
 		}
 

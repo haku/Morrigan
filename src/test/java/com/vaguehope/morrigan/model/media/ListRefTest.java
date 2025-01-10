@@ -2,26 +2,34 @@ package com.vaguehope.morrigan.model.media;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.vaguehope.morrigan.model.media.ListRef.ListType;
 
 public class ListRefTest {
 
 	@Test
-	public void itDoesAll4Parts() throws Exception {
-		testRoundTrip("LOCAL:l=li%3Ast%2FId&n=node.Id&s=a%3Db", new ListRef(ListType.LOCAL, "li:st/Id", "node.Id", "a=b"));
+	public void itDoesLocal() throws Exception {
+		testRoundTrip("LOCAL:l=c%3A%2Ffoo%2Fbar.db", ListRef.forLocal("c:/foo/bar.db"));
+		testRoundTrip("LOCAL:l=c%3A%2Ffoo%2Fbar.db&s=a%3Db", ListRef.forLocalSearch("c:/foo/bar.db", "a=b"));
 	}
 
 	@Test
-	public void itDoesTypeAndList() throws Exception {
-		testRoundTrip("REMOTE:l=li%3Ast%2FId", new ListRef(ListType.REMOTE, "li:st/Id", null, null));
+	public void itDoesRemote() throws Exception {
+		testRoundTrip("REMOTE:l=li%3Ast%2FId", ListRef.forRemote("li:st/Id"));
 	}
 
 	@Test
-	public void itDoesTypeAndListAndSearch() throws Exception {
-		testRoundTrip("GRPC:l=li%3Ast%2FId&s=my+search%26term+foo%3Dbar+etc", new ListRef(ListType.GRPC, "li:st/Id", null, "my search&term foo=bar etc"));
+	public void itDoesDlna() throws Exception {
+		testRoundTrip("DLNA:l=li%3Ast%2FId&n=some%3Anode%2Fid", ListRef.forDlnaNode("li:st/Id", "some:node/id"));
+	}
+
+	@Test
+	public void itDoesRpc() throws Exception {
+		testRoundTrip("RPC:l=li%3Ast%2FId&n=some%3Anode%2Fid", ListRef.forRpcNode("li:st/Id", "some:node/id"));
+		testRoundTrip("RPC:l=li%3Ast%2FId&s=my+search%26term+foo%3Dbar+etc", ListRef.forRpcSearch("li:st/Id", "my search&term foo=bar etc"));
 	}
 
 	@Test
@@ -39,6 +47,29 @@ public class ListRefTest {
 		testInvalid("LOCAL");
 		testInvalid("LOCAL:l");
 		testInvalid("LOCAL:l=");
+	}
+
+	@Test
+	public void itSorts() throws Exception {
+		assertEquals(0, ListRef.forRpcNode("id", "0").compareTo(ListRef.forRpcNode("id", "0")));
+
+		assertEquals(-1, ListRef.forRpcNode("a", "0").compareTo(ListRef.forRpcNode("b", "0")));
+		assertEquals(1, ListRef.forRpcNode("b", "0").compareTo(ListRef.forRpcNode("a", "0")));
+
+		assertEquals(-1, ListRef.forRpcNode("a", null).compareTo(ListRef.forRpcNode("b", "0")));
+		assertEquals(1, ListRef.forRpcNode("b", "0").compareTo(ListRef.forRpcNode("a", null)));
+
+		assertEquals(-1, ListRef.forRpcNode("a", "1").compareTo(ListRef.forRpcNode("b", "2")));
+		assertEquals(1, ListRef.forRpcNode("b", "2").compareTo(ListRef.forRpcNode("a", "1")));
+	}
+
+	@Test
+	public void itWorksAsMapKey() throws Exception {
+		final ListRef ref = ListRef.forRpcNode("id", "0");
+		final Object val = new Object();
+		final Map<ListRef, Object> cslp = new ConcurrentSkipListMap<>();
+		cslp.put(ref, val);
+		assertEquals(val, cslp.get(ref));
 	}
 
 	private static void testRoundTrip(final String urlForm, final ListRef objForm) {

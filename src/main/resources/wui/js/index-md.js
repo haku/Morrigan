@@ -7,10 +7,10 @@
   var selectedPlayer;
   var lastQueuePid;
   var lastQueueVersion;
-  var currentDbMid;
+  var currentDbListRef;
   var currentDbQuery;
   var currentDbResults;
-  var tagEditorMid;
+  var tagEditorListRef;
 
   $(document).ready(function() {
     updatePageTitle();
@@ -193,8 +193,8 @@
   }
 
   function footerSearchClicked() {
-    if (selectedPlayer && selectedPlayer.mid) {
-      setDbTabToSearch(selectedPlayer.mid, selectedPlayer.listView);
+    if (selectedPlayer && selectedPlayer.listRef) {
+      setDbTabToSearch(selectedPlayer.listRef, selectedPlayer.listView);
       $('#fixed_tab_db span').click();
       $('#db_query').focus();
     }
@@ -263,8 +263,8 @@
     $('#volume_down').click(function() { setRelativeVolume(-3); });
     $('#volume_up').click(function() { setRelativeVolume(3); });
 
-    setupTagAutocomplete($('#db_query'), true, function(){return currentDbMid});
-    setupTagAutocomplete($('#new_tag'), false, function(){return tagEditorMid});
+    setupTagAutocomplete($('#db_query'), true, function(){return currentDbListRef});
+    setupTagAutocomplete($('#new_tag'), false, function(){return tagEditorListRef});
   }
 
   function tagsClicked() {
@@ -303,10 +303,10 @@
     var menu = $('#queue_add_view_menu');
     $.each(savedViews, function(index, item) {
       var addToQueue = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
-      if (item.name && item.dbmid && (item.query || item.query === '')) {
+      if (item.name && item.listref && (item.query || item.query === '')) {
         addToQueue.text(item.name);
         addToQueue.unbind().click(function() {
-          enqueueView(item.dbmid, item.query);
+          enqueueView(item.listref, item.query);
           hidePopup(menu);
         });
       }
@@ -322,23 +322,23 @@
   }
 
   function enqueueViewClicked() {
-    if (!currentDbMid || !currentDbResults) return;
-    enqueueView(currentDbMid, currentDbQuery);
+    if (!currentDbListRef || !currentDbResults) return;
+    enqueueView(currentDbListRef, currentDbQuery);
   }
 
-  function enqueueView(dbMid, query) {
+  function enqueueView(listRef, query) {
     if (!selectedPlayer) return;
-    MnApi.enqueueView(dbMid, query, selectedPlayer.pid, msgHandler, function(msg) {
+    MnApi.enqueueView(listRef, query, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
       fetchAndDisplayQueue();
     });
   }
 
-  function setupTagAutocomplete(el, isSearch, midSup) {
+  function setupTagAutocomplete(el, isSearch, listRefSup) {
     var source = function(req, resp) {
       $.ajax({
         dataType: "json",
-        url: 'mlists/' + midSup() + '/tags?term=' + encodeURIComponent(req.term),
+        url: 'mlists/' + listRefSup() + '/tags?term=' + encodeURIComponent(req.term),
         success: function(data) {
           if (!el.data('sent')) {
             if (isSearch) fillInTagSearches(data);
@@ -585,7 +585,7 @@
 // DB tab.
 
   function setDbTabToDbs() {
-    currentDbMid = null;
+    currentDbListRef = null;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
@@ -596,8 +596,8 @@
     // TODO show spinner.
   }
 
-  function restoreSavedSearch(mid) {
-    var prevQuery = JSON.parse(localStorage['query:' + mid] || '{}');
+  function restoreSavedSearch(listRef) {
+    var prevQuery = JSON.parse(localStorage['query:' + listRef] || '{}');
 
     var query = prevQuery.query;
     if (typeof(query) != "undefined") {
@@ -612,20 +612,20 @@
   }
 
   function writeSavedSearch() {
-    localStorage['query:' + currentDbMid] = JSON.stringify({
+    localStorage['query:' + currentDbListRef] = JSON.stringify({
       query: $('#db_query').val(),
       sortColumn: $('#db_sort_column').val(),
       sortOrder: $('#db_sort_order').val(),
     });
   }
 
-  function setDbTabToNode(mid, nodeId, parentNodeId) {
-    currentDbMid = mid;
+  function setDbTabToNode(listRef, nodeId, parentNodeId) {
+    currentDbListRef = listRef;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
 
-    MnApi.getNode(mid, nodeId, parentNodeId, msgHandler, displayNode);
+    MnApi.getNode(listRef, nodeId, parentNodeId, msgHandler, displayNode);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
@@ -634,7 +634,7 @@
     $('#db_query').off('keyup').on('keyup', function(event) {
       onAutocompleteKeyup(event);
       if (event.keyCode == 13) {
-        setDbTabToSearch(mid);
+        setDbTabToSearch(listRef);
       }
     });
     $('#db_sort_column').unbind();
@@ -645,12 +645,12 @@
       if (current_icon === 'deleted') new_icon = 'delete_outline';
       $('#db_include_disabled .material-icons').text(new_icon);
     });
-    $('#db_go_tags').unbind().click(function(){setDbTabToTags(mid, view)});
-    $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(mid, view)});
+    $('#db_go_tags').unbind().click(function(){setDbTabToTags(listRef, view)});
+    $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(listRef, view)});
     $('#db_sort_options').show();
   }
 
-  function setDbTabToSearch(mid, view, query) {
+  function setDbTabToSearch(listRef, view, query) {
     if (query) {
       $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
     }
@@ -662,13 +662,13 @@
     var sortOrder = $('#db_sort_order').val();
     var includeDisabled = $('#db_include_disabled .material-icons').text() === 'deleted';
 
-    currentDbMid = mid;
+    currentDbListRef = listRef;
     currentDbQuery = query;
     currentDbResults = null;
     $('#db_fab').hide();
     writeSavedSearch();
 
-    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, displayResults);
+    MnApi.getQuery(listRef, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, displayResults);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
@@ -678,43 +678,43 @@
     $('#db_query').off('keyup').on('keyup', function(event) {
       onAutocompleteKeyup(event);
       if (event.keyCode == 13) {
-        setDbTabToSearch(mid, view);
+        setDbTabToSearch(listRef, view);
       }
     });
-    $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
-    $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
+    $('#db_sort_column').unbind().change(function(){setDbTabToSearch(listRef, view)});
+    $('#db_sort_order').unbind().change(function(){setDbTabToSearch(listRef, view)});
     $('#db_include_disabled').unbind().click(function(event){
       var current_icon = $('#db_include_disabled .material-icons').text();
       var new_icon = 'deleted';
       if (current_icon === 'deleted') new_icon = 'delete_outline';
       $('#db_include_disabled .material-icons').text(new_icon);
-      setDbTabToSearch(mid, view);
+      setDbTabToSearch(listRef, view);
     });
-    $('#db_go_tags').unbind().click(function(){setDbTabToTags(mid, view)});
-    $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(mid, view)});
+    $('#db_go_tags').unbind().click(function(){setDbTabToTags(listRef, view)});
+    $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(listRef, view)});
     $('#db_sort_options').show();
   }
 
-  function setDbTabToTags(mid, view) {
-    currentDbMid = mid;
+  function setDbTabToTags(listRef, view) {
+    currentDbListRef = listRef;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
 
-    MnApi.getTags(mid, view, msgHandler, displayTags);
+    MnApi.getTags(listRef, view, msgHandler, displayTags);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
     // TODO show spinner.
   }
 
-  function setDbTabToAlbums(mid, view) {
-    currentDbMid = mid;
+  function setDbTabToAlbums(listRef, view) {
+    currentDbListRef = listRef;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
 
-    MnApi.getAlbums(mid, view, msgHandler, displayAlbums);
+    MnApi.getAlbums(listRef, view, msgHandler, displayAlbums);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
@@ -726,7 +726,6 @@
     dbList.empty();
     var count = 0;
     $.each(dbs, function(index, db) {
-      if (db.mid.startsWith("REMOTEMMDB")) return true;
       dbList.append(makeDbItem(db));
       count += 1;
     });
@@ -745,14 +744,14 @@
     if (db.hasRootNodes) {
       a.unbind().click(function(event) {
         event.preventDefault();
-        setDbTabToNode(db.mid, "0", null);
+        setDbTabToNode(db.listRef, "0", null);
       });
     }
     else {
       a.unbind().click(function(event) {
         event.preventDefault();
-        restoreSavedSearch(db.mid);
-        setDbTabToSearch(db.mid);
+        restoreSavedSearch(db.listRef);
+        setDbTabToSearch(db.listRef);
       });
     }
 
@@ -767,7 +766,7 @@
 
     if (node.parentNodeId) {
       dbList.append(makeNodeItem({
-        "mid": node.mid,
+        "listRef": node.listRef,
         "id": node.parentNodeId,
         "title": "..",
       }));
@@ -787,7 +786,7 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
-      setDbTabToNode(node.mid, node.id, parentNodeId);
+      setDbTabToNode(node.listRef, node.id, parentNodeId);
     });
 
     return row;
@@ -879,7 +878,7 @@
         invertSelection(res, row);
       }
       else if (res.remoteId) {
-        setDbTabToSearch(res.mid, res.view, res.remoteId);
+        setDbTabToSearch(res.listRef, res.view, res.remoteId);
       }
       else {
         showDbItemMenu(res, row);
@@ -916,7 +915,7 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
-      setDbTabToSearch(tag.mid, tag.view, tag.value);
+      setDbTabToSearch(tag.listRef, tag.view, tag.value);
     });
 
     return el;
@@ -1081,11 +1080,11 @@
   }
 
   function showMultiTagEditor(selectedItems) {
-    // They should all have the same mid and view.
+    // They should all have the same listRef and view.
     var firstItem = selectedItems.values().next().value;
-    var mid = firstItem.mid;
+    var listRef = firstItem.listRef;
     var view = firstItem.view;
-    tagEditorMid = mid
+    tagEditorListRef = listRef;
 
     var tags = new Map();  // tag => [items]
     selectedItems.forEach(function(item, alsoItem, set) {
@@ -1136,7 +1135,7 @@
       var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
       updateRowText(search, tag, items);
       search.unbind().click(function() {
-        setDbTabToSearch(mid, view, 't=' + tag);
+        setDbTabToSearch(listRef, view, 't=' + tag);
         hidePopup(dlg);
         $('#fixed_tab_db span').click();
       });

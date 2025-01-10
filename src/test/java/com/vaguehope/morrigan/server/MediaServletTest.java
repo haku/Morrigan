@@ -61,7 +61,8 @@ public class MediaServletTest {
 	public void itServesLists() throws Exception {
 		this.req.setPathInfo(null);
 		this.undertest.service(this.req, this.resp);
-		assertOkJson("[{\"title\":\"media-servlet-test-db\",\"mid\":\"LOCALMMDB:media-servlet-test-db\",\"hasRootNodes\":false}]\n");
+		// TODO check if escaping the = is ok, otherwise disable html escaping in gson.
+		assertOkJson("[{\"title\":\"media-servlet-test-db\",\"listRef\":\"LOCAL:l\\u003dmedia-servlet-test-db\",\"hasRootNodes\":false}]\n");
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class MediaServletTest {
 		this.testDb.addNode(new MediaNode("node-id", "node tile", "0"));
 		final MediaItem track = this.testDb.addTestTrack(new File("/path/file.mp3"), new BigInteger("1"), new BigInteger("2"), 1234567890000L, 1234567890000L);
 		this.testDb.addTag(track, "some-tag", MediaTagType.MANUAL, (String) null);
-		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db");
+		this.req.setPathInfo("/LOCAL:l=media-servlet-test-db");
 		this.undertest.service(this.req, this.resp);
 		assertOkJson("{"
 				+ "\"nodeId\":\"0\","
@@ -83,7 +84,7 @@ public class MediaServletTest {
 
 	@Test
 	public void it404sForUnknownNode() throws Exception {
-		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db/node/unknown");
+		this.req.setPathInfo("/LOCAL:l=media-servlet-test-db/node/unknown");
 		this.undertest.service(this.req, this.resp);
 		assertEquals(404, this.resp.getStatus());
 	}
@@ -96,7 +97,7 @@ public class MediaServletTest {
 		when(node.getListName()).thenReturn("things");
 		when(node.getSubNodes()).thenReturn(ImmutableList.of(new MediaNode("sub-node-id", "node tile", "my-node")));
 		this.testDb.addChildNode("my-node", node);
-		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db/node/my-node");
+		this.req.setPathInfo("/LOCAL:l=media-servlet-test-db/node/my-node");
 		this.undertest.service(this.req, this.resp);
 		verify(node).read();
 		assertOkJson("{"
@@ -114,7 +115,7 @@ public class MediaServletTest {
 		this.testDb.addTag(track2, "foo", MediaTagType.MANUAL, (String) null);
 
 		final String search = URLEncoder.encode("t=foo f~/bar/", StandardCharsets.UTF_8);
-		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db/search/" + search);
+		this.req.setPathInfo("/LOCAL:l=media-servlet-test-db/search/" + search);
 		this.req.setParameter("sort", "DATE_LAST_PLAYED");
 		this.req.setParameter("order", "DESC");
 
@@ -138,7 +139,7 @@ public class MediaServletTest {
 		FileUtils.writeByteArrayToFile(file, data);
 		this.testDb.addTestTrack(file);
 
-		this.req.setPathInfo("/LOCALMMDB:media-servlet-test-db/item/" + file.getAbsolutePath());
+		this.req.setPathInfo("/LOCAL:l=media-servlet-test-db/item/" + file.getAbsolutePath());
 		this.undertest.service(this.req, this.resp);
 		assertArrayEquals(data, this.resp.getOutputAsByteArray());
 	}

@@ -23,7 +23,7 @@ public class LocalMediaDbFactory extends RecyclingFactory2<MediaDb, MediaDbConfi
 
 	@Override
 	protected MediaDb makeNewProduct (MediaDbConfig material) throws DbException {
-		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getMmdbTitle(material), material);
+		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getDbTitle(material), material);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 		final MediaStorageLayer dbLayer = MediaSqliteLayerFactory.getAutocommit(material.getFilePath(), itemFactory);
 		db.setDbLayer(dbLayer);
@@ -55,7 +55,7 @@ public class LocalMediaDbFactory extends RecyclingFactory2<MediaDb, MediaDbConfi
 	 */
 	public static MediaDb getTransactional (String fullFilePath) throws DbException {
 		final MediaDbConfig config = new MediaDbConfig(fullFilePath, null);
-		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getMmdbTitle(config), config);
+		final LocalMediaDb db = new LocalMediaDb(LocalMediaDbHelper.getDbTitle(config), config);
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(db);
 		final MediaStorageLayer dbLayer = MediaSqliteLayerFactory.getTransactional(fullFilePath, itemFactory);
 		db.setDbLayer(dbLayer);

@@ -12,8 +12,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaList;
 
 public class MediaFactoryImplTest {
 
@@ -30,35 +31,22 @@ public class MediaFactoryImplTest {
 	@Test
 	public void itGetsLocalByMid() throws Exception {
 		final MediaDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
-		final MediaListReference ref = this.undertest.getAllLocalMixedMediaDbs().iterator().next();
-		assertEquals(db, this.undertest.getMediaListByMid(ref.getMid(), null));
-		assertEquals(db, this.undertest.getMediaListByRef(ref));
+		final ListRef ref = this.undertest.allLists().iterator().next().getListRef();
+		assertEquals(db, this.undertest.getList(ref));
 
-		final String filter = "some-filter" + RND.nextLong();
-		final MediaDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
-		assertEquals(dbWithFilter, this.undertest.getMediaListByMid(ref.getMid(), filter));
-		assertEquals(dbWithFilter, this.undertest.getMediaListByRef(ref, filter));
+		final ListRef filterRef = db.makeView("some-filter" + RND.nextLong()).getListRef();
+		final MediaList dbWithFilter = this.undertest.getList(filterRef);
+		assertEquals(filterRef, dbWithFilter.getListRef());
 	}
 
 	@Test
-	public void itGetsLocalWithPathThatHasStuffOnTheEnd() throws Exception {
-		final String name = "test" + RND.nextLong();
-		final MediaDb db = this.undertest.createLocalMixedMediaDb(name);
-		assertEquals(db, this.undertest.getMediaListByMid("LOCALMMDB/" + name + ".local.db3/query/*?&column=DATE_LAST_PLAYED&order=desc&_=1736334474459", null));
-		assertEquals(db, this.undertest.getMediaListByMid("LOCALMMDB:" + name + ".local.db3/query/*?&column=DATE_LAST_PLAYED&order=desc&_=1736334474459", null));
-	}
+	public void itGetsRemote() throws Exception {
+		final ListRef ref = ListRef.forRpcNode("id" + RND.nextLong(), "0");
+		final MediaList external = mock(MediaList.class);
+		when(external.getListRef()).thenReturn(ref);
 
-	@Test
-	public void itGetsRemoteByMid() throws Exception {
-		final MediaDb external = mock(MediaDb.class);
-		final String id = "id" + RND.nextLong();
-		when(external.getListId()).thenReturn(id);
-		when(external.getListName()).thenReturn("name for " + id);
 		this.undertest.addExternalList(external);
-
-		final MediaListReference ref = this.undertest.getExternalLists().iterator().next();
-		assertEquals(external, this.undertest.getMediaListByMid(ref.getMid(), null));
-		assertEquals(external, this.undertest.getMediaListByRef(ref));
+		assertEquals(external, this.undertest.getList(ref));
 	}
 
 }

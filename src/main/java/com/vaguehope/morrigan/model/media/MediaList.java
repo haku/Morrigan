@@ -12,7 +12,6 @@ import java.util.UUID;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
@@ -20,22 +19,12 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 
 public interface MediaList extends List<AbstractItem> {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void dispose ();
 
-	String getListId ();
-	String getListName ();
-	UUID getUuid ();
-
-	MediaListType getType ();
-
-	/**
-	 * May contain a :, e.g. "/some/path.db:filter".
-	 */
-	String getSerial (); // TODO rename to something more helpful?
-
-	String getSearchTerm ();
+	ListRef getListRef();
+	String getListName();
+	UUID getUuid();
 
 	DirtyState getDirtyState ();
 	void setDirtyState (DirtyState state);
@@ -66,7 +55,7 @@ public interface MediaList extends List<AbstractItem> {
 	default String getNodeId() {
 		throw new UnsupportedOperationException();
 	}
-	default MediaList makeNode(String id, String title) throws MorriganException {
+	default MediaList makeNode(String nodeId, String title) throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
 	default List<MediaNode> getSubNodes() throws MorriganException {

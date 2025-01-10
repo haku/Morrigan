@@ -126,7 +126,7 @@ public class MlistsServletTest {
 		// The force read will query DB, applying DefaultMediaType to getMediaItems().
 		this.testDb.forceRead();
 
-		this.req.setRequestURI("/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags");
+		this.req.setRequestURI("/mlists/LOCAL:l=server-test-db/sha1tags");
 		for (final boolean includeautotags : Arrays.asList(false, true)) {  // TODO this should be 2 tests but its late.
 			this.req.setParameter("includeautotags", includeautotags ? "true" : "");
 			this.resp = new MockHttpServletResponse();  // reset between runs.

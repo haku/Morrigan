@@ -12,11 +12,13 @@ import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.dlna.httpserver.FileLocator;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRef.ListType;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.Cache;
 import com.vaguehope.morrigan.util.HashHelper;
@@ -42,15 +44,15 @@ public class MediaFileLocator implements FileLocator {
 		return id;
 	}
 
-	public String mediaItemId (final MediaListReference mlr, final MediaItem mi) {
+	public String mediaItemId (final ListRef mlr, final MediaItem mi) {
 		return String.format("%s/item/%s/%s", mlrRef(mlr), encodeFilepath(mi), mi.getMd5().toString(16));
 	}
 
-	public String mediaItemArtId (final MediaListReference mlr, final MediaItem mi) {
+	public String mediaItemArtId (final ListRef mlr, final MediaItem mi) {
 		return String.format("%s/item/%s/%s/art", mlrRef(mlr), encodeFilepath(mi), mi.getMd5().toString(16));
 	}
 
-	public String albumArtId (final MediaListReference mlr, final MediaAlbum album) {
+	public String albumArtId (final ListRef mlr, final MediaAlbum album) {
 		return String.format("%s/album/%s/art", mlrRef(mlr), encodeName(album));
 	}
 
@@ -76,9 +78,9 @@ public class MediaFileLocator implements FileLocator {
 		final String[] parts = id.split("/");
 		if (parts.length < 3) throw new IllegalArgumentException("Need at least 3 parts: " + id);
 
-		final MediaListReference mlr = derefMlr(parts[0]);
+		final ListRef mlr = derefMlr(parts[0]);
 		if (mlr == null) throw new IllegalArgumentException("Invalid ref in ID: " + id);
-		final MediaDb db = this.dbHelper.mediaListReferenceToDb(mlr);
+		final MediaList db = this.dbHelper.mediaListReferenceToDb(mlr);
 
 		if ("item".equals(parts[1])) {
 			if (parts.length < 4) throw new IllegalArgumentException("Need at least 4 parts: " + id);
@@ -109,25 +111,25 @@ public class MediaFileLocator implements FileLocator {
 		}
 	}
 
-	private static String mlrRef (final MediaListReference mlr) {
+	private static String mlrRef (final ListRef mlr) {
 		try {
-			return URLEncoder.encode(filenameFromPath(mlr.getIdentifier()), "UTF-8");
+			return URLEncoder.encode(filenameFromPath(mlr.getListId()), "UTF-8");
 		}
 		catch (final UnsupportedEncodingException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private final Cache<String, MediaListReference> mlrCache = new Cache<>(10);
+	private final Cache<String, ListRef> mlrCache = new Cache<>(10);
 
-	private MediaListReference derefMlr (final String encodedMlrIdentifier) {
-		final MediaListReference cached = this.mlrCache.getFresh(encodedMlrIdentifier, 60, TimeUnit.SECONDS);
+	private ListRef derefMlr (final String encodedMlrIdentifier) {
+		final ListRef cached = this.mlrCache.getFresh(encodedMlrIdentifier, 60, TimeUnit.SECONDS);
 		if (cached != null) return cached;
 
-		for (final MediaListReference mlr : this.mediaFactory.getAllLocalMixedMediaDbs()) {
-			if (encodedMlrIdentifier.equals(filenameFromPath(mlr.getIdentifier()))) {
-				this.mlrCache.put(encodedMlrIdentifier, mlr);
-				return mlr;
+		for (final ListRefWithTitle mlr : this.mediaFactory.allListsOfType(ListType.LOCAL)) {
+			if (encodedMlrIdentifier.equals(filenameFromPath(mlr.getListRef().getListId()))) {
+				this.mlrCache.put(encodedMlrIdentifier, mlr.getListRef());
+				return mlr.getListRef();
 			}
 		}
 		return null;

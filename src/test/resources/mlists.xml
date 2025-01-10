@@ -3,8 +3,8 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
  <title>Morrigan media lists desu~</title>
  <link rel="self" type="text/xml" href="mlists"/>
- <entry type="local">
+ <entry type="LOCAL">
   <title>server-test-db</title>
-  <link rel="self" type="text/xml" href="mlists/LOCALMMDB/server-test-db"/></entry>
+  <link rel="self" type="text/xml" href="mlists/LOCAL:l=server-test-db"/></entry>
 </feed>
 

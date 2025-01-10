@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,11 +26,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef;
+import com.vaguehope.morrigan.model.media.ListRefWithTitle;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.SortColumn;
@@ -55,7 +55,7 @@ public class MediaServlet extends HttpServlet {
 
 	private final MediaFactory mediaFactory;
 	private final Gson gson = new GsonBuilder()
-			.registerTypeHierarchyAdapter(MediaListReference.class, new MediaListReferenceSrl())
+			.registerTypeHierarchyAdapter(ListRefWithTitle.class, new ListRefWithTitleSrl())
 			.registerTypeHierarchyAdapter(MediaNode.class, new MediaNodeSrl())
 			.registerTypeHierarchyAdapter(MediaItem.class, new MediaItemSrl())
 			.registerTypeHierarchyAdapter(MediaTag.class, new MediaTagSrl())
@@ -82,15 +82,13 @@ public class MediaServlet extends HttpServlet {
 	}
 
 	private void serveAllLists(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final List<Object> ret = new ArrayList<>();
-		ret.addAll(this.mediaFactory.getAllLocalMixedMediaDbs());
-		ret.addAll(this.mediaFactory.getExternalLists());
-		returnJson(resp, ret);
+		returnJson(resp, this.mediaFactory.allLists());
 	}
 
 	private void serveListThings(final PathAndSubPath pth, final HttpServletRequest req, final HttpServletResponse resp)
 			throws IOException, MorriganException {
-		final MediaList list = this.mediaFactory.getMediaListByMid(pth.getPath(), null);
+		final ListRef listRef = ListRef.fromUrlForm(pth.getPath());
+		final MediaList list = this.mediaFactory.getList(listRef);
 		if (list == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -203,13 +201,13 @@ public class MediaServlet extends HttpServlet {
 		resp.getWriter().println(this.gson.toJson(ret));
 	}
 
-	public class MediaListReferenceSrl implements JsonSerializer<MediaListReference> {
+	public class ListRefWithTitleSrl implements JsonSerializer<ListRefWithTitle> {
 		@Override
-		public JsonElement serialize(final MediaListReference src, final Type typeOfSrc, final JsonSerializationContext context) {
+		public JsonElement serialize(final ListRefWithTitle src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
 			j.addProperty("title", src.getTitle());
-			j.addProperty("mid", src.getMid().replace("/", ":"));
-			j.addProperty("hasRootNodes", src.isHasRootNodes());
+			j.addProperty("listRef", src.getListRef().toUrlForm());
+			j.addProperty("hasRootNodes", src.getListRef().isHasRootNodes());
 			return j;
 		}
 	}

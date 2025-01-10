@@ -91,7 +91,7 @@ MnApi = {};
 
     var listHref = node.find('link[rel="list"]').attr('href');
     if (listHref) {
-      player.mid = listHref.replace('mlists/', '');
+      player.listRef = listHref.replace('mlists/', '');
     }
 
     var listView = node.find('listview').text();
@@ -99,7 +99,7 @@ MnApi = {};
 
     var trackNode = node.find('track');
     if (trackNode.length > 0) {
-      player.item = parseItemNode($(trackNode[0]), player.mid, listView);
+      player.item = parseItemNode($(trackNode[0]), player.listRef, listView);
     }
 
     player.monitors = [];
@@ -299,23 +299,23 @@ MnApi = {};
     });
   }
 
-  MnApi.getNode = function(mid, nodeId, parentNodeId, msgHandler, onNode) {
+  MnApi.getNode = function(listRef, nodeId, parentNodeId, msgHandler, onNode) {
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'media/' + mid + '/node/' + nodeId,
+      url : 'media/' + listRef + '/node/' + nodeId,
       dataType : 'json',
       beforeSend : function() {
         msgHandler.onInfo('Reading Node...');
       },
       success : function(node) {
-        // stuffing mid everywhere seems silly, but seems to make everything else simpler.
-        node.mid = mid;
+        // stuffing listRef everywhere seems silly, but seems to make everything else simpler.
+        node.listRef = listRef;
         node.parentNodeId = parentNodeId;  // for implementing ".." in the UI.  showing proper browing breadcome would hopefully make this not needed.
-        node.nodes.forEach(n => n.mid = mid);
+        node.nodes.forEach(n => n.listRef = listRef);
         node.items.forEach(i => {
-          i.mid = mid;
-          i.url = 'mlists/' + mid + "/items/" + i.id;  // for now point to old handler so playback etc works.
+          i.listRef = listRef;
+          i.url = 'mlists/' + listRef + "/items/" + i.id;  // for now point to old handler so playback etc works.
         });
         onNode(node);
         msgHandler.onInfo('');
@@ -326,8 +326,8 @@ MnApi = {};
     });
   }
 
-  MnApi.getDb = function(mid, view, msgHandler, onDb) {
-    var url = 'mlists/' + mid;
+  MnApi.getDb = function(listRef, view, msgHandler, onDb) {
+    var url = 'mlists/' + listRef;
     if (view) url += '?view=' + encodeURIComponent(view);
     $.ajax({
       type : 'GET',
@@ -335,7 +335,7 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        msgHandler.onInfo('Reading DB ' + mid + '...');
+        msgHandler.onInfo('Reading DB ' + listRef + '...');
       },
       success : function(xml) {
         var mlistNode = $(xml).find('mlist');
@@ -344,14 +344,14 @@ MnApi = {};
         msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        msgHandler.onError('Error fetching media list ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching media list ' + listRef + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
   function parseMlistNode(node) {
     var mlist = {};
-    mlist.mid = node.find('link[rel="self"]').attr('href').replace('mlists/', '');
+    mlist.listRef = node.find('link[rel="self"]').attr('href').replace('mlists/', '');
     mlist.type = node.attr('type');
     mlist.title = node.find('title').text();
     mlist.count = parseInt(node.find('count').text(), 10);
@@ -360,9 +360,9 @@ MnApi = {};
     return mlist;
   }
 
-  MnApi.getQuery = function(mid, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, onItems) {
+  MnApi.getQuery = function(listRef, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, onItems) {
     if (!query || query.length < 1) query = '*';
-    var url = 'mlists/' + mid + '/query/' + encodeURIComponent(query) + '?';
+    var url = 'mlists/' + listRef + '/query/' + encodeURIComponent(query) + '?';
     if (view) url += '&view=' + encodeURIComponent(view);
     if (sortColumn) url += "&column=" + sortColumn;
     if (sortOrder) url += "&order=" + sortOrder;
@@ -374,32 +374,32 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        msgHandler.onInfo('Querying ' + mid + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' disabled=' + includeDisabled + ' ...');
+        msgHandler.onInfo('Querying ' + listRef + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' disabled=' + includeDisabled + ' ...');
       },
       success : function(xml) {
         var itemsNode = $(xml).find('mlist');
-        var items = parseItemsNode(itemsNode, mid, view);
+        var items = parseItemsNode(itemsNode, listRef, view);
         onItems(items);
         msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        msgHandler.onError('Error querying ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error querying ' + listRef + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
-  function parseItemsNode(node, mid, view) {
+  function parseItemsNode(node, listRef, view) {
     var items = [];
     node.find('entry').each(function() {
-      var item = parseItemNode($(this), mid, view);
+      var item = parseItemNode($(this), listRef, view);
       items.push(item);
     });
     return items;
   }
 
-  function parseItemNode(node, mid, view) {
+  function parseItemNode(node, listRef, view) {
     var item = {
-      mid: mid,
+      listRef: listRef,
       view: view,
       title: node.find('title').text(),
       duration: parseInt(node.find('duration').text(), 10),
@@ -416,7 +416,7 @@ MnApi = {};
     }
     else {
       item.relativeUrl = href;
-      item.url = 'mlists/' + mid + '/items/' + item.relativeUrl;
+      item.url = 'mlists/' + listRef + '/items/' + item.relativeUrl;
     }
 
     item.tags = [];
@@ -430,8 +430,8 @@ MnApi = {};
     return item;
   }
 
-  MnApi.getAlbums = function(mid, view, msgHandler, onAlbums) {
-    var url = 'mlists/' + mid + '/albums';
+  MnApi.getAlbums = function(listRef, view, msgHandler, onAlbums) {
+    var url = 'mlists/' + listRef + '/albums';
     if (view) url += '?view=' + encodeURIComponent(view);
     $.ajax({
       type : 'GET',
@@ -439,32 +439,32 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        msgHandler.onInfo('Fetching albums ' + mid + ' view=' + view + ' ...');
+        msgHandler.onInfo('Fetching albums ' + listRef + ' view=' + view + ' ...');
       },
       success : function(xml) {
         var albumsNode = $(xml).find('albums');
-        var albums = parseAlbumsNode(albumsNode, mid, view);
+        var albums = parseAlbumsNode(albumsNode, listRef, view);
         onAlbums(albums);
         msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        msgHandler.onError('Error fetching albums ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching albums ' + listRef + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
-  function parseAlbumsNode(node, mid, view) {
+  function parseAlbumsNode(node, listRef, view) {
     var albums = [];
     node.find('entry').each(function() {
-      var album = parseAlbumNode($(this), mid, view);
+      var album = parseAlbumNode($(this), listRef, view);
       albums.push(album);
     });
     return albums;
   }
 
-  function parseAlbumNode(node, mid, view) {
+  function parseAlbumNode(node, listRef, view) {
     var album = {
-      mid: mid,
+      listRef: listRef,
       view: view,
       title: node.find('name').text(),
       trackCount: node.find('trackcount').text(),
@@ -472,15 +472,15 @@ MnApi = {};
       coverRelativeUrl: node.find('link[rel="cover"]').attr('href'),
     };
 
-    album.url = 'mlists/' + mid + '/albums/' + album.relativeUrl;
-    if (album.coverRelativeUrl) album.coverUrl = 'mlists/' + mid + '/items/' + album.coverRelativeUrl;
+    album.url = 'mlists/' + listRef + '/albums/' + album.relativeUrl;
+    if (album.coverRelativeUrl) album.coverUrl = 'mlists/' + listRef + '/items/' + album.coverRelativeUrl;
     if (album.coverUrl) album.resizedCoverUrl = album.coverUrl + '?resize=200'; // TODO make param?
 
     return album;
   }
 
-  MnApi.getTags = function(mid, view, msgHandler, onTags) {
-    var url = 'mlists/' + mid + '/tags?count=100';
+  MnApi.getTags = function(listRef, view, msgHandler, onTags) {
+    var url = 'mlists/' + listRef + '/tags?count=100';
     if (view) url += '&view=' + encodeURIComponent(view);
     $.ajax({
       type : 'GET',
@@ -488,12 +488,12 @@ MnApi = {};
       url : url,
       dataType : 'json',
       beforeSend : function() {
-        msgHandler.onInfo('Fetching tags ' + mid + ' view=' + view + ' ...');
+        msgHandler.onInfo('Fetching tags ' + listRef + ' view=' + view + ' ...');
       },
       success : function(json) {
         var tags = $.map(json, function(val, i) {
           return {
-            mid: mid,
+            listRef: listRef,
             view: view,
             title: val.label,
             value: val.value,
@@ -503,7 +503,7 @@ MnApi = {};
         msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        msgHandler.onError('Error fetching tags ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching tags ' + listRef + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -524,10 +524,10 @@ MnApi = {};
     actionItem(items, 'queue_top', args, msgHandler, onComplete);
   };
 
-  MnApi.enqueueView = function(mid, view, pid, msgHandler, onComplete) {
+  MnApi.enqueueView = function(listRef, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
-    actionItem({url: 'mlists/' + mid}, 'queue', args, msgHandler, onComplete);
+    actionItem({url: 'mlists/' + listRef}, 'queue', args, msgHandler, onComplete);
   };
 
   MnApi.addTag = function(item, tag, msgHandler, onComplete) {

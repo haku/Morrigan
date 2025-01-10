@@ -34,19 +34,6 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	public void dispose () {}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// DB Metadata.
-
-	@Override
-	public String getSerial () {
-		return getListId();
-	}
-
-	@Override
-	public String getSearchTerm () {
-		return null;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Getters that return nothing.
 
 	@Override

@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.Face.FaceNavigation;
@@ -31,8 +31,8 @@ public class DbHelper {
 		this.defaultDbFace = defaultDbFace;
 	}
 
-	public MediaList resolveReference (final MediaListReference ref) throws DbException, MorriganException {
-		final MediaList db = this.mnContext.getMediaFactory().getMediaListByRef(ref);
+	public MediaList resolveReference (final ListRef ref) throws DbException, MorriganException {
+		final MediaList db = this.mnContext.getMediaFactory().getList(ref);
 		db.read();
 		return db;
 	}

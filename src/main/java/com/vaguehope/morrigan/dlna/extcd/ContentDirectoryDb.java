@@ -17,10 +17,10 @@ import org.jupnp.support.model.container.Container;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -31,8 +31,7 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	private static final int MAX_TRIES = 2;
 	private static final int MAX_ITEMS = 500;
 
-	private final String listId;
-	private final String containerId;
+	private final ListRef listRef;
 	private final RemoteDevice device;
 	private final ControlPoint controlPoint;
 	private final RemoteService remoteService;
@@ -45,16 +44,14 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	private volatile long durationOfLastRead = -1;
 
 	public ContentDirectoryDb (
-			final String listId,
-			final String containerId,
+			final ListRef listRef,
 			final String title,
 			final ControlPoint controlPoint,
 			final RemoteDevice device,
 			final RemoteService remoteService,
 			final MetadataStorage storage,
 			final ContentDirectory contentDirectory) {
-		this.listId = listId;
-		this.containerId = containerId;
+		this.listRef = listRef;
 		this.controlPoint = controlPoint;
 		this.device = device;
 		this.remoteService = remoteService;
@@ -70,13 +67,13 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	}
 
 	@Override
-	public String getListId () {
-		return this.listId;
+	public ListRef getListRef() {
+		return this.listRef;
 	}
 
 	@Override
 	public UUID getUuid () {
-		return UUID.fromString(this.listId);
+		return UUID.fromString(this.listRef.getListId());
 	}
 
 	@Override
@@ -84,11 +81,6 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 		String name = this.device.getDetails().getFriendlyName();
 		if (StringUtils.isNotBlank(this.title)) name += ": " + this.title;
 		return name;
-	}
-
-	@Override
-	public MediaListType getType () {
-		return MediaListType.EXTMMDB;
 	}
 
 	@Override
@@ -117,12 +109,13 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 
 	@Override
 	public String getNodeId() {
-		return this.containerId;
+		return this.listRef.getNodeId();
 	}
 
 	@Override
-	public MediaList makeNode(final String id, final String nodeTitle) throws MorriganException {
-		return new ContentDirectoryDb(this.listId, id, nodeTitle, this.controlPoint, this.device, this.remoteService, this.storage, this.contentDirectory);
+	public MediaList makeNode(final String nodeId, final String nodeTitle) throws MorriganException {
+		final ListRef ref = ListRef.forDlnaNode(this.listRef.getListId(), nodeId);
+		return new ContentDirectoryDb(ref, nodeTitle, this.controlPoint, this.device, this.remoteService, this.storage, this.contentDirectory);
 	}
 
 	@Override
@@ -135,17 +128,17 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 		final long start = System.nanoTime();
 
 		final CountDownLatch cdl = new CountDownLatch(2);
-		final SyncBrowse mdReq = new SyncBrowse(cdl, this.remoteService, this.containerId, BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L);
-		final SyncBrowse dcReq = new SyncBrowse(cdl, this.remoteService, this.containerId, BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) MAX_ITEMS);
+		final SyncBrowse mdReq = new SyncBrowse(cdl, this.remoteService, this.listRef.getNodeId(), BrowseFlag.METADATA, Browse.CAPS_WILDCARD, 0, 1L);
+		final SyncBrowse dcReq = new SyncBrowse(cdl, this.remoteService, this.listRef.getNodeId(), BrowseFlag.DIRECT_CHILDREN, Browse.CAPS_WILDCARD, 0, (long) MAX_ITEMS);
 		this.controlPoint.execute(mdReq);
 		this.controlPoint.execute(dcReq);
 
-		ContentDirectory.await(cdl, "Browse '%s' on content directory '%s'.", this.containerId, this.contentDirectory);
+		ContentDirectory.await(cdl, "Browse '%s' on content directory '%s'.", this.listRef.getNodeId(), this.contentDirectory);
 		if (mdReq.getRef() == null) throw new MorriganException(mdReq.getErr());
 		if (dcReq.getRef() == null) throw new MorriganException(dcReq.getErr());
 
 		if (mdReq.getRef().getContainers().size() < 1) {
-			throw new MorriganException("Container not found: " + this.containerId);
+			throw new MorriganException("Container not found: " + this.listRef.getNodeId());
 		}
 
 		final Container cont = mdReq.getRef().getContainers().get(0);

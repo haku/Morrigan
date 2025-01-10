@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -427,19 +426,16 @@ public class PlayersServlet extends HttpServlet {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not " + detailLevel + ".");
 
 		final String listTitle;
-		final String listId;
 		final String listUrl;
 		final String listView;
 		final MediaList currentList = p.getCurrentList();
 		if (currentList != null) {
 			listTitle = currentList.getListName();
-			listId = currentList.getListId();
-			listUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getType().toString() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
-			listView = StringHelper.trimToEmpty(currentList.getSearchTerm());
+			listUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getListRef().toUrlForm();
+			listView = StringHelper.trimToEmpty(currentList.getListRef().getSearch());
 		}
 		else {
 			listTitle = NULL;
-			listId = NULL;
 			listUrl = null;
 			listView = "";
 		}
@@ -472,7 +468,6 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "queueduration", queueDuration.getDuration());
 		FeedHelper.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
 		FeedHelper.addElement(dw, "listtitle", listTitle);
-		FeedHelper.addElement(dw, "listid", listId);
 		if (listUrl != null) FeedHelper.addLink(dw, listUrl, "list", "text/xml");
 		FeedHelper.addElement(dw, "listview", listView);
 		FeedHelper.addElement(dw, "tracktitle", trackTitle);
@@ -545,8 +540,7 @@ public class PlayersServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "id", playItem.getId());
 
 			if (playItem.hasList()) {
-				final String listFile = URLEncoder.encode(FeedHelper.filenameFromPath(playItem.getList().getListId()), "UTF-8");
-				FeedHelper.addLink(dw, listFile, "list", "text/xml");
+				FeedHelper.addLink(dw, playItem.getList().getListRef().toUrlForm(), "list", "text/xml");
 			}
 
 			if (playItem.hasTrack()) {

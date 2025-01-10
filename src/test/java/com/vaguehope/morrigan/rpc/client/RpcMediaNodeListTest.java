@@ -15,6 +15,7 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeRequest;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 
@@ -25,13 +26,14 @@ public class RpcMediaNodeListTest {
 
 	@Before
 	public void before() throws Exception {
+		final ListRef ref = ListRef.forRpcNode("target", "nodeid");
 		final RemoteInstance ri = mock(RemoteInstance.class);
 		final RpcClient rpcClient = mock(RpcClient.class);
 		this.blockingStub = mock(MediaBlockingStub.class);
 		final MetadataStorage metadataStorage = mock(MetadataStorage.class);
 		when(ri.getLocalIdentifier()).thenReturn("target");
 		when(rpcClient.getMediaBlockingStub("target")).thenReturn(this.blockingStub);
-		this.undertest = new RpcMediaNodeList("nodeid", "title", ri, rpcClient, null, metadataStorage);
+		this.undertest = new RpcMediaNodeList(ref, "title", ri, rpcClient, null, metadataStorage);
 	}
 
 	@Test

@@ -21,8 +21,8 @@ public class ConfigTest {
 
 		final File f = new File(d, "savedviews.json");
 		final String input = "["
-				+ "{\"name\": \"first\", \"dbmid\":\"LOCALMMDB/test1.local.db3\", \"query\": \"query 1\"},"
-				+ "{\"name\": \"second\", \"dbmid\":\"LOCALMMDB/test2.local.db3\", \"query\": \"query 2\"}"
+				+ "{\"name\": \"first\", \"listref\":\"LOCAL:l=test1\", \"query\": \"query 1\"},"
+				+ "{\"name\": \"second\", \"listref\":\"LOCAL:l=test2\", \"query\": \"query 2\"}"
 				+ "]";
 		FileUtils.writeStringToFile(f, input, "UTF-8", false);
 
@@ -32,12 +32,12 @@ public class ConfigTest {
 		final Iterator<SavedView> iterator = actual.iterator();
 		final SavedView first = iterator.next();
 		assertEquals("first", first.getName());
-		assertEquals("LOCALMMDB/test1.local.db3", first.getDbmid());
+		assertEquals("LOCAL:l=test1", first.getListRef());
 		assertEquals("query 1", first.getQuery());
 
 		final SavedView second = iterator.next();
 		assertEquals("second", second.getName());
-		assertEquals("LOCALMMDB/test2.local.db3", second.getDbmid());
+		assertEquals("LOCAL:l=test2", second.getListRef());
 		assertEquals("query 2", second.getQuery());
 	}
 
