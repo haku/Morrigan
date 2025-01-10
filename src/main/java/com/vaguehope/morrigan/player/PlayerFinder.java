@@ -27,10 +27,6 @@ public final class PlayerFinder {
 			if (p.getQueue().size() > 0) return p;
 		}
 
-		for (final Player p : allPlayers) {
-			if (p.getHistory().size() > 0) return p;
-		}
-
 		return null;
 	}
 

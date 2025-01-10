@@ -2,9 +2,6 @@ package com.vaguehope.morrigan.player.internal;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.vaguehope.morrigan.config.Config;
@@ -14,10 +11,6 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.DirtyState;
-import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
@@ -57,102 +50,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements Player {
 	protected void onDispose () {
 		setCurrentItem(null);
 		finalisePlaybackEngine();
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Current selection.
-
-	private final Object _currentItemLock = new Object();
-	private volatile PlayItem _currentItem = null;
-
-	/**
-	 * This is called at the start of each track.
-	 * Must call this with a null before this
-	 * object is disposed so as to remove listener.
-	 */
-	@Override
-	public void setCurrentItem (final PlayItem item) {
-		synchronized (this._currentItemLock) {
-			if (this._currentItem != null && this._currentItem.hasList()) {
-				this._currentItem.getList().removeChangeEventListener(this.listChangedRunnable);
-			}
-
-			this._currentItem = item;
-
-			if (this._currentItem != null && this._currentItem.hasList()) {
-				this._currentItem.getList().addChangeEventListener(this.listChangedRunnable);
-				if (this._currentItem.hasTrack()) addToHistory(this._currentItem);
-			}
-
-			getListeners().currentItemChanged(item);
-		}
-	}
-
-	private final MediaListChangeListener listChangedRunnable = new MediaListChangeListener () {
-
-		@Override
-		public void mediaItemsRemoved (final MediaItem... items) {
-			validateHistory(); // TODO should this be scheduled / rate limited?
-		}
-
-		@Override
-		public void eventMessage(final String msg) { /* Unused. */ }
-		@Override
-		public void mediaListRead() { /* Unused. */ }
-		@Override
-		public void dirtyStateChanged (final DirtyState oldState, final DirtyState newState) { /* Unused. */ }
-		@Override
-		public void mediaItemsAdded (final MediaItem... items) { /* Unused. */ }
-		@Override
-		public void mediaItemsUpdated (final MediaItem... items) { /* Unused. */ }
-		@Override
-		public void mediaItemsForceReadRequired(final MediaItem... items) { /* Unused. */ }
-	};
-
-	@Override
-	public PlayItem getCurrentItem () {
-		// TODO check item is still valid.
-		return this._currentItem;
-	}
-
-	@Override
-	public MediaList getCurrentList () {
-		final PlayItem item = getCurrentItem();
-		return item == null ? null : item.getList();
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	History.
-
-	private static final int HISTORY_LENGTH = 10;
-
-	private final List<PlayItem> _history = new ArrayList<>();
-
-	@Override
-	public List<PlayItem> getHistory () {
-		return Collections.unmodifiableList(this._history);
-	}
-
-	private void addToHistory (final PlayItem item) {
-		synchronized (this._history) {
-			if (this._history.contains(item)) {
-				this._history.remove(item);
-			}
-			this._history.add(0, item);
-			if (this._history.size() > HISTORY_LENGTH) {
-				this._history.remove(this._history.size()-1);
-			}
-		}
-	}
-
-	void validateHistory () {
-		synchronized (this._history) {
-			for (int i = this._history.size() - 1; i >= 0; i--) {
-				if (!this._history.get(i).getList().getMediaItems().contains(this._history.get(i).getTrack())) {
-					this._history.remove(this._history.get(i));
-				}
-			}
-		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

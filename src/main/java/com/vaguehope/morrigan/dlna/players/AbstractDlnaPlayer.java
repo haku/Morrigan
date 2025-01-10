@@ -1,11 +1,7 @@
 package com.vaguehope.morrigan.dlna.players;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jupnp.controlpoint.ControlPoint;
@@ -20,7 +16,6 @@ import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -42,9 +37,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 
 	protected final PlayerEventCache playerEventCache = new PlayerEventCache();
 
-	private final AtomicReference<PlayItem> currentItem = new AtomicReference<>();
 	private final AtomicReference<DlnaPlayingParams> currentPlayingParams = new AtomicReference<>();
-	private final AtomicInteger currentItemDurationSeconds = new AtomicInteger(-1);
 
 	private volatile PlayerState restorePositionState;
 
@@ -106,31 +99,6 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 		return !isDisposed();
 	}
 
-	@Override
-	public List<PlayItem> getHistory () {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public MediaList getCurrentList () {
-		final PlayItem item = getCurrentItem();
-		return item == null ? null : item.getList();
-	}
-
-	@Override
-	public void setCurrentItem (final PlayItem item) {
-		final PlayItem old = this.currentItem.getAndSet(item);
-		if (!Objects.equals(old, item)) {
-			this.currentItemDurationSeconds.set(-1);
-		}
-		getListeners().currentItemChanged(item);
-	}
-
-	@Override
-	public PlayItem getCurrentItem () {
-		return this.currentItem.get();
-	}
-
 	public void setCurrentPlayingParams(final DlnaPlayingParams playingParams) {
 		this.currentPlayingParams.set(playingParams);
 	}
@@ -145,11 +113,6 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public int getCurrentTrackDurationAsMeasured () {
-		return this.currentItemDurationSeconds.get();
-	}
-
-	@Override
 	public int getCurrentTrackDurationFromRenderer () {
 		return this.playerEventCache.getDuration();
 	}
@@ -160,7 +123,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 		dlnaPlay(item, playingParams);
 
 		// After dlnaPlay() because it will (likely) call setCurrentItem().
-		this.currentItemDurationSeconds.set(playingParams.durationSeconds);
+		setCurrentTrackDurationAsMeasured(playingParams.durationSeconds);
 	}
 
 	protected abstract void dlnaPlay (PlayItem item, DlnaPlayingParams playingParams) throws DlnaException;

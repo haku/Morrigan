@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -46,6 +48,9 @@ public abstract class AbstractPlayer implements Player {
 
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<>(PlaybackOrder.MANUAL);
 	private volatile PlaybackOrder playbackOrderOverride = null;
+
+	private final AtomicReference<PlayItem> currentItem = new AtomicReference<>();
+	private final AtomicInteger currentItemDurationSeconds = new AtomicInteger(-1);
 
 	private final AtomicReference<Transcode> transcode = new AtomicReference<>(Transcode.NONE);
 	private final Transcoder transcoder;
@@ -153,12 +158,33 @@ public abstract class AbstractPlayer implements Player {
 		this.listeners.removeEventListener(listener);
 	}
 
-	/**
-	 * Default implementation to be overridden as needed.
-	 */
 	@Override
-	public int getCurrentTrackDurationAsMeasured () {
-		return -1;
+	public MediaList getCurrentList() {
+		final PlayItem item = getCurrentItem();
+		return item == null ? null : item.getList();
+	}
+
+	@Override
+	public void setCurrentItem(final PlayItem item) {
+		final PlayItem old = this.currentItem.getAndSet(item);
+		if (!Objects.equals(old, item)) {
+			this.currentItemDurationSeconds.set(-1);
+		}
+		getListeners().currentItemChanged(item);
+	}
+
+	@Override
+	public PlayItem getCurrentItem() {
+		return this.currentItem.get();
+	}
+
+	@Override
+	public int getCurrentTrackDurationAsMeasured() {
+		return this.currentItemDurationSeconds.get();
+	}
+
+	protected void setCurrentTrackDurationAsMeasured(final int newDuration) {
+		this.currentItemDurationSeconds.set(newDuration);
 	}
 
 	@Override
@@ -374,13 +400,13 @@ public abstract class AbstractPlayer implements Player {
 		final PlayItem queueItem = this.getQueue().takeFromQueue();
 		if (queueItem != null) return queueItem;
 
-		final PlayItem currentItem = getCurrentItem();
+		final PlayItem current = getCurrentItem();
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
-		if (currentItem != null && currentItem.isComplete()) {
-			final MediaItem nextTrack = callChooseItemOnList(currentItem.getList(), pbOrder, currentItem.getTrack());
+		if (current != null && current.isComplete()) {
+			final MediaItem nextTrack = callChooseItemOnList(current.getList(), pbOrder, current.getTrack());
 			if (nextTrack != null) {
-				return new PlayItem(currentItem.getList(), nextTrack);
+				return new PlayItem(current.getList(), nextTrack);
 			}
 		}
 

@@ -1,7 +1,5 @@
 package com.vaguehope.morrigan.player;
 
-import java.util.List;
-
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
@@ -104,7 +102,6 @@ public interface Player {
 	 */
 	void setTranscode(Transcode transcode);
 
-	List<PlayItem> getHistory();
 	PlayerQueue getQueue();
 
 	public interface PlayerEventListener {
