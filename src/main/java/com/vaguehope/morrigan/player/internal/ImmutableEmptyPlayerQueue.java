@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.player.DurationDataImpl;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.PlayerQueue;
@@ -89,7 +88,7 @@ public enum ImmutableEmptyPlayerQueue implements PlayerQueue {
 
 	@Override
 	public DurationData getQueueTotalDuration () {
-		return new DurationDataImpl(0, true);
+		return new DurationData(0, true);
 	}
 
 	@Override

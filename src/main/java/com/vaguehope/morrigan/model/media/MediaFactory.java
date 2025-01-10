@@ -31,9 +31,6 @@ public interface MediaFactory {
 	void addExternalList(MediaList db);
 	MediaList removeExternalList(ListRef listRef);
 
-	@Deprecated
-	DurationData getNewDurationData (long duration, boolean complete);
-
 	/*
 	 * TODO merge these next two methods?
 	 */

@@ -77,7 +77,7 @@ public final class MediaTrackListHelper {
 				complete = false;
 			}
 		}
-		return new DurationDataImpl(duration, complete);
+		return new DurationData(duration, complete);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

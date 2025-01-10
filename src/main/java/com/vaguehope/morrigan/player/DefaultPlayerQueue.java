@@ -209,7 +209,7 @@ public class DefaultPlayerQueue implements PlayerQueue {
 				}
 			}
 		}
-		return new DurationDataImpl(duration, complete);
+		return new DurationData(duration, complete);
 	}
 
 	@Override

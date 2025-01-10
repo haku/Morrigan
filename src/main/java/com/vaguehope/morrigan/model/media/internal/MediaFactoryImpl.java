@@ -18,7 +18,6 @@ import org.jaudiotagger.tag.TagException;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.ListRef.ListType;
 import com.vaguehope.morrigan.model.media.ListRefWithTitle;
@@ -146,11 +145,6 @@ public class MediaFactoryImpl implements MediaFactory {
 	public MediaStorageLayer getStorageLayerWithNewItemFactory(final String filepath) throws DbException {
 		final DefaultMediaItemFactory itemFactory = new DefaultMediaItemFactory(null);
 		return MediaSqliteLayerFactory.getTransactional(filepath, itemFactory);
-	}
-
-	@Override
-	public DurationData getNewDurationData (final long duration, final boolean complete) {
-		return new DurationDataImpl(duration, complete);
 	}
 
 	@Override

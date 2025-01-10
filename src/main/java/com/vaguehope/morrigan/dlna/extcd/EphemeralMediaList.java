@@ -15,17 +15,17 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.player.PlaybackOrder;
-import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public abstract class EphemeralMediaList extends AbstractList<AbstractItem> implements MediaList {
@@ -53,17 +53,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 
 	@Override
 	public DurationData getTotalDuration () {
-		return new DurationData() {
-			@Override
-			public boolean isComplete () {
-				return false;
-			}
-
-			@Override
-			public long getDuration () {
-				return 0L;
-			}
-		};
+		return new DurationData(0L, false);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
