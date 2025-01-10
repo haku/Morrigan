@@ -1,15 +1,15 @@
 package com.vaguehope.morrigan.server.boot;
 
-import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
+import com.vaguehope.morrigan.player.internal.LocalPlayerImpl;
 
 public class ServerPlayerContainer implements PlayerContainer {
 
 	private final String name;
 	private final ServerPlayerEventHandler serverPlayerEventHandler;
 
-	private LocalPlayer player;
+	private Player player;
 
 	public ServerPlayerContainer (final String name) {
 		this.name = name;
@@ -17,7 +17,7 @@ public class ServerPlayerContainer implements PlayerContainer {
 	}
 
 	public void dispose () {
-		LocalPlayer p = this.player;
+		Player p = this.player;
 		if (p != null) p.dispose();
 		this.serverPlayerEventHandler.dispose();
 	}
@@ -34,12 +34,12 @@ public class ServerPlayerContainer implements PlayerContainer {
 
 	@Override
 	public void setPlayer (final Player player) {
-		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
-		this.player = (LocalPlayer) player;
+		if (!(player instanceof LocalPlayerImpl)) throw new IllegalArgumentException("Only LocalPlayer supported.");
+		this.player = player;
 		this.player.addEventListener(this.serverPlayerEventHandler);
 	}
 
-	public LocalPlayer getLocalPlayer () {
+	public Player getLocalPlayer () {
 		return this.player;
 	}
 

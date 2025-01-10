@@ -20,14 +20,14 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
-import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.util.MnLogger;
 
-public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
+public class LocalPlayerImpl extends AbstractPlayer implements Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final MnLogger LOG = MnLogger.make(LocalPlayerImpl.class);
@@ -58,11 +58,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	protected void onDispose () {
 		setCurrentItem(null);
 		finalisePlaybackEngine();
-	}
-
-	@Override
-	public boolean isProxy () {
-		return false;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

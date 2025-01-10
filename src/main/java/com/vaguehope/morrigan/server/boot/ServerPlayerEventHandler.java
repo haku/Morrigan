@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
@@ -30,7 +29,7 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 	public synchronized void dispose() {
 	}
 
-	public LocalPlayer getPlayer () {
+	public Player getPlayer () {
 		return this.playerContainer.getLocalPlayer();
 	}
 
