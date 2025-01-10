@@ -112,7 +112,7 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 
 	@Override
 	public Player makeLocal (final String prefix, final String name, PlaybackEngineFactory playbackEngineFactory) {
-		final LocalPlayerImpl p = new LocalPlayerImpl(
+		final LocalPlayer p = new LocalPlayer(
 				nextIndex(prefix),
 				name,
 				this,

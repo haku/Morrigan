@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.server.boot;
 
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
-import com.vaguehope.morrigan.player.internal.LocalPlayerImpl;
+import com.vaguehope.morrigan.player.internal.LocalPlayer;
 
 public class ServerPlayerContainer implements PlayerContainer {
 
@@ -34,7 +34,7 @@ public class ServerPlayerContainer implements PlayerContainer {
 
 	@Override
 	public void setPlayer (final Player player) {
-		if (!(player instanceof LocalPlayerImpl)) throw new IllegalArgumentException("Only LocalPlayer supported.");
+		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
 		this.player = player;
 		this.player.addEventListener(this.serverPlayerEventHandler);
 	}

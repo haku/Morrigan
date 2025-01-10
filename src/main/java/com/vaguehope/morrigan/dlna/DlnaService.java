@@ -53,7 +53,7 @@ import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
-import com.vaguehope.morrigan.player.internal.LocalPlayerImpl;
+import com.vaguehope.morrigan.player.internal.LocalPlayer;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
@@ -133,7 +133,7 @@ public class DlnaService {
 			// TODO replace with event listener inside playerreg to dynamically reg/unreg
 			// which is needed for non-local players (this assumes local players are static).
 			for (final Player p : this.playerRegister.getAll()) {
-				if (!(p instanceof LocalPlayerImpl)) continue;
+				if (!(p instanceof LocalPlayer)) continue;
 				final LocalDevice device = PlayerControlBridgeFactory.makeMediaRendererDevice(systemId, p, dlnaPlayingParamsFactory, this.scheduledExecutor);
 				this.upnpService.getRegistry().addDevice(device);
 				p.addOnDisposeListener(() -> this.upnpService.getRegistry().removeDevice(device));

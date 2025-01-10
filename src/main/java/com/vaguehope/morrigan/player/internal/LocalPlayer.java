@@ -19,10 +19,10 @@ import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.util.MnLogger;
 
-public class LocalPlayerImpl extends AbstractPlayer implements Player {
+public class LocalPlayer extends AbstractPlayer implements Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final MnLogger LOG = MnLogger.make(LocalPlayerImpl.class);
+	private static final MnLogger LOG = MnLogger.make(LocalPlayer.class);
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ContentProxy contentProxy;
@@ -31,7 +31,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public LocalPlayerImpl(
+	public LocalPlayer(
 			final String id,
 			final String name,
 			final PlayerRegister register,
@@ -262,13 +262,13 @@ public class LocalPlayerImpl extends AbstractPlayer implements Player {
 
 		@Override
 		public void positionChanged(final long position) {
-			LocalPlayerImpl.this._currentPosition = position;
+			LocalPlayer.this._currentPosition = position;
 			getListeners().positionChanged(position, getCurrentTrackDuration());
 		}
 
 		@Override
 		public void durationChanged(final int duration) {
-			LocalPlayerImpl.this._currentTrackDuration = duration;
+			LocalPlayer.this._currentTrackDuration = duration;
 
 			if (duration > 0) {
 				final PlayItem c = getCurrentItem();
