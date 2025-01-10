@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
@@ -34,7 +33,7 @@ public abstract class AbstractPlayer implements Player {
 
 	private final String id;
 	private final String name;
-	private final Register<Player> register;
+	private final PlayerRegister register;
 	private final PlayerStateStorage playerStateStorage;
 	private final Config config;
 
