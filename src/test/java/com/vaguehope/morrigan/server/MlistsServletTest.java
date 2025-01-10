@@ -54,7 +54,7 @@ public class MlistsServletTest {
 		this.mediaFactory = new MediaFactoryImpl(this.config, null);
 		this.executor = Executors.newCachedThreadPool(new DaemonThreadFactory("test"));
 		this.asyncTasksRegister = new AsyncTasksRegisterImpl(this.executor);
-		this.asyncActions = new AsyncActions(this.asyncTasksRegister, this.mediaFactory, this.config);
+		this.asyncActions = new AsyncActions(this.asyncTasksRegister, this.mediaFactory);
 		this.transcoder = new Transcoder("test");
 		this.undertest = new MlistsServlet(this.playerReader, this.mediaFactory, this.asyncActions, this.transcoder, this.config);
 

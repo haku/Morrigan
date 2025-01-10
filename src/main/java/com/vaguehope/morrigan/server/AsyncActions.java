@@ -1,6 +1,5 @@
 package com.vaguehope.morrigan.server;
 
-import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.ListRef.ListType;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -18,12 +17,10 @@ public class AsyncActions {
 
 	private final MediaFactory mediaFactory;
 	private final AsyncTasksRegister asyncTasksRegister;
-	private final Config config;
 
-	public AsyncActions (final AsyncTasksRegister asyncTasksRegister, final MediaFactory mediaFactory, final Config config) {
+	public AsyncActions (final AsyncTasksRegister asyncTasksRegister, final MediaFactory mediaFactory) {
 		this.asyncTasksRegister = asyncTasksRegister;
 		this.mediaFactory = mediaFactory;
-		this.config = config;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -83,7 +83,7 @@ public final class Main {
 		final VlcEngineFactory infoPlaybackEngineFactory = new VlcEngineFactory(args.isVerboseLog(), Collections.emptyList());
 		final MediaFactory mediaFactory = new MediaFactoryImpl(config, infoPlaybackEngineFactory);
 		final PlayerRegister playerRegister = makePlayerRegister(config, args, mediaFactory);
-		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);
+		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory);
 		final Transcoder transcoder = new Transcoder("srv");
 		makeLocalPlayers(args, playerRegister);
 

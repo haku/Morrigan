@@ -11,7 +11,6 @@ import java.io.Writer;
 import java.util.Properties;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.util.Quietly;
 
 public class UserPrefs {
 
@@ -69,24 +68,16 @@ public class UserPrefs {
 	}
 
 	private void writeFile () throws IOException {
-		final Writer writer = new OutputStreamWriter(new FileOutputStream(this.prefsFile), "UTF-8");
-		try {
+		try (final Writer writer = new OutputStreamWriter(new FileOutputStream(this.prefsFile), "UTF-8")) {
 			this.properties.store(writer, "");
-		}
-		finally {
-			Quietly.close(writer);
 		}
 		this.cached = false;
 	}
 
 	private void readFile () throws IOException {
 		if (this.prefsFile.exists()) {
-			final Reader reader = new InputStreamReader(new FileInputStream(this.prefsFile), "UTF-8");
-			try {
+			try (final Reader reader = new InputStreamReader(new FileInputStream(this.prefsFile), "UTF-8")) {
 				this.properties.load(reader);
-			}
-			finally {
-				Quietly.close(reader);
 			}
 		}
 		else {
