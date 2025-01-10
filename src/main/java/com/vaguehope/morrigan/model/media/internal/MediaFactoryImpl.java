@@ -26,15 +26,12 @@ import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaStorageLayer;
-import com.vaguehope.morrigan.model.media.RemoteMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.CopyToLocalMmdbTask;
 import com.vaguehope.morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbFactory;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayerFactory;
-import com.vaguehope.morrigan.model.media.internal.db.RemoteMediaDbUpdateTask;
-import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
@@ -153,11 +150,6 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public MorriganTask getRemoteMixedMediaDbUpdateTask (final RemoteMediaDb library) {
-		return RemoteMediaDbUpdateTask.FACTORY.manufacture(library, null);
-	}
-
-	@Override
 	public MorriganTask getMediaFileCopyTask (final MediaList mediaItemList, final List<MediaItem> mediaSelection, final File targetDirectory) {
 		return new MediaFileCopyTask(mediaItemList, mediaSelection, targetDirectory);
 	}
@@ -165,12 +157,6 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public MorriganTask getNewCopyToLocalMmdbTask (final MediaList fromList, final Collection<MediaItem> itemsToCopy, final MediaDb toDb) {
 		return new CopyToLocalMmdbTask(fromList, itemsToCopy, toDb, this.config);
-	}
-
-	@Override
-	public MorriganTask getSyncMetadataRemoteToLocalTask (final MediaDb local, final RemoteMediaDb remote) {
-		// TODO FIXME use a factory to prevent duplicates.
-		return new SyncMetadataRemoteToLocalTask(local, remote, this);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

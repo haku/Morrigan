@@ -35,10 +35,8 @@ public interface MediaFactory {
 	 * TODO merge these next two methods?
 	 */
 	MorriganTask getLocalMixedMediaDbUpdateTask (MediaDb library);
-	MorriganTask getRemoteMixedMediaDbUpdateTask (RemoteMediaDb library);
 	MorriganTask getMediaFileCopyTask (MediaList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
 	MorriganTask getNewCopyToLocalMmdbTask (MediaList fromList, Collection<MediaItem> itemsToCopy, MediaDb toDb);
-	MorriganTask getSyncMetadataRemoteToLocalTask (MediaDb local, RemoteMediaDb remote);
 
 	void readTrackTags (MediaDb itemDb, MediaItem mlt, File file) throws IOException, MorriganException;
 
