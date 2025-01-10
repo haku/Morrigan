@@ -1,14 +1,10 @@
 package com.vaguehope.morrigan.server;
 
-import java.net.URI;
-
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.ListRef.ListType;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.RemoteMediaDb;
-import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -73,12 +69,6 @@ public class AsyncActions {
 		else {
 			throw new IllegalArgumentException("Failed to get task object from factory method.");
 		}
-	}
-
-	public AsyncTask scheduleMmdbPull (final MediaDb db, final String remote) throws DbException {
-		final URI remoteUri = db.getRemote(remote);
-		if (remoteUri == null) throw new IllegalArgumentException("Invalid remote name: " + remote);
-		return this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(db, remoteUri, this.mediaFactory, this.config));
 	}
 
 }

@@ -36,8 +36,6 @@ import com.vaguehope.morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.RemoteMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
-import com.vaguehope.morrigan.server.model.RemoteMediaDbFactory;
-import com.vaguehope.morrigan.server.model.RemoteMediaDbHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
@@ -84,10 +82,6 @@ public class MediaFactoryImpl implements MediaFactory {
 			final String localFile = LocalMediaDbHelper.getFullPathToLocalDb(this.config, listRef.getListId());
 			if (StringUtils.isBlank(listRef.getSearch())) return getLocalMixedMediaDb(localFile);
 			return LocalMediaDbFactory.getView(localFile, listRef.getSearch());
-
-		case REMOTE:
-			final String remoteFile = RemoteMediaDbHelper.getFullPathToMmdb(this.config, listRef.getListId());
-			return RemoteMediaDbFactory.getExisting(remoteFile, listRef.getSearch());
 
 		case RPC:
 		case DLNA:

@@ -51,10 +51,6 @@ public class ListRef implements Comparable<ListRef> {
 		return new ListRef(ListType.LOCAL, dbFilePath, null, search);
 	}
 
-	public static ListRef forRemote(final String dbFilePath) {
-		return new ListRef(ListType.REMOTE, dbFilePath, null, null);
-	}
-
 	public static ListRef forDlnaNode(final String listId, final String nodeId) {
 		return new ListRef(ListType.DLNA, listId, nodeId, null);
 	}
@@ -138,7 +134,6 @@ public class ListRef implements Comparable<ListRef> {
 
 	public enum ListType {
 		LOCAL("Local"),
-		REMOTE("Remote"),
 		RPC("RPC"),
 		DLNA("DLNA");
 

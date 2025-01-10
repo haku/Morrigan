@@ -17,11 +17,6 @@ public class ListRefTest {
 	}
 
 	@Test
-	public void itDoesRemote() throws Exception {
-		testRoundTrip("REMOTE:l=li%3Ast%2FId", ListRef.forRemote("li:st/Id"));
-	}
-
-	@Test
 	public void itDoesDlna() throws Exception {
 		testRoundTrip("DLNA:l=li%3Ast%2FId&n=some%3Anode%2Fid", ListRef.forDlnaNode("li:st/Id", "some:node/id"));
 	}

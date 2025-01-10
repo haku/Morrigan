@@ -34,17 +34,16 @@ import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.MediaDb;
-import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.ListRef;
-import com.vaguehope.morrigan.model.media.ListRef.ListType;
 import com.vaguehope.morrigan.model.media.ListRefWithTitle;
 import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaItem;
+import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -143,12 +142,10 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_INCLUDE_DISABLED = "includedisabled";
 	private static final String PARAM_TRANSCODE = "transcode";
 	private static final String PARAM_ENABLED = "enabled";
-	private static final String PARAM_REMOTE = "remote";
 	private static final String PARAM_INCLUDE_AUTO_TAGS = "includeautotags";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
-	public static final String CMD_PULL = "pull";
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
 	public static final String CMD_QUEUE_TOP = "queue_top";
@@ -348,23 +345,6 @@ public class MlistsServlet extends HttpServlet {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Only supported on DBs: " + action);
 			}
 		}
-		else if (action.equals(CMD_PULL)) {
-			if (mmdb instanceof MediaDb) {
-				final String remote = req.getParameter(PARAM_REMOTE);
-				if (StringHelper.notBlank(remote)) {
-					final AsyncTask at = this.asyncActions.scheduleMmdbPull((MediaDb) mmdb, remote);
-					resp.setContentType("text/plain");
-					resp.getWriter().println("Pull scheduled desu~");
-					resp.getWriter().println("id=" + at.id());
-				}
-				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'remote' parameter not set desu~");
-				}
-			}
-			else {
-				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Only supported on DBs: " + action);
-			}
-		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
 		}
@@ -511,8 +491,6 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.addLink(dw, REL_CONTEXTPATH, "self", "text/xml");
 
 		for (final ListRefWithTitle listRef : this.mediaFactory.allLists()) {
-			if (listRef.getListRef().getType() == ListType.REMOTE) continue;  // TODO decided what to do about these.
-
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", listRef.getListRef().getType().toString() } });
 			printMlistShort(dw, listRef);
 			dw.endElement("entry");
