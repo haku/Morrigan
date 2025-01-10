@@ -45,23 +45,17 @@ public class IoHelper {
 	}
 
 	public static void write (final InputStream is, final File file) throws IOException {
-		final OutputStream os = new FileOutputStream(file);
-		try {
+		try (final OutputStream os = new FileOutputStream(file)) {
 			copy(is, os);
 		}
 		finally {
 			closeQuietly(is);
-			closeQuietly(os);
 		}
 	}
 
 	public static void write (final ByteArrayOutputStream baos, final File file) throws IOException {
-		final OutputStream os = new FileOutputStream(file);
-		try {
+		try (final OutputStream os = new FileOutputStream(file)) {
 			baos.writeTo(os);
-		}
-		finally {
-			closeQuietly(os);
 		}
 	}
 
@@ -73,16 +67,11 @@ public class IoHelper {
 	 * Returns null if file does not exist.
 	 */
 	public static String readAsString (final File file) throws IOException {
-		try {
-			final FileInputStream stream = new FileInputStream(file);
-			try {
-				final FileChannel fc = stream.getChannel();
+		try (final FileInputStream stream = new FileInputStream(file)) {
+			try (final FileChannel fc = stream.getChannel()) {
 				final MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 				/* Instead of using default, pass in a decoder. */
 				return Charset.defaultCharset().decode(bb).toString();
-			}
-			finally {
-				stream.close();
 			}
 		}
 		catch (final FileNotFoundException e) {
@@ -97,18 +86,14 @@ public class IoHelper {
 	}
 
 	public static List<String> readAsList (final InputStream is) throws IOException {
-		try {
+		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)))) {
 			final List<String> ret = new ArrayList<>();
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (StringHelper.blank(line)) continue;
 				ret.add(line);
 			}
 			return ret;
-		}
-		finally {
-			closeQuietly(is);
 		}
 	}
 

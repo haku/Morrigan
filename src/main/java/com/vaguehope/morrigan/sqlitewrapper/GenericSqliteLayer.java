@@ -151,7 +151,8 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	Initialise.
 
 	private void initDatabaseTables () throws DbException {
-		try (final Statement stmt = getDbCon().createStatement()) {
+		try (@SuppressWarnings("resource")
+		final Statement stmt = getDbCon().createStatement()) {
 			for (final SqlCreateCmd sqlCreateCmd : getTblCreateCmds()) {
 				try (final ResultSet rs = stmt.executeQuery(sqlCreateCmd.getTblExistsSql())) {
 					if (!rs.next()) { // True if there are rows in the result.

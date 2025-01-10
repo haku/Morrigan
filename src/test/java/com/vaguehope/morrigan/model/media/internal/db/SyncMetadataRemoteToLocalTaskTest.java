@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.math.BigInteger;
 import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -9,11 +10,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.media.internal.db.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.model.media.test.Tag;
 import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.model.media.test.TestRemoteDb;
