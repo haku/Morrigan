@@ -47,6 +47,7 @@ public abstract class AbstractPlayer implements Player {
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<>(PlaybackOrder.MANUAL);
 	private volatile PlaybackOrder playbackOrderOverride = null;
 
+	private final AtomicReference<MediaList> currentList = new AtomicReference<>();
 	private final AtomicReference<PlayItem> currentItem = new AtomicReference<>();
 	private final AtomicInteger currentItemDurationSeconds = new AtomicInteger(-1);
 
@@ -164,8 +165,14 @@ public abstract class AbstractPlayer implements Player {
 
 	@Override
 	public MediaList getCurrentList() {
+		MediaList list = this.currentList.get();
+		if (list != null) return list;
+
 		final PlayItem item = getCurrentItem();
-		return item == null ? null : item.getList();
+		list = item == null ? null : item.getList();
+		if (list != null) this.currentList.compareAndExchange(null, list);
+
+		return this.currentList.get();
 	}
 
 	@Override
@@ -282,6 +289,10 @@ public abstract class AbstractPlayer implements Player {
 
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
+			if (!pi.hasList()) return;  // can not pick a track without a list.
+
+			this.currentList.set(pi.getList());  // list only items update the current list.
+
 			final MediaItem track = findTrackForListOnlyPlayItem(pi);
 			if (track == null) return;
 			pi = pi.withTrack(track);
@@ -357,7 +368,7 @@ public abstract class AbstractPlayer implements Player {
 
 	private void rollbackToTopOfQueue (final PlayItem item) {
 		if (item.equals(getCurrentItem())) return;
-		getQueue().addToQueueTop(item.withoutId());
+		this.queue.addToQueueTop(item.withoutId());
 	}
 
 	@Override
@@ -401,23 +412,23 @@ public abstract class AbstractPlayer implements Player {
 	protected abstract void loadAndPlay (PlayItem item) throws Exception;
 
 	protected PlayItem findNextItemToPlay () throws MorriganException {
-		final PlayItem queueItem = this.getQueue().takeFromQueue();
+		final PlayItem queueItem = this.queue.takeFromQueue();
 		if (queueItem != null) return queueItem;
 
 		final PlayItem current = getCurrentItem();
+		final MediaList curList = getCurrentList();
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
-		if (current != null && current.isComplete()) {
+		if (current != null && current.isComplete() && current.getList().equals(curList)) {
 			final MediaItem nextTrack = callChooseItemOnList(current.getList(), pbOrder, current.getTrack());
 			if (nextTrack != null) {
 				return new PlayItem(current.getList(), nextTrack);
 			}
 		}
 
-		final MediaList currentList = getCurrentList();
-		final MediaItem nextTrack = callChooseItemOnList(currentList, pbOrder, null);
+		final MediaItem nextTrack = callChooseItemOnList(curList, pbOrder, null);
 		if (nextTrack != null) {
-			return new PlayItem(currentList, nextTrack);
+			return new PlayItem(curList, nextTrack);
 		}
 
 		return null;

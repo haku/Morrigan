@@ -456,6 +456,12 @@
     $('#subtitle_list_name').updateText(player.listTitle);
     $('#subtitle_transcode').updateText(player.transcodeTitle);
     $('#track_title').updateText(player.trackTitle);
+    if (player.listTitle != player.trackListTitle) {
+      $('#track_list_title').updateText(player.trackListTitle);
+    }
+    else {
+      $('#track_list_title').updateText('');
+    }
     $('#track_tags').updateText(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     $('#queue_info').updateText(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
 

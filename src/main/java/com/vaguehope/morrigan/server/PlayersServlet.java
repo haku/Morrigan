@@ -425,23 +425,26 @@ public class PlayersServlet extends HttpServlet {
 	private void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, MorriganException, IOException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not " + detailLevel + ".");
 
-		final String listTitle;
-		final String listUrl;
-		final String listView;
+		final String currentListTitle;
+		final String currentListUrl;
+		final String currentListView;
 		final MediaList currentList = p.getCurrentList();
 		if (currentList != null) {
-			listTitle = currentList.getListName();
-			listUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getListRef().toUrlForm();
-			listView = StringHelper.trimToEmpty(currentList.getListRef().getSearch());
+			currentListTitle = currentList.getListName();
+			currentListUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getListRef().toUrlForm();
+			currentListView = StringHelper.trimToEmpty(currentList.getListRef().getSearch());
 		}
 		else {
-			listTitle = NULL;
-			listUrl = null;
-			listView = "";
+			currentListTitle = NULL;
+			currentListUrl = null;
+			currentListView = "";
 		}
 
 		final PlayItem currentItem = p.getCurrentItem();
+
 		final String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
+		final String trackListTitle = (currentItem != null && currentItem.hasList()) ? currentItem.getList().getListName() : "";
+
 		final Integer volume = p.getVoume();
 		final Integer volumeMaxValue = p.getVoumeMaxValue();
 
@@ -467,10 +470,13 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "queuelength", queueLength);
 		FeedHelper.addElement(dw, "queueduration", queueDuration.getDuration());
 		FeedHelper.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
-		FeedHelper.addElement(dw, "listtitle", listTitle);
-		if (listUrl != null) FeedHelper.addLink(dw, listUrl, "list", "text/xml");
-		FeedHelper.addElement(dw, "listview", listView);
+
+		FeedHelper.addElement(dw, "listtitle", currentListTitle);
+		if (currentListUrl != null) FeedHelper.addLink(dw, currentListUrl, "list", "text/xml");
+		FeedHelper.addElement(dw, "listview", currentListView);
+
 		FeedHelper.addElement(dw, "tracktitle", trackTitle);
+		FeedHelper.addElement(dw, "tracklisttitle", trackListTitle);
 
 		if (detailLevel == 1) {
 			final String trackLink;
@@ -503,21 +509,19 @@ public class PlayersServlet extends HttpServlet {
 				FeedHelper.addElement(dw, "trackstartcount", String.valueOf(track.getStartCount()));
 				FeedHelper.addElement(dw, "trackendcount", String.valueOf(track.getEndCount()));
 
-				if (currentList != null) {
-					final List<MediaTag> tags = currentList.getTags(track);
-					if (tags != null) {
-						for (final MediaTag tag : tags) {
-							FeedHelper.addElement(dw, "tracktag", tag.getTag(), new String[][] {
-								{"t", String.valueOf(tag.getType().getIndex())},
-								{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
-							});
-						}
+				final List<MediaTag> tags = track.getTags();
+				if (tags != null) {
+					for (final MediaTag tag : tags) {
+						FeedHelper.addElement(dw, "tracktag", tag.getTag(), new String[][] {
+							{"t", String.valueOf(tag.getType().getIndex())},
+							{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
+						});
 					}
-
-					dw.startElement("track");
-					MlistsServlet.fillInMediaItem(dw, currentList, track, IncludeTags.YES, null, this.config);
-					dw.endElement("track");
 				}
+
+				dw.startElement("track");
+				MlistsServlet.fillInMediaItem(dw, currentItem.getList(), track, IncludeTags.YES, null, this.config);
+				dw.endElement("track");
 			}
 		}
 	}

@@ -113,8 +113,8 @@ public final class PrintingThingsHelper {
 
 	public static String summariseTags (final Player player) {
 		final PlayItem playItem = player.getCurrentItem();
-		if (playItem != null && playItem.hasTrack()) {
-			final MediaList list = player.getCurrentList();
+		if (playItem != null && playItem.isComplete()) {
+			final MediaList list = playItem.getList();
 			if (list != null) {
 				try {
 					final List<MediaTag> tags = list.getTags(playItem.getTrack()); // TODO cache this?
