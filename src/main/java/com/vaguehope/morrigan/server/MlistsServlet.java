@@ -245,7 +245,7 @@ public class MlistsServlet extends HttpServlet {
 			final String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
 			if (path.length() > 0) {
 				final String[] pathParts = path.split("/");
-				if (pathParts.length >= 2) {
+				if (pathParts.length >= 1) {
 					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 					ListRef ref = ListRef.fromUrlForm(pathParts[0]);
 					if (filter != null) ref = ref.withSearch(filter);
