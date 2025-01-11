@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.dlna.extcd;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -69,6 +70,20 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	@Override
 	public ListRef getListRef() {
 		return this.listRef;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof ContentDirectoryDb)) return false;
+		final ContentDirectoryDb that = (ContentDirectoryDb) obj;
+		return Objects.equals(this.listRef, that.listRef);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.listRef.hashCode();
 	}
 
 	@Override

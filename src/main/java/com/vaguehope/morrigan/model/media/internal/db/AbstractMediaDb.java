@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -93,21 +92,6 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	public void dispose () {
 		super.dispose();
 		this.dbLayer.dispose(); // TODO FIXME what if this layer is shared???  Count attached change listeners?
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) return false;
-		if (this == obj) return true;
-		if (!(obj instanceof AbstractMediaDb)) return false;
-		final AbstractMediaDb that = (AbstractMediaDb) obj;
-
-		return Objects.equals(this.config, that.config);
-	}
-
-	@Override
-	public int hashCode() {
-		return this.config.hashCode();
 	}
 
 	public void setDbLayer(final MediaStorageLayer dbLayer) throws DbException {

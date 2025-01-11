@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.rpc.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -39,6 +40,12 @@ public class RpcMediaSearchListTest {
 		when(ri.getLocalIdentifier()).thenReturn("target");
 		when(rpcClient.getMediaBlockingStub("target")).thenReturn(this.blockingStub);
 		this.undertest = new RpcMediaSearchList(ref, ri, rpcClient, contentServer, metadataStorage);
+	}
+
+	@Test
+	public void itImplementsEquals() throws Exception {
+		final RpcMediaSearchList other = new RpcMediaSearchList(this.undertest.getListRef(), null, null, null, null);
+		assertEquals(other, this.undertest);
 	}
 
 	@Test

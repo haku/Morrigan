@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +52,20 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public ListRef getListRef() {
 		return this.listRef;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof RpcMediaList)) return false;
+		final RpcMediaList that = (RpcMediaList) obj;
+		return Objects.equals(this.listRef, that.listRef);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.listRef.hashCode();
 	}
 
 	@Override

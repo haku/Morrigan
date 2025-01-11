@@ -37,6 +37,12 @@ public class RpcMediaNodeListTest {
 	}
 
 	@Test
+	public void itImplementsEquals() throws Exception {
+		final RpcMediaNodeList other = new RpcMediaNodeList(this.undertest.getListRef(), "whatever", null, null, null, null);
+		assertEquals(other, this.undertest);
+	}
+
+	@Test
 	public void itReportsSupportedChooseMethods() throws Exception {
 		assertThat(this.undertest.getSupportedChooseMethods(), contains(PlaybackOrder.SEQUENTIAL));
 	}

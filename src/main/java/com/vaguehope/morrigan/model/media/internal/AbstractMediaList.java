@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,6 +64,20 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	@Override
 	public ListRef getListRef() {
 		return this.listRef;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof AbstractMediaList)) return false;
+		final AbstractMediaList that = (AbstractMediaList) obj;
+		return Objects.equals(this.listRef, that.listRef);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.listRef.hashCode();
 	}
 
 	@Override
