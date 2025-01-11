@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.dlna.players;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -13,6 +14,7 @@ import java.net.URL;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,8 +35,6 @@ import org.jupnp.support.model.TransportInfo;
 import org.jupnp.support.model.TransportState;
 import org.jupnp.support.model.TransportStatus;
 import org.mockito.InOrder;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
@@ -86,13 +86,14 @@ public class GoalSeekingDlnaPlayerTest {
 		this.playerStateStorage = mock(PlayerStateStorage.class);
 		this.controlPoint = mock(ControlPoint.class);
 		this.scheduledExecutor = mock(ScheduledExecutorService.class);
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer (final InvocationOnMock inv) throws Throwable {
+		doAnswer((inv) -> {
 				GoalSeekingDlnaPlayerTest.this.scheduledActions.add(inv.getArgument(0, Runnable.class));
 				return null;
-			}
 		}).when(this.scheduledExecutor).execute(any(Runnable.class));
+		doAnswer((inv) -> {
+				GoalSeekingDlnaPlayerTest.this.scheduledActions.add(inv.getArgument(0, Runnable.class));
+				return null;
+		}).when(this.scheduledExecutor).schedule(any(Runnable.class), anyLong(), any(TimeUnit.class));
 		makeTransportService();
 		this.avTransport = mock(AvTransportActions.class);
 		this.renderingControl = mock(RenderingControlActions.class);

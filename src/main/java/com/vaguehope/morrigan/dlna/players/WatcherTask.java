@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlaybackRecorder;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
@@ -31,9 +33,10 @@ final class WatcherTask implements Runnable {
 			final int trackDurationSeconds,
 			final AvTransportActions avTransport,
 			final PlayerEventListener listener,
-			final Runnable onStartOfTrack, final Runnable onEndOfTrack
+			final PlaybackRecorder playbackRecorder,
+			final PlayItem item
 			) {
-		final WatcherTask task = new WatcherTask(uriToWatch, currentUri, trackDurationSeconds, avTransport, listener, onStartOfTrack, onEndOfTrack);
+		final WatcherTask task = new WatcherTask(uriToWatch, currentUri, trackDurationSeconds, avTransport, listener, playbackRecorder, item);
 		final ScheduledFuture<?> scheduledFuture = scheduledExecutor.scheduleWithFixedDelay(task, 1, 1, TimeUnit.SECONDS);
 		task.setFuture(scheduledFuture);
 		return task;
@@ -44,8 +47,8 @@ final class WatcherTask implements Runnable {
 	private final int trackDurationSeconds;
 	private final AvTransportActions avTransport;
 	private final PlayerEventListener listener;
-	private final Runnable onStartOfTrack;
-	private final Runnable onEndOfTrack;
+	private final PlaybackRecorder playbackRecorder;
+	private final PlayItem item;
 
 	private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>();
 	private volatile long restorePositionAfterPlaybackStarts;
@@ -59,14 +62,14 @@ final class WatcherTask implements Runnable {
 	private WatcherTask (final String uriToWatch, final AtomicReference<String> currentUri,
 			final int trackDurationSeconds,
 			final AvTransportActions avTransport,
-			final PlayerEventListener listener, final Runnable onStartOfTrack, final Runnable onEndOfTrack) {
+			final PlayerEventListener listener, final PlaybackRecorder playbackRecorder, final PlayItem item) {
 		this.uriToWatch = uriToWatch;
 		this.currentUri = currentUri;
 		this.trackDurationSeconds = trackDurationSeconds;
 		this.avTransport = avTransport;
 		this.listener = listener;
-		this.onStartOfTrack = onStartOfTrack;
-		this.onEndOfTrack = onEndOfTrack;
+		this.playbackRecorder = playbackRecorder;
+		this.item = item;
 	}
 
 	public void requestSeekAfterPlaybackStarts (final long position) {
@@ -177,18 +180,16 @@ final class WatcherTask implements Runnable {
 					this.restorePositionAfterPlaybackStarts = 0;
 				}
 			}
-
-			// TODO consider writing duration back to DB.
 		}
 	}
 
 	private void callStartOfTrack () {
-		if (this.trackStarted.compareAndSet(false, true)) this.onStartOfTrack.run();
+		if (this.trackStarted.compareAndSet(false, true)) this.playbackRecorder.recordStarted(this.item);
 	}
 
 	private void callEndOfTrack () {
 		callStartOfTrack();
-		if (this.trackEnded.compareAndSet(false, true)) this.onEndOfTrack.run();
+		if (this.trackEnded.compareAndSet(false, true)) this.playbackRecorder.recordCompleted(this.item);
 	}
 
 	private void setFuture (final ScheduledFuture<?> scheduledFuture) {

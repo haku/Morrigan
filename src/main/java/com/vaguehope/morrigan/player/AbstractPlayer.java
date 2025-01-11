@@ -5,11 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,12 +23,14 @@ import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.transcode.Transcoder;
-import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class AbstractPlayer implements Player {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractPlayer.class);
+
+	protected final ScheduledExecutorService schEx;
+	protected final PlaybackRecorder playbackRecorder;
 
 	private final String id;
 	private final String name;
@@ -42,7 +41,6 @@ public abstract class AbstractPlayer implements Player {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final List<Runnable> onDisposeListener = new ArrayList<>();
 
-	private final ExecutorService loadEs;
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 
@@ -58,13 +56,20 @@ public abstract class AbstractPlayer implements Player {
 	private volatile boolean stateRestoreAttempted = false;
 	private volatile boolean loadingTrack = false;
 
-	public AbstractPlayer (final String id, final String name, final PlayerRegister register, final PlayerStateStorage playerStateStorage, final Config config) {
+	public AbstractPlayer(
+			final String id,
+			final String name,
+			final PlayerRegister register,
+			final ScheduledExecutorService schEx,
+			final PlayerStateStorage playerStateStorage,
+			final Config config) {
 		this.id = id;
 		this.name = name;
 		this.register = register;
+		this.schEx = schEx;
 		this.playerStateStorage = playerStateStorage;
 		this.config = config;
-		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new DaemonThreadFactory("pld"));
+		this.playbackRecorder = new PlaybackRecorder(schEx);
 		this.transcoder = new Transcoder(id);
 	}
 
@@ -82,9 +87,8 @@ public abstract class AbstractPlayer implements Player {
 				}
 				finally {
 					saveState();
-					onDispose();
-					this.loadEs.shutdown();
 					this.transcoder.dispose();
+					onDispose();
 				}
 			}
 		}
@@ -320,7 +324,7 @@ public abstract class AbstractPlayer implements Player {
 			this.listeners.onException(e);
 		}
 
-		return this.loadEs.submit(new Runnable() {
+		return this.schEx.submit(new Runnable() {
 			@Override
 			public void run () {
 				try {

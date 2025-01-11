@@ -81,12 +81,13 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		final WatcherTask oldWatcher = this.watcher.getAndSet(null);
 		if (oldWatcher != null) oldWatcher.cancel();
 
-		final WatcherTask task = WatcherTask.schedule(this.scheduledExecutor,
+		final WatcherTask task = WatcherTask.schedule(this.schEx,
 				uri, this.currentUri,
 				item.getTrack().getDuration(),
 				this.avTransport,
 				getListeners(),
-				new OnTrackStarted(this, item), new OnTrackComplete(this, item));
+				this.playbackRecorder,
+				item);
 		if (!this.watcher.compareAndSet(null, task)) {
 			task.cancel();
 			LOG.info("Failed to configure watcher as another got there first.");

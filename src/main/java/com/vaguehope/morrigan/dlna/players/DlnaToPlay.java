@@ -6,29 +6,25 @@ import org.jupnp.util.MimeType;
 
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlaybackRecorder;
 import com.vaguehope.morrigan.util.StringHelper;
 
 class DlnaToPlay {
 
 	private final PlayItem item;
 	private final DlnaPlayingParams playingParams;
+	private final PlaybackRecorder playbackRecorder;
 
-	private final Runnable onStartOfTrack;
-	private final Runnable onEndOfTrack;
-
-	public DlnaToPlay (final PlayItem item, final DlnaPlayingParams playingParams, final AbstractDlnaPlayer dlnaPlayer) {
+	public DlnaToPlay (final PlayItem item, final DlnaPlayingParams playingParams, final PlaybackRecorder playbackRecorder) {
 		if (item == null) throw new IllegalArgumentException();
 		if (StringHelper.blank(playingParams.id)) throw new IllegalArgumentException();
 		if (StringHelper.blank(playingParams.uri)) throw new IllegalArgumentException();
 		if (playingParams.mimeType == null) throw new IllegalArgumentException();
 		if (playingParams.durationSeconds < 1) throw new IllegalArgumentException("Can not play tracks without a known duration.");
-		if (dlnaPlayer == null) throw new IllegalArgumentException();
 
 		this.item = item;
 		this.playingParams = playingParams;
-
-		this.onStartOfTrack = new OnTrackStarted(dlnaPlayer, item);
-		this.onEndOfTrack = new OnTrackComplete(dlnaPlayer, item);
+		this.playbackRecorder = playbackRecorder;
 	}
 
 	public PlayItem getItem () {
@@ -74,13 +70,13 @@ class DlnaToPlay {
 		return this.trackStarted.get();
 	}
 
-	public void recordStartOfTrack () {
-		if (this.trackStarted.compareAndSet(false, true)) this.onStartOfTrack.run();
+	public void recordStartOfTrack() {
+		if (this.trackStarted.compareAndSet(false, true)) this.playbackRecorder.recordStarted(this.item);
 	}
 
-	public void recordEndOfTrack () {
+	public void recordEndOfTrack() {
 		recordStartOfTrack();
-		if (this.trackEnded.compareAndSet(false, true)) this.onEndOfTrack.run();
+		if (this.trackEnded.compareAndSet(false, true)) this.playbackRecorder.recordCompleted(this.item);
 	}
 
 }

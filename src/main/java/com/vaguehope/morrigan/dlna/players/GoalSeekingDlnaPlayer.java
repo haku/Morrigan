@@ -541,7 +541,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		setCurrentPlayingParams(playingParams);
 		saveState();
 
-		this.eventQueue.add(new DlnaToPlay(item, playingParams, this));
+		this.eventQueue.add(new DlnaToPlay(item, playingParams, this.playbackRecorder));
 		this.eventQueue.add(PlayState.PLAYING);
 		setStateToReportExternally(PlayState.LOADING);
 

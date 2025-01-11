@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.player;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
@@ -15,16 +15,11 @@ import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.util.MnLogger;
 
 public class LocalPlayer extends AbstractPlayer implements Player {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final MnLogger LOG = MnLogger.make(LocalPlayer.class);
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ContentProxy contentProxy;
-	private final ExecutorService executorService;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Main.
 
 	public LocalPlayer(
 			final String id,
@@ -32,13 +27,12 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			final PlayerRegister register,
 			final PlaybackEngineFactory playbackEngineFactory,
 			final ContentProxy contentProxy,
-			final ExecutorService executorService,
+			final ScheduledExecutorService schEx,
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
-		super(id, name, register, playerStateStorage, config);
+		super(id, name, register, schEx, playerStateStorage, config);
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.contentProxy = contentProxy;
-		this.executorService = executorService;
 	}
 
 	@Override
@@ -126,28 +120,9 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			this._currentTrackDuration = engine.getDuration();
 			LOG.d("Started to play '{}'...", item.getTrack().getTitle());
 
-			// Put DB stuff in DB thread.
-			this.executorService.submit(new Runnable() {
-				@Override
-				public void run () {
-					try {
-						item.getList().incTrackStartCnt(item.getTrack());
-						getListeners().currentItemChanged(item);
-						saveState();
-					}
-					catch (final MorriganException e) {
-						LOG.e("Failed to increment track count.", e);
-					}
-				}
-			});
-
-			/* This was useful at some point, but leaving it disabled for now.
-			 * Will put it back if it proves needed.
-			 */
-//				if (item.item.getDuration() <= 0 && Player.this._currentTrackDuration > 0) {
-//					item.list.setTrackDuration(item.item, Player.this._currentTrackDuration);
-//				}
-
+			this.schEx.submit(() -> getListeners().currentItemChanged(item));
+			this.playbackRecorder.recordStarted(item);
+			this.schEx.submit(() -> saveState());
 		} // END synchronized.
 	}
 

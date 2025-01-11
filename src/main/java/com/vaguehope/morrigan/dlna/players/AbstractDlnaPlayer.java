@@ -30,7 +30,6 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 
 	protected final AvTransportActions avTransport;
 	protected final RenderingControlActions renderingControl;
-	protected final ScheduledExecutorService scheduledExecutor;
 	private final DlnaPlayingParamsFactory dlnaPlayingParamsFactory;
 
 	private final String uid;
@@ -46,12 +45,12 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 			final ControlPoint controlPoint,
 			final RemoteService avTransportSvc,
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
-			final ScheduledExecutorService scheduledExecutor,
+			final ScheduledExecutorService schEx,
 			final PlayerStateStorage playerStateStorage,
 			final Config config,
 			final AvTransportActions avTransportActions,
 			final RenderingControlActions renderingControlActions) {
-		super(UpnpHelper.idFromRemoteService(avTransportSvc), avTransportSvc.getDevice().getDetails().getFriendlyName(), register, playerStateStorage, config);
+		super(UpnpHelper.idFromRemoteService(avTransportSvc), avTransportSvc.getDevice().getDetails().getFriendlyName(), register, schEx, playerStateStorage, config);
 		this.controlPoint = controlPoint;
 		this.avTransportSvc = avTransportSvc;
 
@@ -76,7 +75,6 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 		}
 
 		this.dlnaPlayingParamsFactory = dlnaPlayingParamsFactory;
-		this.scheduledExecutor = scheduledExecutor;
 		this.uid = UpnpHelper.remoteServiceUid(avTransportSvc);
 		addEventListener(this.playerEventCache);
 	}
@@ -156,14 +154,6 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 
 	protected void clearRestorePositionState () {
 		this.restorePositionState = null;
-	}
-
-	protected void recordTrackStarted (final PlayItem item) {
-		this.scheduledExecutor.execute(new RecordTrackStarted(item));
-	}
-
-	protected void recordTrackCompleted (final PlayItem item) {
-		this.scheduledExecutor.execute(new RecordTrackCompleted(item));
 	}
 
 	public static PlayState transportIntoToPlayState (final TransportInfo ti) {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -28,13 +28,13 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 	private final PlayerStateStorage stateStorage;
 	private final Config config;
 	private final ContentProxy contentProxy;
-	private final ExecutorService executorService;
+	private final ScheduledExecutorService schEx;
 
-	public PlayerRegisterImpl (final PlayerStateStorage stateStorage, final Config config, final ContentProxy contentProxy, final ExecutorService executorService) {
+	public PlayerRegisterImpl (final PlayerStateStorage stateStorage, final Config config, final ContentProxy contentProxy, final ScheduledExecutorService schEx) {
 		this.stateStorage = stateStorage;
 		this.config = config;
 		this.contentProxy = contentProxy;
-		this.executorService = executorService;
+		this.schEx = schEx;
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 				this,
 				playbackEngineFactory,
 				this.contentProxy,
-				this.executorService,
+				this.schEx,
 				this.stateStorage,
 				this.config);
 		this.stateStorage.requestReadState(p);
