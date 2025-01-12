@@ -201,7 +201,7 @@ public class MediaServlet extends HttpServlet {
 		resp.getWriter().println(this.gson.toJson(ret));
 	}
 
-	public class ListRefWithTitleSrl implements JsonSerializer<ListRefWithTitle> {
+	private class ListRefWithTitleSrl implements JsonSerializer<ListRefWithTitle> {
 		@Override
 		public JsonElement serialize(final ListRefWithTitle src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
@@ -212,7 +212,7 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
-	public class MediaNodeSrl implements JsonSerializer<MediaNode> {
+	private class MediaNodeSrl implements JsonSerializer<MediaNode> {
 		@Override
 		public JsonElement serialize(final MediaNode src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
@@ -223,7 +223,7 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
-	public class MediaItemSrl implements JsonSerializer<MediaItem> {
+	private class MediaItemSrl implements JsonSerializer<MediaItem> {
 		@Override
 		public JsonElement serialize(final MediaItem src, final Type typeOfSrc, final JsonSerializationContext context) {
 			try {
@@ -247,7 +247,7 @@ public class MediaServlet extends HttpServlet {
 		}
 	}
 
-	public class MediaTagSrl implements JsonSerializer<MediaTag> {
+	private class MediaTagSrl implements JsonSerializer<MediaTag> {
 		@Override
 		public JsonElement serialize(final MediaTag src, final Type typeOfSrc, final JsonSerializationContext context) {
 			final JsonObject j = new JsonObject();
