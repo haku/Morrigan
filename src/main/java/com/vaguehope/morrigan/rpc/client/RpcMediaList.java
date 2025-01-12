@@ -31,6 +31,8 @@ import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
+import io.grpc.StatusRuntimeException;
+
 public abstract class RpcMediaList extends EphemeralMediaList {
 
 	protected final ListRef listRef;
@@ -115,16 +117,26 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public FileExistance hasFile(final String identifer) throws MorriganException, DbException {
-		final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
-		return convertExistance(ret.getExistence());
+	public FileExistance hasFile(final String identifer) throws MorriganException {
+		try {
+			final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
+			return convertExistance(ret.getExistence());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("hasMedia() RPC failed: " + e.toString(), e);
+		}
 	}
 
 	@Override
-	public MediaItem getByFile(final String identifer) throws DbException {
-		final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
-		if (ret.getExistence() != com.vaguehope.dlnatoad.rpc.MediaToadProto.FileExistance.EXISTS) return null;
-		return makeItem(ret.getItem(), ret.getTagList());
+	public MediaItem getByFile(final String identifer) throws MorriganException {
+		try {
+			final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
+			if (ret.getExistence() != MediaToadProto.FileExistance.EXISTS) return null;
+			return makeItem(ret.getItem(), ret.getTagList());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("hasMedia() RPC failed: " + e.toString(), e);
+		}
 	}
 
 	protected RpcMediaItem makeItem(final MediaToadProto.MediaItem item, final List<MediaTag> tags) throws DbException {
@@ -143,7 +155,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 			final int maxResults,
 			final SortColumn[] sortColumns,
 			final SortDirection[] sortDirections,
-			final boolean includeDisabled) throws DbException {
+			final boolean includeDisabled) throws MorriganException {
 		if (sortColumns == null ^ sortDirections == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
 		if (sortColumns != null && sortDirections != null && sortColumns.length != sortDirections.length) throw new IllegalArgumentException("Sorts and directions must be same length.");
 
@@ -183,7 +195,13 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 			}
 		}
 
-		final SearchReply resp = blockingStub().search(req.build());
+		final SearchReply resp;
+		try {
+			resp = blockingStub().search(req.build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("search() RPC failed: " + e.toString(), e);
+		}
 
 		final List<MediaItem> items = new ArrayList<>(resp.getResultList().size());
 		for (final MediaToadProto.MediaItem i : resp.getResultList()) {

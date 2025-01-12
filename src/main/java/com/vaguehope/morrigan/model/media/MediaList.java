@@ -76,7 +76,7 @@ public interface MediaList extends List<AbstractItem> {
 	default boolean canSort() {
 		return false;
 	}
-	default List<SortColumn> getSuportedSortColumns() {
+	default List<SortColumn> getSuportedSortColumns() throws MorriganException {
 		throw new UnsupportedOperationException();
 	}
 	default SortColumn getSortColumn() {
@@ -89,7 +89,7 @@ public interface MediaList extends List<AbstractItem> {
 		throw new UnsupportedOperationException();
 	}
 
-	List<PlaybackOrder> getSupportedChooseMethods();
+	List<PlaybackOrder> getSupportedChooseMethods() throws MorriganException;
 	PlaybackOrder getDefaultChooseMethod();
 	MediaItem chooseItem(PlaybackOrder order, MediaItem previousItem) throws MorriganException;
 
@@ -163,13 +163,13 @@ public interface MediaList extends List<AbstractItem> {
 	 */
 	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
-	default List<MediaItem> search (MediaType mediaType, String term, int maxResults) throws DbException {
+	default List<MediaItem> search (MediaType mediaType, String term, int maxResults) throws MorriganException {
 		return search(mediaType, term, maxResults, (SortColumn[]) null, (SortDirection[]) null, false);
 	}
-	default List<MediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn sortColumn, SortDirection sortDirection, boolean includeDisabled) throws DbException {
+	default List<MediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn sortColumn, SortDirection sortDirection, boolean includeDisabled) throws MorriganException {
 		return search(mediaType, term, maxResults, new SortColumn[] { sortColumn }, new SortDirection[] { sortDirection }, includeDisabled);
 	}
-	List<MediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
+	List<MediaItem> search (MediaType mediaType, String term, int maxResults, SortColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws MorriganException;
 
 	/**
 	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
@@ -181,7 +181,7 @@ public interface MediaList extends List<AbstractItem> {
 	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
 	 * has to match hasFile();
 	 */
-	MediaItem getByFile (String identifer) throws DbException;
+	MediaItem getByFile (String identifer) throws MorriganException;
 
 	MediaItem getByMd5 (BigInteger md5) throws DbException;
 

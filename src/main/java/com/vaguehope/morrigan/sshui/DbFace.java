@@ -380,7 +380,7 @@ public class DbFace extends DefaultFace {
 
 	private void enqueueDb (final WindowBasedTextGUI gui) {
 		final Player player = getPlayer(gui, "Enqueue DB");
-		if (player != null) enqueuePlayItem(new PlayItem(this.list, null), player);
+		if (player != null) enqueuePlayItem(PlayItem.makeReady(this.list, null), player);
 	}
 
 	protected void enqueuePlayItem (final PlayItem playItem, final Player player) {
@@ -502,7 +502,7 @@ public class DbFace extends DefaultFace {
 		this.lastActionMessage.setLastActionMessage(String.format("Toggled enabled on %s items.", items.size()));
 	}
 
-	private void askSortColumn (final WindowBasedTextGUI gui) {
+	private void askSortColumn (final WindowBasedTextGUI gui) throws MorriganException {
 		if (!this.list.canSort()) {
 			this.lastActionMessage.setLastActionMessage("Can not sort this type of list.");
 			return;

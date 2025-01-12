@@ -22,7 +22,7 @@ public class PlaybackRecorder {
 	public void recordStarted(final PlayItem playItem) {
 		this.schEx.schedule(() -> {
 			try {
-				playItem.getList().incTrackStartCnt(playItem.getTrack());
+				playItem.getList().incTrackStartCnt(playItem.getItem());
 			}
 			catch (MorriganException e) {
 				LOG.info("Failed to record track started: " + ErrorHelper.getCauseTrace(e));
@@ -33,7 +33,7 @@ public class PlaybackRecorder {
 	public void recordCompleted(final PlayItem playItem) {
 		this.schEx.schedule(() -> {
 			try {
-				playItem.getList().incTrackEndCnt(playItem.getTrack());
+				playItem.getList().incTrackEndCnt(playItem.getItem());
 			}
 			catch (MorriganException e) {
 				LOG.info("Failed to record track completed: " + ErrorHelper.getCauseTrace(e));

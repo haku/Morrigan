@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
@@ -34,6 +35,7 @@ public class PlayerHolder {
 	private final UpnpService upnpService;
 	private final DlnaPlayingParamsFactory dlnaPlayingParamsFactory;
 	private final PlayerStateStorage stateStorage;
+	private final MediaFactory mediaFactory;
 	private final Config config;
 	private final ScheduledExecutorService scheduledExecutor;
 
@@ -42,13 +44,19 @@ public class PlayerHolder {
 	private final ConcurrentMap<UDN, Set<AbstractDlnaPlayer>> players = new ConcurrentHashMap<>();
 	private final Map<String, PlayerState> backedupPlayerState = new ConcurrentHashMap<>();
 
-	public PlayerHolder (final PlayerRegister playerRegister, final UpnpService upnpService,
+	public PlayerHolder(
+			final PlayerRegister playerRegister,
+			final UpnpService upnpService,
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
-			final PlayerStateStorage playerStateStorage, final Config config, final ScheduledExecutorService scheduledExecutor) {
+			final PlayerStateStorage playerStateStorage,
+			final MediaFactory mediaFactory,
+			final Config config,
+			final ScheduledExecutorService scheduledExecutor) {
 		this.playerRegister = playerRegister;
 		this.upnpService = upnpService;
 		this.dlnaPlayingParamsFactory = dlnaPlayingParamsFactory;
 		this.stateStorage = playerStateStorage;
+		this.mediaFactory = mediaFactory;
 		this.config = config;
 		this.scheduledExecutor = scheduledExecutor;
 	}
@@ -114,12 +122,12 @@ public class PlayerHolder {
 		if (StringHelper.blank(System.getenv("DLNA_OLD_PLAYER"))) {
 			player = new GoalSeekingDlnaPlayer(this.playerRegister,
 					this.upnpService.getControlPoint(), avTransport, this.dlnaPlayingParamsFactory,
-					this.scheduledExecutor, this.stateStorage, this.config);
+					this.scheduledExecutor, this.stateStorage, this.mediaFactory, this.config);
 		}
 		else {
 			player = new DlnaPlayer(this.playerRegister,
 					this.upnpService.getControlPoint(), avTransport, this.dlnaPlayingParamsFactory,
-					this.scheduledExecutor, this.stateStorage, this.config);
+					this.scheduledExecutor, this.stateStorage, this.mediaFactory, this.config);
 		}
 
 		final PlayerState previousState = this.backedupPlayerState.get(UpnpHelper.remoteServiceUid(avTransport));

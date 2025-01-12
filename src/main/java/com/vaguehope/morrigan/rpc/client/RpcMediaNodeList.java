@@ -19,6 +19,8 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaNode;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 
+import io.grpc.StatusRuntimeException;
+
 public class RpcMediaNodeList extends RpcMediaList {
 
 	private final String title;
@@ -45,7 +47,13 @@ public class RpcMediaNodeList extends RpcMediaList {
 	@Override
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
-		final ListNodeReply resp = blockingStub().listNode(ListNodeRequest.newBuilder().setNodeId(this.listRef.getNodeId()).build());
+		final ListNodeReply resp;
+		try {
+			resp = blockingStub().listNode(ListNodeRequest.newBuilder().setNodeId(this.listRef.getNodeId()).build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("listNode() RPC failed: " + e.toString(), e);
+		}
 
 		final List<MediaNode> nodes = new ArrayList<>(resp.getChildCount());
 		for (final MediaToadProto.MediaNode n : resp.getChildList()) {

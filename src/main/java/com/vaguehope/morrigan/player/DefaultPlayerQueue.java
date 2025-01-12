@@ -31,14 +31,13 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	public PlayItem makeMetaItem (final PlayItemType type) {
 		switch (type) {
 			case STOP:
-				return new PlayItem(PlayItemType.STOP);
+				return PlayItem.makeAction(PlayItemType.STOP);
 			default:
 				throw new IllegalArgumentException("Not a meta type: " + type);
 		}
 	}
 
 	private void validateQueueItemBeforeAdd (final PlayItem item) {
-		if (item.hasTrack() && !item.getTrack().isPlayable()) throw new IllegalArgumentException("item is not playable.");
 		item.setId(this.queueId.getAndIncrement());
 	}
 
@@ -196,15 +195,10 @@ public class DefaultPlayerQueue implements PlayerQueue {
 		long duration = 0;
 		synchronized (this.queue) {
 			for (final PlayItem pi : this.queue) {
-				if (pi.hasTrack()) {
-					if (pi.getTrack().getDuration() > 0) {
-						duration += pi.getTrack().getDuration();
-					}
-					else {
-						complete = false;
-					}
+				if (pi.isReady() && pi.hasItem() && pi.getItem().getDuration() > 0) {
+					duration += pi.getItem().getDuration();
 				}
-				else if (pi.hasList()) {
+				else {
 					complete = false;
 				}
 			}

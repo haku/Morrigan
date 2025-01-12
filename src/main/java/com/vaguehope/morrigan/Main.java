@@ -132,6 +132,7 @@ public final class Main {
 
 		final PlayerRegister playerRegister = new PlayerRegisterImpl(
 				new PlayerStateStorage(mediaFactory, playerEx, config),
+				mediaFactory,
 				config,
 				localHttpServer,
 				playerEx);

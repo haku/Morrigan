@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.server;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +19,6 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -33,7 +31,6 @@ import com.vaguehope.morrigan.player.PlayerFinder;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.MlistsServlet.IncludeTags;
 import com.vaguehope.morrigan.server.util.FeedHelper;
-import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -273,7 +270,7 @@ public class PlayersServlet extends HttpServlet {
 			final String tag = req.getParameter("tag");
 			if (tag != null && tag.length() > 0) {
 				final PlayItem currentItem = player.getCurrentItem();
-				final MediaItem item = currentItem != null ? currentItem.getTrack() : null;
+				final MediaItem item = currentItem != null ? currentItem.getItem() : null;
 				final MediaList list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
 					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
@@ -442,8 +439,8 @@ public class PlayersServlet extends HttpServlet {
 
 		final PlayItem currentItem = p.getCurrentItem();
 
-		final String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
-		final String trackListTitle = (currentItem != null && currentItem.hasList()) ? currentItem.getList().getListName() : "";
+		final String trackTitle = currentItem != null ? currentItem.resolveTitle(null) : "(empty)";
+		final String trackListTitle = currentItem != null ? currentItem.getListTitle() : "";
 
 		final Integer volume = p.getVoume();
 		final Integer volumeMaxValue = p.getVoumeMaxValue();
@@ -482,10 +479,10 @@ public class PlayersServlet extends HttpServlet {
 			final String trackLink;
 			final String filename;
 			final String filepath;
-			if (currentItem != null && currentItem.hasTrack()) {
-				trackLink = MlistsServlet.fileLink(currentItem.getTrack());
-				filename = currentItem.getTrack().getTitle(); // FIXME This is a hack :s .
-				filepath = StringHelper.notBlank(currentItem.getTrack().getFilepath()) ? currentItem.getTrack().getFilepath() : NULL;
+			if (currentItem != null && currentItem.hasItem() && currentItem.isReady()) {
+				trackLink = MlistsServlet.fileLink(currentItem.getItem());
+				filename = currentItem.getItem().getTitle(); // FIXME This is a hack :s .
+				filepath = StringHelper.notBlank(currentItem.getItem().getFilepath()) ? currentItem.getItem().getFilepath() : NULL;
 			}
 			else {
 				trackLink = null;
@@ -500,8 +497,8 @@ public class PlayersServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "playposition", p.getCurrentPosition());
 			FeedHelper.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 
-			if (currentItem != null && currentItem.hasTrack()) {
-				final MediaItem track = currentItem.getTrack();
+			if (currentItem != null && currentItem.hasItem() && currentItem.isReady()) {
+				final MediaItem track = currentItem.getItem();
 				FeedHelper.addElement(dw, "trackfilesize", track.getFileSize());
 				if (track.getMd5() != null) FeedHelper.addElement(dw, "trackhash", track.getMd5().toString(16));
 				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(track.isEnabled()));
@@ -540,33 +537,16 @@ public class PlayersServlet extends HttpServlet {
 
 		for (final PlayItem playItem : p.getQueue().getQueueList()) {
 			dw.startElement("entry");
-			FeedHelper.addElement(dw, "title", playItem.toString());
+			FeedHelper.addElement(dw, "title", playItem.resolveTitle(null));
 			FeedHelper.addElement(dw, "id", playItem.getId());
 
-			if (playItem.hasList()) {
-				FeedHelper.addLink(dw, playItem.getList().getListRef().toUrlForm(), "list", "text/xml");
-			}
-
-			if (playItem.hasTrack()) {
-				final MediaItem mi = playItem.getTrack();
-				FeedHelper.addLink(dw, MlistsServlet.fileLink(mi), "item");
-
-				if (mi.getDateAdded() != null) {
-					FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+			if (playItem.hasItem()) {
+				if (playItem.isReady()) {
+					final MediaItem mi = playItem.getItem();
+					FeedHelper.addElement(dw, "duration", mi.getDuration());
 				}
-				if (mi.getDateLastModified() != null) {
-					FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
-				}
-				FeedHelper.addElement(dw, "type", MediaType.TRACK.getN());
-				FeedHelper.addElement(dw, "filesize", mi.getFileSize());
-				if (mi.getMd5() != null && !BigInteger.ZERO.equals(mi.getMd5())) FeedHelper.addElement(dw, "hash", mi.getMd5().toString(16));
-				FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
-				FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
-				FeedHelper.addElement(dw, "duration", mi.getDuration());
-				FeedHelper.addElement(dw, "startcount", mi.getStartCount());
-				FeedHelper.addElement(dw, "endcount", mi.getEndCount());
-				if (mi.getDateLastPlayed() != null) {
-					FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
+				else {
+					FeedHelper.addElement(dw, "duration", 0);
 				}
 			}
 

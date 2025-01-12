@@ -17,7 +17,6 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -117,9 +116,8 @@ public class PlayerFace extends DefaultFace {
 		this.itemDetailsBarItem = this.selectedItem;
 		if (this.selectedItem instanceof PlayItem) {
 			final PlayItem playItem = (PlayItem) this.selectedItem;
-			final MediaItem item = playItem.getTrack();
-			if (item != null) {
-				this.itemDetailsBar = PrintingThingsHelper.summariseItemWithPlayCounts(playItem.getList(), item, this.dateFormat);
+			if (playItem.isReady() && playItem.hasItem()) {
+				this.itemDetailsBar = PrintingThingsHelper.summariseItemWithPlayCounts(playItem.getList(), playItem.getItem(), this.dateFormat);
 			}
 			else {
 				this.itemDetailsBar = "(no track selected)";
@@ -319,8 +317,8 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	private static void showEditTagsForItem (final WindowBasedTextGUI gui, final PlayItem item) throws MorriganException {
-		if (item == null || !item.isComplete()) return;
-		TagEditor.show(gui, item.getList(), item.getTrack());
+		if (item == null || !item.isReady() || !item.hasListAndItem()) return;
+		TagEditor.show(gui, item.getList(), item.getItem());
 	}
 
 	private void menuMove (final KeyStroke k, final int distance) throws MorriganException {
@@ -439,8 +437,8 @@ public class PlayerFace extends DefaultFace {
 				}
 			}
 
-			if (item.hasTrack()) {
-				final String dur = TimeHelper.formatTimeSeconds(item.getTrack().getDuration());
+			if (item.hasItem() && item.isReady()) {
+				final String dur = TimeHelper.formatTimeSeconds(item.getItem().getDuration());
 				tg.putString(columns - dur.length(), l, dur);
 			}
 

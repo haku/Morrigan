@@ -46,11 +46,11 @@ public class DlnaPlayingParamsFactory {
 		if (altFile != null) {
 			id = this.mediaFileLocator.fileId(altFile);
 		}
-		else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
-			id = item.getTrack().getRemoteId();
+		else if (StringHelper.notBlank(item.getItem().getRemoteId())) {
+			id = item.getItem().getRemoteId();
 		}
 		else {
-			id = this.mediaFileLocator.fileId(new File(item.getTrack().getFilepath()));
+			id = this.mediaFileLocator.fileId(new File(item.getItem().getFilepath()));
 		}
 
 		final String uri;
@@ -63,23 +63,23 @@ public class DlnaPlayingParamsFactory {
 			fileSize = altFile.length();
 			durationSeconds = readFileDurationSeconds(altFile);
 		}
-		else if (item.getTrack().hasRemoteLocation()) {
+		else if (item.getItem().hasRemoteLocation()) {
 			if (item.hasList()) {
-				uri = item.getList().prepairRemoteLocation(item.getTrack(), this.mediaServer);
+				uri = item.getList().prepairRemoteLocation(item.getItem(), this.mediaServer);
 			}
 			else {
-				uri = item.getTrack().getRemoteLocation();
+				uri = item.getItem().getRemoteLocation();
 			}
-			mimeType = MimeType.valueOf(item.getTrack().getMimeType());
-			fileSize = item.getTrack().getFileSize();
-			durationSeconds = item.getTrack().getDuration(); // TODO what if this is not available?
+			mimeType = MimeType.valueOf(item.getItem().getMimeType());
+			fileSize = item.getItem().getFileSize();
+			durationSeconds = item.getItem().getDuration(); // TODO what if this is not available?
 		}
 		else {
 			uri = this.mediaServer.uriFor(id);
-			final File file = new File(item.getTrack().getFilepath());
+			final File file = new File(item.getItem().getFilepath());
 			mimeType = MediaFormat.identify(file).toMimeType();
 			fileSize = file.length();
-			int d = item.getTrack().getDuration();
+			int d = item.getItem().getDuration();
 			if (d < 1) d = readFileDurationSeconds(file);
 			durationSeconds = d;
 		}
@@ -87,15 +87,15 @@ public class DlnaPlayingParamsFactory {
 		if (durationSeconds < 1) throw new DlnaException("Can not play track without a known duration.");
 
 		final String coverArtUri;
-		if (StringHelper.notBlank(item.getTrack().getCoverArtRemoteLocation())) {
-			coverArtUri = item.getTrack().getCoverArtRemoteLocation();
+		if (StringHelper.notBlank(item.getItem().getCoverArtRemoteLocation())) {
+			coverArtUri = item.getItem().getCoverArtRemoteLocation();
 		}
 		else {
-			final File coverArt = item.getTrack().findCoverArt();
+			final File coverArt = item.getItem().findCoverArt();
 			coverArtUri = coverArt != null ? this.mediaServer.uriFor(this.mediaFileLocator.fileId(coverArt)) : null;
 		}
 
-		return new DlnaPlayingParams(id, uri, item.getTrack().getTitle(), mimeType, fileSize, coverArtUri, durationSeconds);
+		return new DlnaPlayingParams(id, uri, item.getItem().getTitle(), mimeType, fileSize, coverArtUri, durationSeconds);
 	}
 
 	/**

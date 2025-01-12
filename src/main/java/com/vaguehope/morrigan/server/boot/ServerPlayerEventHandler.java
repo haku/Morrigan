@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
@@ -33,24 +32,21 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 		return this.playerContainer.getLocalPlayer();
 	}
 
-	private void outputStatus () {
+	private void outputStatus (final PlayItem newItem) {
 		final Player player = this.playerContainer.getPlayer();
 		final PlayState currentState = (player == null ? null : player.getPlayState());
 		if (currentState != this.prevPlayState.get()) {
 			this.prevPlayState.set(currentState);
-			logger.log(Level.INFO, getPlayerStateDescription(player));
+			logger.log(Level.INFO, getPlayerStateDescription(player, newItem));
 		}
 	}
 
-	private static String getPlayerStateDescription (final Player p) {
+	private static String getPlayerStateDescription (final Player p, final PlayItem newItem) {
 		if (p != null) {
 			final PlayState currentState = p.getPlayState();
-			if (currentState == PlayState.LOADING) return currentState + "...";
-
 			if (currentState != null) {
-				final PlayItem currentPlayItem = p.getCurrentItem();
-				final MediaItem track = (currentPlayItem != null ? currentPlayItem.getTrack() : null);
-				if (track != null) return currentState + " " + track + ".";
+				final PlayItem playItem = newItem != null ? newItem : p.getCurrentItem();
+				if (playItem != null) return currentState + " " + playItem.resolveTitle(null) + ".";
 				return currentState + ".";
 			}
 			return "Unknown.";
@@ -62,27 +58,27 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 
 	@Override
 	public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
-		outputStatus();
+		outputStatus(null);
 	}
 
 	@Override
 	public void transcodeChanged (final Transcode newTranscode) {
-		outputStatus();
+		outputStatus(null);
 	}
 
 	@Override
 	public void currentItemChanged (final PlayItem newItem) {
-		outputStatus();
+		outputStatus(newItem);
 	}
 
 	@Override
 	public void playStateChanged (final PlayState newPlayState) {
-		outputStatus();
+		outputStatus(null);
 	}
 
 	@Override
 	public void positionChanged (final long newPosition, final int duration) {
-		outputStatus();
+		outputStatus(null);
 	}
 
 	@Override

@@ -76,16 +76,17 @@ public final class PrintingThingsHelper {
 	}
 
 	public static String playingItemTitle (final Player p) {
-		final PlayItem currentItem = p.getCurrentItem();
-		return currentItem != null && currentItem.hasTrack() ? currentItem.getTrack().getTitle() : "";
+		final PlayItem item = p.getCurrentItem();
+		if (item == null) return "";
+		return item.resolveTitle(null);
 	}
 
 	public static String listTitleAndOrder(final Player p) {
 		final StringBuilder s = new StringBuilder();
 
-		final PlayItem currentItem = p.getCurrentItem();
-		if (currentItem != null && currentItem.hasList()) {
-			s.append(currentItem.getList().getListName());
+		final PlayItem item = p.getCurrentItem();
+		if (item != null && item.hasList()) {
+			s.append(item.getListTitle());
 		}
 
 		if (s.length() > 0) s.append(" ");
@@ -113,11 +114,11 @@ public final class PrintingThingsHelper {
 
 	public static String summariseTags (final Player player) {
 		final PlayItem playItem = player.getCurrentItem();
-		if (playItem != null && playItem.isComplete()) {
+		if (playItem != null && playItem.isReady() && playItem.hasListAndItem()) {
 			final MediaList list = playItem.getList();
 			if (list != null) {
 				try {
-					final List<MediaTag> tags = list.getTags(playItem.getTrack()); // TODO cache this?
+					final List<MediaTag> tags = list.getTags(playItem.getItem()); // TODO cache this?
 					return join(tags, ", ", t -> t.getTag());
 				}
 				catch (final MorriganException e) {

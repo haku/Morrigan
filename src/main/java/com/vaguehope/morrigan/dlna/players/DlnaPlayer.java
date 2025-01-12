@@ -13,6 +13,7 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
@@ -31,8 +32,9 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
+			final MediaFactory mediaFactory,
 			final Config config) {
-		super(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, config, null, null);
+		super(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, mediaFactory, config, null, null);
 	}
 
 	@Override
@@ -61,8 +63,8 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 
 		// Only restore position if for same item.
 		final PlayerState rps = getRestorePositionState();
-		if (rps != null && rps.getCurrentItem() != null && rps.getCurrentItem().hasTrack()) {
-			if (Objects.equals(item.getTrack(), rps.getCurrentItem().getTrack())) {
+		if (rps != null && rps.getCurrentItem() != null && rps.getCurrentItem().hasItem()) {
+			if (Objects.equals(item.getItem(), rps.getCurrentItem().getItem())) {
 				final WatcherTask w = this.watcher.get();
 				if (w != null) {
 					w.requestSeekAfterPlaybackStarts(rps.getPosition());
@@ -71,7 +73,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 			}
 			else {
 				LOG.info("Not restoring position for {} as track is {}.",
-						rps.getCurrentItem().getTrack(), item.getTrack());
+						rps.getCurrentItem().getItem(), item.getItem());
 			}
 		}
 		clearRestorePositionState();
@@ -83,7 +85,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 
 		final WatcherTask task = WatcherTask.schedule(this.schEx,
 				uri, this.currentUri,
-				item.getTrack().getDuration(),
+				item.getItem().getDuration(),
 				this.avTransport,
 				getListeners(),
 				this.playbackRecorder,

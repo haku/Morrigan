@@ -21,6 +21,8 @@ import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 
+import io.grpc.StatusRuntimeException;
+
 public class RpcMediaSearchList extends RpcMediaList {
 
 	private static final int MAX_VIEW_SIZE = 10000;  // this is just a guess.
@@ -56,10 +58,17 @@ public class RpcMediaSearchList extends RpcMediaList {
 		return true;
 	}
 	@Override
-	public List<SortColumn> getSuportedSortColumns() {
+	public List<SortColumn> getSuportedSortColumns() throws MorriganException {
 		if (this.supportSortColumns != null) return this.supportSortColumns;
 
-		final AboutReply about = blockingStub().about(AboutRequest.newBuilder().build());
+		final AboutReply about;
+		try {
+			about = blockingStub().about(AboutRequest.newBuilder().build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("about() RPC failed: " + e.toString(), e);
+		}
+
 		final List<SortColumn> ret = new ArrayList<>();
 		for (final SortField sf : about.getSupportedSortFieldList()) {
 			switch (sf) {
@@ -87,7 +96,12 @@ public class RpcMediaSearchList extends RpcMediaList {
 	@Override
 	public SortColumn getSortColumn() {
 		if (this.sortColumn == null) {
-			this.sortColumn = getSuportedSortColumns().get(0);
+			try {
+				this.sortColumn = getSuportedSortColumns().get(0);
+			}
+			catch (final MorriganException e) {
+				return SortColumn.UNSPECIFIED;
+			}
 		}
 
 		return this.sortColumn;
@@ -129,10 +143,17 @@ public class RpcMediaSearchList extends RpcMediaList {
 	}
 
 	@Override
-	public List<PlaybackOrder> getSupportedChooseMethods() {
+	public List<PlaybackOrder> getSupportedChooseMethods() throws MorriganException {
 		if (this.supportChooseMethods != null) return this.supportChooseMethods;
 
-		final AboutReply about = blockingStub().about(AboutRequest.newBuilder().build());
+		final AboutReply about;
+		try {
+			about = blockingStub().about(AboutRequest.newBuilder().build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("about() RPC failed: " + e.toString(), e);
+		}
+
 		final List<PlaybackOrder> ret = new ArrayList<>();
 		for (final ChooseMethod cm : about.getSupportedChooseMethodList()) {
 			switch (cm) {
@@ -177,9 +198,14 @@ public class RpcMediaSearchList extends RpcMediaList {
 			throw new IllegalArgumentException("Unsupported method: " + order);
 		}
 
-		final ChooseMediaReply resp = blockingStub().chooseMedia(req.build());
-		if (resp.getItemCount() < 1) return null;
-		return makeItem(resp.getItem(0), Collections.emptyList());
+		try {
+			final ChooseMediaReply resp = blockingStub().chooseMedia(req.build());
+			if (resp.getItemCount() < 1) return null;
+			return makeItem(resp.getItem(0), Collections.emptyList());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("chooseMedia() RPC failed: " + e.toString(), e);
+		}
 	}
 
 }

@@ -42,6 +42,7 @@ import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -84,6 +85,7 @@ public class GoalSeekingDlnaPlayerTest {
 		this.dlnaPlayingParamsFactory = mock(DlnaPlayingParamsFactory.class);
 		this.playerRegister = mock(PlayerRegister.class);
 		this.playerStateStorage = mock(PlayerStateStorage.class);
+		final MediaFactory mediaFactory = mock(MediaFactory.class);
 		this.controlPoint = mock(ControlPoint.class);
 		this.scheduledExecutor = mock(ScheduledExecutorService.class);
 		doAnswer((inv) -> {
@@ -102,6 +104,7 @@ public class GoalSeekingDlnaPlayerTest {
 				this.playerRegister, this.controlPoint, this.avTransportSvc,
 				this.dlnaPlayingParamsFactory, this.scheduledExecutor,
 				this.playerStateStorage,
+				mediaFactory,
 				this.config,
 				this.avTransport, this.renderingControl);
 	}
@@ -128,7 +131,7 @@ public class GoalSeekingDlnaPlayerTest {
 
 		// start playback.
 		final PlayItem item1 = makeItem();
-		final DlnaPlayingParams item1Params = new DlnaPlayingParams(TEST_FILE_1_ID, TEST_FILE_1_URI, item1.getTrack().getTitle(), MediaFormat.MP3.toMimeType(), TEST_FILE_1_SIZE, TEST_COVER_1_URI, TEST_FILE_1_DURATION);
+		final DlnaPlayingParams item1Params = new DlnaPlayingParams(TEST_FILE_1_ID, TEST_FILE_1_URI, item1.getItem().getTitle(), MediaFormat.MP3.toMimeType(), TEST_FILE_1_SIZE, TEST_COVER_1_URI, TEST_FILE_1_DURATION);
 		this.undertest.dlnaPlay(item1, item1Params);
 
 		// verify starts loading.
@@ -139,7 +142,7 @@ public class GoalSeekingDlnaPlayerTest {
 		ord.verify(this.avTransport).getTransportInfo();
 		ord.verify(this.avTransport).getPositionInfo();
 		ord.verify(this.avTransport).setUri(
-				TEST_FILE_1_ID, TEST_FILE_1_URI, item1.getTrack().getTitle(),
+				TEST_FILE_1_ID, TEST_FILE_1_URI, item1.getItem().getTitle(),
 				MediaFormat.MP3.toMimeType(), TEST_FILE_1_SIZE, TEST_COVER_1_URI, TEST_FILE_1_DURATION);
 		ord.verify(this.avTransport).play();
 		ord.verifyNoMoreInteractions();
@@ -175,7 +178,7 @@ public class GoalSeekingDlnaPlayerTest {
 		when(positionInfo.getTrackElapsedSeconds()).thenReturn(30L); // more than minimums.
 		assertEquals(PlayState.PLAYING, runEventLoop());
 		assertEquals(1, runScheduledExecutor());
-		assertEquals(1, item1.getTrack().getStartCount());
+		assertEquals(1, item1.getItem().getStartCount());
 		ord.verify(this.avTransport).getMediaInfo();
 		ord.verify(this.avTransport).getTransportInfo();
 		ord.verify(this.avTransport).getPositionInfo();
@@ -183,7 +186,7 @@ public class GoalSeekingDlnaPlayerTest {
 
 		// Skip to a new item.
 		final PlayItem item2 = makeItem();
-		final DlnaPlayingParams item2Params = new DlnaPlayingParams(TEST_FILE_2_ID, TEST_FILE_2_URI, item2.getTrack().getTitle(), MediaFormat.OGG.toMimeType(), TEST_FILE_2_SIZE, TEST_COVER_2_URI, TEST_FILE_2_DURATION);
+		final DlnaPlayingParams item2Params = new DlnaPlayingParams(TEST_FILE_2_ID, TEST_FILE_2_URI, item2.getItem().getTitle(), MediaFormat.OGG.toMimeType(), TEST_FILE_2_SIZE, TEST_COVER_2_URI, TEST_FILE_2_DURATION);
 		this.undertest.dlnaPlay(item2, item2Params);
 
 		// verify starts loading.
@@ -193,7 +196,7 @@ public class GoalSeekingDlnaPlayerTest {
 		ord.verify(this.avTransport).getTransportInfo();
 		ord.verify(this.avTransport).getPositionInfo();
 		ord.verify(this.avTransport).setUri(
-				TEST_FILE_2_ID, TEST_FILE_2_URI, item2.getTrack().getTitle(),
+				TEST_FILE_2_ID, TEST_FILE_2_URI, item2.getItem().getTitle(),
 				MediaFormat.OGG.toMimeType(), TEST_FILE_2_SIZE, TEST_COVER_2_URI, TEST_FILE_2_DURATION);
 		ord.verify(this.avTransport).play();
 		ord.verifyNoMoreInteractions();
@@ -231,7 +234,7 @@ public class GoalSeekingDlnaPlayerTest {
 
 	private PlayItem makeItem () throws MorriganException, DbException {
 		final MediaItem track = this.testDb.addTestTrack();
-		return new PlayItem(this.testDb, track);
+		return PlayItem.makeReady(this.testDb, track);
 	}
 
 	@SuppressWarnings("unused")

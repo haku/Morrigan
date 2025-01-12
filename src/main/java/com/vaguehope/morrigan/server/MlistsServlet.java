@@ -322,11 +322,11 @@ public class MlistsServlet extends HttpServlet {
 					resp.getWriter().println("MMDB playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					player.getQueue().addToQueue(new PlayItem(mmdb, null));
+					player.getQueue().addToQueue(PlayItem.makeReady(mmdb, null));
 					resp.getWriter().println("MMDB added to queue desu~");
 				}
 				else if (action.equals(CMD_QUEUE_TOP)) {
-					player.getQueue().addToQueueTop(new PlayItem(mmdb, null));
+					player.getQueue().addToQueueTop(PlayItem.makeReady(mmdb, null));
 					resp.getWriter().println("MMDB added to queue top desu~");
 				}
 				else {
@@ -362,11 +362,11 @@ public class MlistsServlet extends HttpServlet {
 					resp.getWriter().println("Item playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					player.getQueue().addToQueue(new PlayItem(mmdb, item));
+					player.getQueue().addToQueue(PlayItem.makeReady(mmdb, item));
 					resp.getWriter().println("Item added to queue desu~");
 				}
 				else if (action.equals(CMD_QUEUE_TOP)) {
-					player.getQueue().addToQueueTop(new PlayItem(mmdb, item));
+					player.getQueue().addToQueueTop(PlayItem.makeReady(mmdb, item));
 					resp.getWriter().println("Item added to queue top desu~");
 				}
 				else {
@@ -445,7 +445,7 @@ public class MlistsServlet extends HttpServlet {
 				final Collection<MediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
 				final List<PlayItem> trackPlayItems = new ArrayList<>();
 				for (final MediaItem track : tracks) {
-					trackPlayItems.add(new PlayItem(mmdb, track));
+					trackPlayItems.add(PlayItem.makeReady(mmdb, track));
 				}
 				if (action.equals(CMD_PLAY)) {
 					player.getQueue().addToQueue(trackPlayItems);

@@ -23,6 +23,7 @@ import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.DlnaResponseException;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
@@ -61,8 +62,9 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
+			final MediaFactory mediaFactory,
 			final Config config) {
-		this(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, config, null, null);
+		this(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, mediaFactory, config, null, null);
 	}
 
 	public GoalSeekingDlnaPlayer (
@@ -72,10 +74,11 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
+			final MediaFactory mediaFactory,
 			final Config config,
 			final AvTransportActions avTransportActions,
 			final RenderingControlActions renderingControlActions) {
-		super(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, config,
+		super(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, mediaFactory, config,
 				avTransportActions, renderingControlActions);
 		controlPoint.execute(new AvSubscriber(this, this.avEventListener, avTransportSvc, 600));
 		this.schdFuture = scheduledExecutor.scheduleWithFixedDelay(this.schdRunner, 1, 1, TimeUnit.SECONDS);
@@ -368,7 +371,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			this.avTransport.setUri(
 					goToPlay.getId(),
 					goToPlay.getUri(),
-					goToPlay.getItem().getTrack().getTitle(),
+					goToPlay.getItem().getItem().getTitle(),
 					goToPlay.getMimeType(), goToPlay.getFileSize(),
 					goToPlay.getCoverArtUri(),
 					goToPlay.getDurationSeconds());
@@ -547,14 +550,15 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 		// Only restore position if for same item.
 		final PlayerState rps = getRestorePositionState();
-		if (rps != null && rps.getCurrentItem() != null && rps.getCurrentItem().hasTrack()) {
-			if (Objects.equals(item.getTrack(), rps.getCurrentItem().getTrack())) {
+		final PlayItem cItem = rps != null ? rps.getCurrentItem() : null;
+		if (cItem != null && cItem.isReady() && cItem.hasItem()) {
+			if (Objects.equals(item.getItem(), cItem.getItem())) {
 				this.eventQueue.add(Long.valueOf(rps.getPosition()));
 				LOG.info("Play scheduled restore position: {}s", rps.getPosition());
 			}
 			else {
 				LOG.info("Not restoring position for {} as track is {}.",
-						rps.getCurrentItem().getTrack(), item.getTrack());
+						cItem.getItem(), item.getItem());
 			}
 		}
 		clearRestorePositionState();

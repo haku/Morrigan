@@ -4,6 +4,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
@@ -11,12 +14,12 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
-import com.vaguehope.morrigan.util.MnLogger;
 
 public class LocalPlayer extends AbstractPlayer implements Player {
 
-	private static final MnLogger LOG = MnLogger.make(LocalPlayer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LocalPlayer.class);
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ContentProxy contentProxy;
@@ -25,12 +28,13 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			final String id,
 			final String name,
 			final PlayerRegister register,
+			final MediaFactory mediaFactory,
 			final PlaybackEngineFactory playbackEngineFactory,
 			final ContentProxy contentProxy,
 			final ScheduledExecutorService schEx,
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
-		super(id, name, register, schEx, playerStateStorage, config);
+		super(id, name, register, mediaFactory, schEx, playerStateStorage, config);
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.contentProxy = contentProxy;
 	}
@@ -71,7 +75,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				eng.stopPlaying();
 			}
 			catch (final PlaybackException e) {
-				LOG.e("Failed top stop playback.", e);
+				LOG.error("Failed top stop playback.", e);
 			}
 			eng.unloadFile();
 			eng.finalise();
@@ -95,22 +99,22 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			mediaLocation = item.getAltFile().getAbsolutePath();
 			if (!Files.isReadable(Paths.get(mediaLocation))) throw new MorriganException("Alt file not found for item " + item + ": " + mediaLocation);
 		}
-		else if (item.getTrack().hasRemoteLocation()) {
+		else if (item.getItem().hasRemoteLocation()) {
 			if (item.hasList()) {
-				mediaLocation = item.getList().prepairRemoteLocation(item.getTrack(), this.contentProxy);
+				mediaLocation = item.getList().prepairRemoteLocation(item.getItem(), this.contentProxy);
 			}
 			else {
-				mediaLocation = item.getTrack().getRemoteLocation();
+				mediaLocation = item.getItem().getRemoteLocation();
 			}
 		}
 		else {
-			mediaLocation = item.getTrack().getFilepath();
+			mediaLocation = item.getItem().getFilepath();
 			if (!Files.isReadable(Paths.get(mediaLocation))) throw new MorriganException("File not found for item " + item + ": " + mediaLocation);
 		}
 
 		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
-			LOG.d("Loading '{}'...", item.getTrack().getTitle());
+			LOG.debug("Loading '{}'...", item.getItem().getTitle());
 			setCurrentItem(item);
 
 			engine.setFile(mediaLocation);
@@ -118,7 +122,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			engine.startPlaying();
 
 			this._currentTrackDuration = engine.getDuration();
-			LOG.d("Started to play '{}'...", item.getTrack().getTitle());
+			LOG.debug("Started to play '{}'...", item.getItem().getTitle());
 
 			this.schEx.submit(() -> getListeners().currentItemChanged(item));
 			this.playbackRecorder.recordStarted(item);
@@ -242,14 +246,14 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 			if (duration > 0) {
 				final PlayItem c = getCurrentItem();
-				if (c != null && c.isComplete()) {
-					if (c.getTrack().getDuration() != duration) {
+				if (c != null && c.hasListAndItem()) {
+					if (c.getItem().getDuration() != duration) {
 						try {
-							LOG.d("setting item duration={}.", duration);
-							c.getList().setTrackDuration(c.getTrack(), duration);
+							LOG.debug("setting item duration={}.", duration);
+							c.getList().setTrackDuration(c.getItem(), duration);
 						}
 						catch (final MorriganException e) {
-							LOG.e("Failed to update track duration.", e);
+							LOG.error("Failed to update track duration.", e);
 						}
 					}
 				}
@@ -265,10 +269,10 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 		@Override
 		public void onEndOfTrack() {
-			LOG.d("Player received endOfTrack event.");
+			LOG.debug("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
-				getCurrentItem().getList().incTrackEndCnt(getCurrentItem().getTrack());
+				getCurrentItem().getList().incTrackEndCnt(getCurrentItem().getItem());
 			} catch (final MorriganException e) {
 				getListeners().onException(e);
 			}
@@ -280,7 +284,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 					loadAndStartPlaying(nextItemToPlay);
 				}
 				else {
-					LOG.i("No more tracks to play.");
+					LOG.info("No more tracks to play.");
 					getListeners().currentItemChanged(null);
 				}
 			}

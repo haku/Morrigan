@@ -30,7 +30,7 @@ public final class PlayerHelper {
 	public static void playAll (final MediaList db, final List<MediaItem> tracks, final Player player) {
 		final List<PlayItem> items = new ArrayList<>();
 		for (final MediaItem track : tracks) {
-			items.add(new PlayItem(db, track));
+			items.add(PlayItem.makeReady(db, track));
 		}
 		player.getQueue().addToQueue(items);
 		player.getQueue().moveInQueueEnd(items, false);
@@ -40,7 +40,7 @@ public final class PlayerHelper {
 	public static void enqueueAll (final MediaList db, final List<MediaItem> tracks, final Player player) {
 		final PlayerQueue queue = player.getQueue();
 		for (final MediaItem track : tracks) {
-			queue.addToQueue(new PlayItem(db, track));
+			queue.addToQueue(PlayItem.makeReady(db, track));
 		}
 	}
 

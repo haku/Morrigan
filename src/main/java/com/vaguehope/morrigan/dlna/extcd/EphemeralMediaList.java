@@ -60,7 +60,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 // Not supported - but possible to implement.
 
 	@Override
-	public List<PlaybackOrder> getSupportedChooseMethods() {
+	public List<PlaybackOrder> getSupportedChooseMethods() throws MorriganException {
 		return Collections.emptyList();
 	}
 

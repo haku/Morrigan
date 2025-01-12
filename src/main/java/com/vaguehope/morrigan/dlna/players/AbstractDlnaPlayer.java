@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -47,10 +48,11 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService schEx,
 			final PlayerStateStorage playerStateStorage,
+			final MediaFactory mediaFactory,
 			final Config config,
 			final AvTransportActions avTransportActions,
 			final RenderingControlActions renderingControlActions) {
-		super(UpnpHelper.idFromRemoteService(avTransportSvc), avTransportSvc.getDevice().getDetails().getFriendlyName(), register, schEx, playerStateStorage, config);
+		super(UpnpHelper.idFromRemoteService(avTransportSvc), avTransportSvc.getDevice().getDetails().getFriendlyName(), register, mediaFactory, schEx, playerStateStorage, config);
 		this.controlPoint = controlPoint;
 		this.avTransportSvc = avTransportSvc;
 

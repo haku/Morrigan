@@ -109,6 +109,7 @@ public class DlnaService {
 				this.upnpService,
 				dlnaPlayingParamsFactory,
 				new PlayerStateStorage(this.mediaFactory, this.scheduledExecutor, this.config),
+				this.mediaFactory,
 				this.config,
 				this.scheduledExecutor);
 		this.contentDirectoryHolder = new ContentDirectoryHolder(this.upnpService, this.mediaFactory, this.config);

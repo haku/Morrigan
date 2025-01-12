@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
 
 public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
@@ -26,12 +27,19 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 	private final Set<String> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
 	private final PlayerStateStorage stateStorage;
+	private final MediaFactory mediaFactory;
 	private final Config config;
 	private final ContentProxy contentProxy;
 	private final ScheduledExecutorService schEx;
 
-	public PlayerRegisterImpl (final PlayerStateStorage stateStorage, final Config config, final ContentProxy contentProxy, final ScheduledExecutorService schEx) {
+	public PlayerRegisterImpl(
+			final PlayerStateStorage stateStorage,
+			final MediaFactory mediaFactory,
+			final Config config,
+			final ContentProxy contentProxy,
+			final ScheduledExecutorService schEx) {
 		this.stateStorage = stateStorage;
+		this.mediaFactory = mediaFactory;
 		this.config = config;
 		this.contentProxy = contentProxy;
 		this.schEx = schEx;
@@ -112,6 +120,7 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 				nextIndex(prefix),
 				name,
 				this,
+				this.mediaFactory,
 				playbackEngineFactory,
 				this.contentProxy,
 				this.schEx,

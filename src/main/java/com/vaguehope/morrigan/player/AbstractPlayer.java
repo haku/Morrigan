@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.transcode.Transcode;
@@ -35,6 +36,7 @@ public abstract class AbstractPlayer implements Player {
 	private final String id;
 	private final String name;
 	private final PlayerRegister register;
+	private final MediaFactory mediaFactory;
 	private final PlayerStateStorage playerStateStorage;
 	private final Config config;
 
@@ -61,12 +63,14 @@ public abstract class AbstractPlayer implements Player {
 			final String id,
 			final String name,
 			final PlayerRegister register,
+			final MediaFactory mediaFactory,
 			final ScheduledExecutorService schEx,
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
 		this.id = id;
 		this.name = name;
 		this.register = register;
+		this.mediaFactory = mediaFactory;
 		this.schEx = schEx;
 		this.playerStateStorage = playerStateStorage;
 		this.config = config;
@@ -114,19 +118,25 @@ public abstract class AbstractPlayer implements Player {
 		if (!this.alive.get()) throw new IllegalStateException("Player is disposed: " + toString());
 	}
 
-	protected void markStateRestoreAttempted () {
+	@Override
+	public void markStateRestoreAttempted() {
 		this.stateRestoreAttempted = true;
 	}
 
 	/**
 	 * A hint. May be handled asynchronously.
 	 */
-	protected void saveState () {
-		if (this.stateRestoreAttempted) {
-			this.playerStateStorage.writeState(this);
+	protected void saveState() {
+		try {
+			if (this.stateRestoreAttempted) {
+				this.playerStateStorage.writeState(this);
+			}
+			else {
+				LOG.info("Not saving player state as a restore has not yet been attempted.");
+			}
 		}
-		else {
-			LOG.info("Not saving player state as a restore has not yet been attempted.");
+		catch (final Exception e) {
+			this.listeners.onException(e);
 		}
 	}
 
@@ -161,6 +171,11 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public void removeEventListener (final PlayerEventListener listener) {
 		this.listeners.removeEventListener(listener);
+	}
+
+	@Override
+	public void setCurrentList(final MediaList list) {
+		this.currentList.set(list);
 	}
 
 	@Override
@@ -204,9 +219,10 @@ public abstract class AbstractPlayer implements Player {
 		if (asMeasured > 0) return asMeasured;
 
 		final PlayItem item = getCurrentItem();
-		final MediaItem track = item != null && item.hasTrack() ? item.getTrack() : null;
-		final int trackDuration = track != null ? track.getDuration() : -1;
-		if (trackDuration > 0) return trackDuration;
+		if (item != null && item.isReady() && item.hasItem()) {
+			final int itemDuration = item.getItem().getDuration();
+			if (itemDuration > 0) return itemDuration;
+		}
 
 		return getCurrentTrackDurationFromRenderer();
 	}
@@ -269,7 +285,7 @@ public abstract class AbstractPlayer implements Player {
 
 	@Override
 	public final void loadAndStartPlaying (final MediaList list, final MediaItem track) {
-		loadAndStartPlaying(new PlayItem(list, track));
+		loadAndStartPlaying(PlayItem.makeReady(list, track));
 	}
 
 	@Override
@@ -288,14 +304,14 @@ public abstract class AbstractPlayer implements Player {
 		}
 
 		PlayItem pi = item;
-		if (!pi.hasTrack()) {
+		if (!pi.hasItem()) {
 			if (!pi.hasList()) return;  // can not pick a track without a list.
 
 			this.currentList.set(pi.getList());  // list only items update the current list.
 
 			final MediaItem track = findTrackForListOnlyPlayItem(pi);
 			if (track == null) return;
-			pi = pi.withTrack(track);
+			pi = pi.withItem(track);
 		}
 
 		loadAndStartPlayingTrack(pi);
@@ -314,53 +330,45 @@ public abstract class AbstractPlayer implements Player {
 		getListeners().playStateChanged(getPlayState());
 	}
 
-	private final Future<?> loadAndStartPlayingTrack (final PlayItem item) {
-		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
-		if (!item.hasTrack()) throw new IllegalArgumentException("Item must have a track.");
-		if (!item.getTrack().isPlayable()) throw new IllegalArgumentException("Item is not playable: '" + item.getTrack().getFilepath() + "'.");
-
-		try {
-			if (StringHelper.notBlank(item.getTrack().getFilepath())) {
-				final File file = new File(item.getTrack().getFilepath());
-				if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
-			}
-			else if (!item.getTrack().hasRemoteLocation()) {
-				throw new FileNotFoundException("Track has no filepath or remote location: " + item.getTrack());
-			}
-
-			markLoadingState(true);
-		}
-		catch (final Exception e) { // NOSONAR reporting exceptions.
-			rollbackToTopOfQueue(item);
-			this.listeners.onException(e);
-		}
+	private final Future<?> loadAndStartPlayingTrack (final PlayItem argItem) {
+		if (argItem == null) throw new IllegalArgumentException("PlayItem can not be null.");
+		if (!argItem.hasItem()) throw new IllegalArgumentException("Item must have a track.");
 
 		return this.schEx.submit(new Runnable() {
 			@Override
 			public void run () {
+				markLoadingState(true);
 				try {
-					markLoadingState(true);
-					try {
-						AbstractPlayer.this.listeners.currentItemChanged(item);
+					final PlayItem item = argItem.makeReady(AbstractPlayer.this.mediaFactory);
+					if (item == null) throw new MorriganException("Failed to resolve item: " + argItem);
 
-						PlayItem maybeUpdatedItem = item;
-
-						final TranscodeProfile tProfile = getTranscode().profileForItem(new TranscodeContext(AbstractPlayer.this.config), item.getList(), item.getTrack());
-						if (tProfile != null) {
-							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
-							final File altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.
-							maybeUpdatedItem = item.withAltFile(altFile);
-						}
-
-						loadAndPlay(maybeUpdatedItem);
+					if (StringHelper.notBlank(item.getItem().getFilepath())) {
+						final File file = new File(item.getItem().getFilepath());
+						if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
 					}
-					finally {
-						markLoadingState(false);
+					else if (!item.getItem().hasRemoteLocation()) {
+						throw new FileNotFoundException("Track has no filepath or remote location: " + item.getItem());
 					}
+
+					AbstractPlayer.this.listeners.currentItemChanged(item);
+
+					PlayItem maybeUpdatedItem = item;
+
+					final TranscodeProfile tProfile = getTranscode().profileForItem(new TranscodeContext(AbstractPlayer.this.config), item.getList(), item.getItem());
+					if (tProfile != null) {
+						AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
+						final File altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.
+						maybeUpdatedItem = item.withAltFile(altFile);
+					}
+
+					loadAndPlay(maybeUpdatedItem);
 				}
 				catch (final Exception e) { // NOSONAR reporting exceptions.
-					rollbackToTopOfQueue(item);
+					rollbackToTopOfQueue(argItem);
 					AbstractPlayer.this.listeners.onException(e);
+				}
+				finally {
+					markLoadingState(false);
 				}
 			}
 		});
@@ -419,22 +427,22 @@ public abstract class AbstractPlayer implements Player {
 		final MediaList curList = getCurrentList();
 		final PlaybackOrder pbOrder = getPlaybackOrder();
 
-		if (current != null && current.isComplete() && current.getList().equals(curList)) {
-			final MediaItem nextTrack = callChooseItemOnList(current.getList(), pbOrder, current.getTrack());
+		if (current != null && current.hasListAndItem() && current.getList().equals(curList)) {
+			final MediaItem nextTrack = callChooseItemOnList(current.getList(), pbOrder, current.getItem());
 			if (nextTrack != null) {
-				return new PlayItem(current.getList(), nextTrack);
+				return PlayItem.makeReady(current.getList(), nextTrack);
 			}
 		}
 
 		final MediaItem nextTrack = callChooseItemOnList(curList, pbOrder, null);
 		if (nextTrack != null) {
-			return new PlayItem(curList, nextTrack);
+			return PlayItem.makeReady(curList, nextTrack);
 		}
 
 		return null;
 	}
 
-	private MediaItem callChooseItemOnList(final MediaList list, final PlaybackOrder order, MediaItem item) throws MorriganException {
+	private MediaItem callChooseItemOnList(final MediaList list, final PlaybackOrder order, final MediaItem item) throws MorriganException {
 		if (list == null) return null;
 		if (order == PlaybackOrder.MANUAL) return null;  // do this here so list impls do not have to.
 

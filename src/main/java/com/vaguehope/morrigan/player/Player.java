@@ -48,6 +48,8 @@ public interface Player {
 
 	void setCurrentItem(PlayItem item);
 	PlayItem getCurrentItem();
+
+	void setCurrentList(MediaList list);
 	MediaList getCurrentList();
 
 	/**
@@ -103,6 +105,8 @@ public interface Player {
 	void setTranscode(Transcode transcode);
 
 	PlayerQueue getQueue();
+
+	void markStateRestoreAttempted();
 
 	public interface PlayerEventListener {
 

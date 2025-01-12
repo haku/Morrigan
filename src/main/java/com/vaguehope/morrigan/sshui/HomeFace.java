@@ -158,7 +158,7 @@ public class HomeFace extends MenuFace {
 			final Player player = getPlayer(gui, "Play List");
 			if (player != null) {
 				final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
-				playPlayItem(new PlayItem(db, null), player);
+				playPlayItem(PlayItem.makeReady(db, null), player);
 			}
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
@@ -218,7 +218,7 @@ public class HomeFace extends MenuFace {
 			final Player player = getPlayer(gui, "Enqueue DB");
 			if (player != null) {
 				final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
-				enqueuePlayItem(new PlayItem(db, null), player);
+				enqueuePlayItem(PlayItem.makeReady(db, null), player);
 			}
 		}
 	}
