@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,6 +30,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class AbstractPlayer implements Player {
 
+	private static final long SAVE_STATE_INTERVAL_MINUTES = 5;
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractPlayer.class);
 
 	protected final ScheduledExecutorService schEx;
@@ -56,6 +59,9 @@ public abstract class AbstractPlayer implements Player {
 	private final AtomicReference<Transcode> transcode = new AtomicReference<>(Transcode.NONE);
 	private final Transcoder transcoder;
 
+	private final ScheduledFuture<?> saveStatePeriodicFuture;
+	private volatile long saveStatePeriodicQueueVersion;
+
 	private volatile boolean stateRestoreAttempted = false;
 	private volatile boolean loadingTrack = false;
 
@@ -76,12 +82,15 @@ public abstract class AbstractPlayer implements Player {
 		this.config = config;
 		this.playbackRecorder = new PlaybackRecorder(schEx);
 		this.transcoder = new Transcoder(id);
+		this.saveStatePeriodicFuture = this.schEx.scheduleWithFixedDelay(this::saveStatePeriodic, SAVE_STATE_INTERVAL_MINUTES,
+				SAVE_STATE_INTERVAL_MINUTES, TimeUnit.MINUTES);
 	}
 
 	@Override
 	public final void dispose () {
 		if (this.alive.compareAndSet(true, false)) {
 			try {
+				this.saveStatePeriodicFuture.cancel(false);
 				this.register.unregister(this);
 			}
 			finally {
@@ -137,6 +146,15 @@ public abstract class AbstractPlayer implements Player {
 		}
 		catch (final Exception e) {
 			this.listeners.onException(e);
+		}
+	}
+
+	private void saveStatePeriodic() {
+		if (!this.alive.get()) return;
+		final long queueVersion = this.queue.getVersion();
+		if (this.saveStatePeriodicQueueVersion != queueVersion) {
+			saveState();
+			this.saveStatePeriodicQueueVersion = queueVersion;
 		}
 	}
 
