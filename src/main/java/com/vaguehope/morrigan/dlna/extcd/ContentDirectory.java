@@ -20,6 +20,7 @@ import org.jupnp.support.model.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaNode;
@@ -31,7 +32,6 @@ import com.vaguehope.morrigan.util.StringHelper;
 public class ContentDirectory {
 
 	static final String SEARCH_BY_ID_PREFIX = "id=";
-	static final String ROOT_CONTENT_ID = "0"; // Root id of '0' is in the spec.
 	private static final String TYPE_CRITERIA = "(upnp:class derivedfrom \"object.item.videoItem\" or upnp:class derivedfrom \"object.item.audioItem\")";
 
 	private static final long SLEEP_BEFORE_RETRY_MILLIS = 500L;
@@ -114,7 +114,7 @@ public class ContentDirectory {
 	}
 
 	private List<MediaItem> oldDlnaBrowseRoot (final int maxResults) throws DbException {
-		return oldDlnaBrowse(ROOT_CONTENT_ID, maxResults);
+		return oldDlnaBrowse(ListRef.DLNA_ROOT_NODE_ID, maxResults);
 	}
 
 	private List<MediaItem> oldDlnaBrowse (final String containerId, final int maxResults) throws DbException {
@@ -145,7 +145,7 @@ public class ContentDirectory {
 		final AtomicReference<DIDLContent> ref = new AtomicReference<>();
 		final AtomicReference<String> err = new AtomicReference<>();
 
-		this.controlPoint.execute(new Search(this.contentDirectory, ROOT_CONTENT_ID, searchCriteria, Search.CAPS_WILDCARD, 0, (long) maxResults) {
+		this.controlPoint.execute(new Search(this.contentDirectory, ListRef.DLNA_ROOT_NODE_ID, searchCriteria, Search.CAPS_WILDCARD, 0, (long) maxResults) {
 			@Override
 			public void failure (final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
 				final String msg = "Failed to search content directory: " + defaultMsg;

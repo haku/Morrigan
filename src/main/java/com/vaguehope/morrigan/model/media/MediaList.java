@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
@@ -48,6 +50,14 @@ public interface MediaList extends List<AbstractItem> {
 	void read () throws MorriganException;
 	void forceRead () throws MorriganException;
 	long getDurationOfLastRead();
+
+	default MediaList resolveRef(ListRef ref) throws MorriganException {
+		if (ref == null) return null;
+		if (ref.getType() != getListRef().getType()) throw new IllegalArgumentException();
+		if (canMakeView() && StringUtils.isNotBlank(ref.getSearch())) return makeView(ref.getSearch());
+		if (hasNodes() && StringUtils.isNotBlank(ref.getNodeId())) return makeNode(ref.getNodeId(), null);
+		return null;
+	}
 
 	default boolean hasNodes() {
 		return false;

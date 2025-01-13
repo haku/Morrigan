@@ -81,7 +81,13 @@ public class MediaFactoryImpl implements MediaFactory {
 
 		case RPC:
 		case DLNA:
-			return this.externalListsByListRef.get(listRef);
+			final MediaList list = this.externalListsByListRef.get(listRef);
+			if (list != null) return list;
+
+			final MediaList root = this.externalListsByListRef.get(listRef.toRoot());
+			if (root != null) return root.resolveRef(listRef);
+
+			return null;
 
 		default:
 			throw new IllegalArgumentException();

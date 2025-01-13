@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ListRef implements Comparable<ListRef> {
 
+	public static final String DLNA_ROOT_NODE_ID = "0"; // Root id of '0' is in the DLNA spec.
+	public static final String RPC_ROOT_NODE_ID = "0";
+
 	public static ListRef fromUrlForm(final String urlFrom) {
 		if (urlFrom == null) return null;
 
@@ -104,6 +107,17 @@ public class ListRef implements Comparable<ListRef> {
 
 	public ListRef withSearch(String newSearch) {
 		return new ListRef(this.type, this.listId, this.nodeId, newSearch);
+	}
+
+	public ListRef toRoot() {
+		switch (this.type) {
+		case DLNA:
+			return forRpcNode(this.listId, DLNA_ROOT_NODE_ID);
+		case RPC:
+			return forRpcNode(this.listId, RPC_ROOT_NODE_ID);
+		default:
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public boolean isHasRootNodes() {

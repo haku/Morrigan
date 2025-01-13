@@ -14,8 +14,6 @@ import com.vaguehope.morrigan.model.media.MediaStorageLayer;
 
 public class RpcRemotesManager {
 
-	protected static final String ROOT_NODE_ID = "0";
-
 	private final RpcClient rpcClient;
 	private final MediaFactory mediaFactory;
 	private final Config config;
@@ -42,7 +40,7 @@ public class RpcRemotesManager {
 		this.rpcClient.start();
 
 		for (final RemoteInstance ri : this.rpcClient.getRemoteInstances()) {
-			final ListRef ref = ListRef.forRpcNode(ri.getLocalIdentifier(), ROOT_NODE_ID);
+			final ListRef ref = ListRef.forRpcNode(ri.getLocalIdentifier(), ListRef.RPC_ROOT_NODE_ID);
 			final MediaStorageLayer storageLayer = this.mediaFactory.getStorageLayerWithNewItemFactory(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
 			final MetadataStorage storage = new MetadataStorage(storageLayer);
 			this.mediaFactory.addExternalList(new RpcMediaNodeList(ref, "", ri, this.rpcClient, this.rpcContentServer, storage));

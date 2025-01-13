@@ -73,7 +73,7 @@ public class ContentDirectoryHolder {
 
 	private static ListRef refForDevice(final RemoteDevice device) {
 		final String id = device.getIdentity().getUdn().getIdentifierString();
-		return ListRef.forDlnaNode(id, ContentDirectory.ROOT_CONTENT_ID);
+		return ListRef.forDlnaNode(id, ListRef.DLNA_ROOT_NODE_ID);
 	}
 
 	private static void dispose (final MediaList db) {

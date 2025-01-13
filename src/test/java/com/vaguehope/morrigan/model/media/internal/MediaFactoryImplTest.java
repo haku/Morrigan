@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.model.media.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,13 +41,26 @@ public class MediaFactoryImplTest {
 	}
 
 	@Test
-	public void itGetsRemote() throws Exception {
-		final ListRef ref = ListRef.forRpcNode("id" + RND.nextLong(), "0");
-		final MediaList external = mock(MediaList.class);
-		when(external.getListRef()).thenReturn(ref);
+	public void itGetsRemoteRootAndSubNode() throws Exception {
+		final ListRef rootRef = ListRef.forRpcNode("id" + RND.nextLong(), "0");
+		final MediaList rootList = mock(MediaList.class);
+		when(rootList.getListRef()).thenReturn(rootRef);
 
-		this.undertest.addExternalList(external);
-		assertEquals(external, this.undertest.getList(ref));
+		this.undertest.addExternalList(rootList);
+		assertEquals(rootList, this.undertest.getList(rootRef));
+
+		final MediaList nodeList = mock(MediaList.class);
+		when(rootList.resolveRef(any(ListRef.class))).thenCallRealMethod();
+		when(rootList.makeNode("some-node-id", null)).thenReturn(nodeList);
+		when(rootList.hasNodes()).thenReturn(true);
+		final ListRef nodeRef = ListRef.forRpcNode(rootRef.getListId(), "some-node-id");
+		assertEquals(nodeList, this.undertest.getList(nodeRef));
+
+		final MediaList searchList = mock(MediaList.class);
+		when(rootList.makeView("some search")).thenReturn(searchList);
+		when(rootList.canMakeView()).thenReturn(true);
+		final ListRef searchRef = ListRef.forRpcSearch(rootRef.getListId(), "some search");
+		assertEquals(searchList, this.undertest.getList(searchRef));
 	}
 
 }
