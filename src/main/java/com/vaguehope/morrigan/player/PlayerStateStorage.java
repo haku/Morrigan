@@ -55,8 +55,8 @@ public class PlayerStateStorage {
 		final String json = this.gson.toJson(playerState);
 
 		final File outFile = getFile(player.getId());
-		final File tmpFile = getTmpFile(outFile);
 		try {
+			final File tmpFile = File.createTempFile(outFile.getName() + ".", null, outFile.getParentFile());
 			FileUtils.writeStringToFile(tmpFile, json, StandardCharsets.UTF_8);
 			if (!tmpFile.renameTo(outFile)) {
 				LOG.error("Failed to mv {} to {}.", tmpFile.getAbsolutePath(), outFile.getAbsolutePath());
@@ -179,10 +179,6 @@ public class PlayerStateStorage {
 		final File dir = new File(this.config.getConfigDir(), DIR_NAME);
 		if (!dir.exists()) dir.mkdirs();
 		return new File(dir, playerId);
-	}
-
-	private static File getTmpFile(final File outFile) {
-		return new File(outFile.getAbsolutePath() + ".tmp");
 	}
 
 }
