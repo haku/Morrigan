@@ -105,7 +105,11 @@ public class ListRef implements Comparable<ListRef> {
 		return this.search;
 	}
 
-	public ListRef withSearch(String newSearch) {
+	public ListRef withNodeId(final String newNodeId) {
+		return new ListRef(this.type, this.listId, newNodeId, this.search);
+	}
+
+	public ListRef withSearch(final String newSearch) {
 		return new ListRef(this.type, this.listId, this.nodeId, newSearch);
 	}
 
@@ -163,7 +167,7 @@ public class ListRef implements Comparable<ListRef> {
 	}
 
 	@Override
-	public int compareTo(ListRef o) {
+	public int compareTo(final ListRef o) {
 		return Order.ASC.compare(this, o);
 	}
 

@@ -526,8 +526,9 @@ MnApi = {};
     actionItem(items, 'queue_top', args, msgHandler, onComplete);
   };
 
-  MnApi.enqueueView = function(listRef, view, pid, msgHandler, onComplete) {
+  MnApi.enqueueView = function(listRef, nodeId, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
+    if (nodeId) args += '&nodeid=' + encodeURIComponent(nodeId);
     if (view) args += '&view=' + encodeURIComponent(view);
     actionItem({url: 'mlists/' + listRef}, 'queue', args, msgHandler, onComplete);
   };

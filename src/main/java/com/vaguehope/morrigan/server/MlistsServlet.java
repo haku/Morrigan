@@ -135,6 +135,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_ACTION = "action";
 	private static final String PARAM_PLAYERID = "playerid";
 	private static final String PARAM_TAG = "tag";
+	private static final String PARAM_NODEID = "nodeid";
 	private static final String PARAM_VIEW = "view";
 	private static final String PARAM_COLUMN = "column";
 	private static final String PARAM_ORDER = "order";
@@ -246,9 +247,11 @@ public class MlistsServlet extends HttpServlet {
 			if (path.length() > 0) {
 				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 1) {
-					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
+					final String nodeId = StringHelper.trimToNull(req.getParameter(PARAM_NODEID));
+					final String view = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 					ListRef ref = ListRef.fromUrlForm(pathParts[0]);
-					if (filter != null) ref = ref.withSearch(filter);
+					if (nodeId != null) ref = ref.withNodeId(nodeId);
+					if (view != null) ref = ref.withSearch(view);
 					final MediaList mmdb = this.mediaFactory.getList(ref);
 					mmdb.read();
 					final String subPath = pathParts.length >= 2 ? pathParts[1] : null;

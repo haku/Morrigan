@@ -8,6 +8,7 @@
   var lastQueuePid;
   var lastQueueVersion;
   var currentDbListRef;
+  var currentDbNodeId;
   var currentDbQuery;
   var currentDbResults;
   var tagEditorListRef;
@@ -306,7 +307,7 @@
       if (item.name && item.listref && (item.query || item.query === '')) {
         addToQueue.text(item.name);
         addToQueue.unbind().click(function() {
-          enqueueView(item.listref, item.query);
+          enqueueView(item.listref, null, item.query);
           hidePopup(menu);
         });
       }
@@ -323,12 +324,12 @@
 
   function enqueueViewClicked() {
     if (!currentDbListRef || !currentDbResults) return;
-    enqueueView(currentDbListRef, currentDbQuery);
+    enqueueView(currentDbListRef, currentDbNodeId, currentDbQuery);
   }
 
-  function enqueueView(listRef, query) {
+  function enqueueView(listRef, nodeId, query) {
     if (!selectedPlayer) return;
-    MnApi.enqueueView(listRef, query, selectedPlayer.pid, msgHandler, function(msg) {
+    MnApi.enqueueView(listRef, nodeId, query, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
       fetchAndDisplayQueue();
     });
@@ -592,6 +593,7 @@
 
   function setDbTabToDbs() {
     currentDbListRef = null;
+    currentDbNodeId = null;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
@@ -627,6 +629,7 @@
 
   function setDbTabToNode(listRef, nodeId, parentNodeId) {
     currentDbListRef = listRef;
+    currentDbNodeId = nodeId;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
@@ -669,6 +672,7 @@
     var includeDisabled = $('#db_include_disabled .material-icons').text() === 'deleted';
 
     currentDbListRef = listRef;
+    currentDbNodeId = null;
     currentDbQuery = query;
     currentDbResults = null;
     $('#db_fab').hide();
@@ -703,6 +707,7 @@
 
   function setDbTabToTags(listRef, view) {
     currentDbListRef = listRef;
+    currentDbNodeId = null;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
@@ -716,6 +721,7 @@
 
   function setDbTabToAlbums(listRef, view) {
     currentDbListRef = listRef;
+    currentDbNodeId = null;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
