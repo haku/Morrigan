@@ -93,11 +93,16 @@ public class PlayerStateStorage {
 			if (state.position > 0) LOG.info("TODO restore position: " + state.position);
 
 			final Map<ListRef, MediaList> listCache = new HashMap<>();
-			final MediaList list = getList(ListRef.fromUrlForm(state.listRef), listCache);
-			if (list != null) player.setCurrentList(list);
 
-			final PlayItem currentItem = fromQueueItem(state.item, listCache);
-			if (currentItem != null && player.getCurrentItem() == null) player.setCurrentItem(currentItem);
+			if (state.listRef != null) {
+				final MediaList list = getList(ListRef.fromUrlForm(state.listRef), listCache);
+				if (list != null) player.setCurrentList(list);
+			}
+
+			if (state.item != null) {
+				final PlayItem currentItem = fromQueueItem(state.item, listCache);
+				if (currentItem != null && player.getCurrentItem() == null) player.setCurrentItem(currentItem);
+			}
 
 			if (state.queue != null) {
 				for (final QueueItem qi : state.queue) {
