@@ -23,8 +23,7 @@ import io.grpc.StatusRuntimeException;
 
 public class RpcMediaNodeList extends RpcMediaList {
 
-	private final String title;
-
+	private volatile String title;
 	private volatile List<MediaNode> mediaNodes = Collections.emptyList();
 	private volatile List<MediaItem> mediaItems = Collections.emptyList();
 	private volatile long durationOfLastRead = -1;
@@ -54,6 +53,8 @@ public class RpcMediaNodeList extends RpcMediaList {
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("listNode() RPC failed: " + e.toString(), e);
 		}
+
+		if (StringUtils.isNotBlank(resp.getNode().getTitle())) this.title = resp.getNode().getTitle();
 
 		final List<MediaNode> nodes = new ArrayList<>(resp.getChildCount());
 		for (final MediaToadProto.MediaNode n : resp.getChildList()) {
