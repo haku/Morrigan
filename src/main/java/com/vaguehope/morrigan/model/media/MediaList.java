@@ -193,7 +193,12 @@ public interface MediaList extends List<AbstractItem> {
 	 */
 	MediaItem getByFile (String identifer) throws MorriganException;
 
-	MediaItem getByMd5 (BigInteger md5) throws DbException;
+	default boolean canGetByMd5() {
+		return false;
+	}
+	default MediaItem getByMd5 (BigInteger md5) throws DbException {
+		throw new UnsupportedOperationException();
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // track

@@ -86,7 +86,11 @@ public class MediaFileLocator implements FileLocator {
 			if (parts.length < 4) throw new IllegalArgumentException("Need at least 4 parts: " + id);
 
 			final String filepath = decodeString(parts[2]);
-			final MediaItem item = db.hasFile(filepath).isKnown() ? db.getByFile(filepath) : db.getByMd5(new BigInteger(parts[3], 16));
+			MediaItem item = db.hasFile(filepath).isKnown() ? db.getByFile(filepath) : null;
+			if (item == null && db.canGetByMd5()) item = db.getByMd5(new BigInteger(parts[3], 16));
+			if (item == null) {
+				throw new IllegalArgumentException("Item with ID not found: " + id);
+			}
 
 			if (parts.length == 4) {
 				return new File(item.getFilepath());

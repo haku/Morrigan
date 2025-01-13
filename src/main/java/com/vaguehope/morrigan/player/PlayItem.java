@@ -225,7 +225,7 @@ public abstract class PlayItem {
 			MediaItem item = null;
 			if (StringUtils.isNotBlank(this.filepath)) item = list.getByFile(this.filepath);
 			if (item == null && StringUtils.isNotBlank(this.remoteId)) item = list.getByFile(this.remoteId);
-			if (item == null) item = list.getByMd5(this.md5);
+			if (item == null && list.canGetByMd5()) item = list.getByMd5(this.md5);
 			if (item != null) return new ReadyPlayItem(PlayItemType.PLAYABLE, list, item, null);
 			return null;
 		}

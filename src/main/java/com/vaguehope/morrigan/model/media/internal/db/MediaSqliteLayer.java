@@ -1130,7 +1130,8 @@ public class MediaSqliteLayer extends GenericSqliteLayer implements MediaStorage
 			try (final ResultSet rs = ps.executeQuery()) {
 				final List<MediaItem> res = local_parseRecordSet(rs, this.itemFactory);
 				if (res.size() == 1) return res.get(0);
-				throw new IllegalArgumentException("File not found '" + md5.toString(16) + "' (results count = " + res.size() + ").");
+				if (res.size() == 0) return null;
+				throw new IllegalArgumentException("Ambigious MD5 '" + md5.toString(16) + "': results count = " + res.size());
 			}
 		}
 		catch (final SQLException e) {

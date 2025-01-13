@@ -434,6 +434,10 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
+	public boolean canGetByMd5() {
+		return true;
+	}
+	@Override
 	public MediaItem getByMd5 (final BigInteger md5) throws DbException {
 		return this.dbLayer.getByMd5(md5);
 	}

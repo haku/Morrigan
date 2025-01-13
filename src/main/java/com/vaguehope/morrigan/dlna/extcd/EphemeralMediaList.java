@@ -26,7 +26,6 @@ import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public abstract class EphemeralMediaList extends AbstractList<AbstractItem> implements MediaList {
 
@@ -206,11 +205,6 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 
 	@Override
 	public void removeItem (final MediaItem item) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public MediaItem getByMd5 (final BigInteger md5) throws DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
