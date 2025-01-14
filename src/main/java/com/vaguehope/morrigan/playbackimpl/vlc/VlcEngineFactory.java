@@ -19,12 +19,16 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 
 	private final MediaPlayerFactory factory;
 
+	// it would be nice to specify the http timeout, but that does not seem to be configurable:
+	// https://code.videolan.org/videolan/vlc/-/issues/28777
+	// https://github.com/videolan/vlc/blob/master/modules/access/http.c
 	private static final List<String> VLC_ARGS = Collections.unmodifiableList(Arrays.asList(new String[] {
 			"--intf=dummy",
 //			"--aout=alsa",
 			"--no-metadata-network-access",
 			"--no-video",
 			"--prefetch-read-size=" + (1024 * 1024),
+			"--http-reconnect",
 	}));
 
 	public VlcEngineFactory(final boolean verbose, final List<String> extraVlcArgs) {
