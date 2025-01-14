@@ -79,6 +79,7 @@ public class RpcContentServlet implements ContentServer {
 
 		final Iterator<ReadMediaReply> replies = stub
 				.withDeadlineAfter(15, TimeUnit.MINUTES)
+				.withOnReadyThreshold(1 * 1024 * 1024)  // default is 32kib.
 				.readMedia(rpcReq.build());
 		final ReadMediaReply first = replies.next();
 

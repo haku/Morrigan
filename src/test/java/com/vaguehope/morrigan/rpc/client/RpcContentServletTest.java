@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.rpc.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,6 +47,7 @@ public class RpcContentServletTest {
 
 		when(this.rpcClient.getMediaBlockingStub(LIST_ID)).thenReturn(this.stub);
 		when(this.stub.withDeadlineAfter(anyLong(), any(TimeUnit.class))).thenReturn(this.stub);
+		when(this.stub.withOnReadyThreshold(anyInt())).thenReturn(this.stub);
 	}
 
 	@Test
