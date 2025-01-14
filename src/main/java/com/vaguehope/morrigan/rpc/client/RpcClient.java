@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.dlnatoad.rpc.MediaGrpc;
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
-import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaFutureStub;
 import com.vaguehope.morrigan.Args.ArgsException;
 
 import io.grpc.ManagedChannel;
@@ -17,7 +16,6 @@ public class RpcClient {
 
 	private final List<RemoteInstance> remoteInstances;
 	private final Map<RemoteInstance, ManagedChannel> managedChannels = new ConcurrentHashMap<>();
-	private final Map<String, MediaFutureStub> mediaFutureStubs = new ConcurrentHashMap<>();
 	private final Map<String, MediaBlockingStub> mediaBlockingStubs = new ConcurrentHashMap<>();
 
 	public RpcClient(final List<RemoteInstance> remoteInstances) throws ArgsException {
@@ -52,19 +50,12 @@ public class RpcClient {
 	public MediaBlockingStub getMediaBlockingStub(final String rid) {
 		final MediaBlockingStub stub = this.mediaBlockingStubs.get(rid);
 		if (stub == null) throw new IllegalArgumentException("No stub found for: " + rid);
-		return stub;
-	}
-
-	public MediaFutureStub getMediaFutureStub(final String rid) {
-		final MediaFutureStub stub = this.mediaFutureStubs.get(rid);
-		if (stub == null) throw new IllegalArgumentException("No stub found for: " + rid);
-		return stub;
+		return stub.withDeadlineAfter(1, TimeUnit.MINUTES);
 	}
 
 	private void startChannel(final RemoteInstance ri) {
 		final ManagedChannel channel = ri.getTarget().buildChannel();
 		this.managedChannels.put(ri, channel);
-		this.mediaFutureStubs.put(ri.getLocalIdentifier(), MediaGrpc.newFutureStub(channel));
 		this.mediaBlockingStubs.put(ri.getLocalIdentifier(), MediaGrpc.newBlockingStub(channel));
 	}
 
