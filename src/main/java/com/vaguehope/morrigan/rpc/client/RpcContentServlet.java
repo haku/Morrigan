@@ -39,6 +39,8 @@ public class RpcContentServlet implements ContentServer {
 	@Override
 	public void doGet(final HttpServletRequest req, final HttpServletResponse resp, final String listId, final String itemId) throws IOException {
 		final MediaBlockingStub stub = this.rpcClient.getMediaBlockingStub(listId);
+
+		// TODO cache hasMedia() calls for a few seconds to make it more efficient when vlc decides to make loads of requests seek through the file.
 		final HasMediaReply hasMedia = stub.hasMedia(HasMediaRequest.newBuilder().setId(itemId).build());
 		if (hasMedia.getExistence() != FileExistance.EXISTS) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Media not found in remote system: " + itemId);
