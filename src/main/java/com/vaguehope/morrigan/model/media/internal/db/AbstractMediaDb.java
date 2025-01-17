@@ -711,7 +711,9 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public void incTrackEndCnt (final MediaItem track) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem track, final boolean completed, final long startTime) throws MorriganException {
+		if (!completed) return;
+
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 		try {
 			this.getDbLayer().incTrackFinished(track);

@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.player;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ContentProxy contentProxy;
+
+	private final AtomicLong playbackStartTime = new AtomicLong();
 
 	public LocalPlayer(
 			final String id,
@@ -115,7 +118,8 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
 			LOG.debug("Loading '{}'...", item.getItem().getTitle());
-			setCurrentItem(item);
+			final PlayItem prevItem = setCurrentItem(item);
+			if (prevItem != null) recordPlaybackOver(prevItem, false);
 
 			engine.setFile(mediaLocation);
 			engine.loadTrack();
@@ -124,6 +128,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			this._currentTrackDuration = engine.getDuration();
 			LOG.debug("Started to play '{}'...", item.getItem().getTitle());
 
+			this.playbackStartTime.set(System.currentTimeMillis());
 			this.schEx.submit(() -> getListeners().currentItemChanged(item));
 			this.playbackRecorder.recordStarted(item);
 			this.schEx.submit(() -> saveState());
@@ -232,6 +237,12 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		}
 	}
 
+	private void recordPlaybackOver(final PlayItem item, final boolean completed) {
+		final long startTime = this.playbackStartTime.getAndSet(0L);
+		if (startTime <= 0L) return;
+		this.playbackRecorder.recordCompleted(item, completed, startTime);
+	}
+
 	private final IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
 
 		@Override
@@ -263,33 +274,27 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		}
 
 		@Override
-		public void statusChanged(final PlayState state) {
-			/* UNUSED */
-		}
-
-		@Override
-		public void onEndOfTrack() {
-			LOG.debug("Player received endOfTrack event.");
-			// Inc. stats.
-			try {
-				getCurrentItem().getList().incTrackEndCnt(getCurrentItem().getItem());
-			} catch (final MorriganException e) {
-				getListeners().onException(e);
+		public void statusChanged(final PlayState state, final boolean isEndOfTrack) {
+			if (state == PlayState.STOPPED) {
+				recordPlaybackOver(getCurrentItem(), isEndOfTrack);
 			}
 
-			// Play next track?
-			try {
-				final PlayItem nextItemToPlay = findNextItemToPlay();
-				if (nextItemToPlay != null) {
-					loadAndStartPlaying(nextItemToPlay);
+			if (isEndOfTrack) {
+				LOG.debug("Player received endOfTrack event.");
+				// Play next track?
+				try {
+					final PlayItem nextItemToPlay = findNextItemToPlay();
+					if (nextItemToPlay != null) {
+						loadAndStartPlaying(nextItemToPlay);
+					}
+					else {
+						LOG.info("No more tracks to play.");
+						getListeners().currentItemChanged(null);
+					}
 				}
-				else {
-					LOG.info("No more tracks to play.");
-					getListeners().currentItemChanged(null);
+				catch (final MorriganException e) {
+					getListeners().onException(e);
 				}
-			}
-			catch (final MorriganException e) {
-				getListeners().onException(e);
 			}
 		}
 

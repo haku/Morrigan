@@ -201,6 +201,11 @@ public class GoalSeekingDlnaPlayerTest {
 		ord.verify(this.avTransport).play();
 		ord.verifyNoMoreInteractions();
 
+		// run record end of track event, ensure end count has not been set cos track skipped.
+		assertEquals(1, runScheduledExecutor());
+		assertEquals(1, item1.getItem().getStartCount());
+		assertEquals(0, item1.getItem().getEndCount());
+
 		// renderer finishes loading and some time passes.
 		when(mediaInfo.getCurrentURI()).thenReturn(TEST_FILE_2_URI);
 		when(transportInfo.getCurrentTransportState()).thenReturn(TransportState.PLAYING);
@@ -215,6 +220,18 @@ public class GoalSeekingDlnaPlayerTest {
 			ord.verify(this.avTransport).getPositionInfo();
 			ord.verifyNoMoreInteractions();
 		}
+
+		assertEquals(1, runScheduledExecutor());
+		assertEquals(1, item2.getItem().getStartCount());
+		assertEquals(0, item2.getItem().getEndCount());
+
+		// simulate complete playback.
+		when(positionInfo.getTrackElapsedSeconds()).thenReturn((long) (TEST_FILE_2_DURATION - 2));
+		when(transportInfo.getCurrentTransportState()).thenReturn(TransportState.STOPPED);
+		assertEquals(PlayState.STOPPED, runEventLoop());
+		assertEquals(1, runScheduledExecutor());
+		assertEquals(1, item2.getItem().getStartCount());
+		assertEquals(1, item2.getItem().getEndCount());
 	}
 
 	private PlayState runEventLoop () throws DlnaException {

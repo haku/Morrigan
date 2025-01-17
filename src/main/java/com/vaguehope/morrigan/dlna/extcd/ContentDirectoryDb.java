@@ -212,7 +212,7 @@ public class ContentDirectoryDb extends EphemeralMediaList {
 	}
 
 	@Override
-	public void incTrackEndCnt (final MediaItem item) throws MorriganException {
+	public void incTrackEndCnt (final MediaItem item, final boolean completed, final long startTime) throws MorriganException {
 		this.storage.incTrackEndCnt(item);
 	}
 

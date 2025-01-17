@@ -14,6 +14,7 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaTag;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.RecordPlaybackRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortBy;
@@ -243,8 +244,19 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	@Override
-	public void incTrackEndCnt(final MediaItem item) throws MorriganException {
+	public void incTrackEndCnt(final MediaItem item, final boolean completed, final long startTime) throws MorriganException {
 		this.metadataStorage.incTrackEndCnt(item);
+
+		try {
+			blockingStub().recordPlayback(RecordPlaybackRequest.newBuilder()
+					.setId(item.getRemoteId())
+					.setCompleted(completed)
+					.setStartTimeMillis(startTime)
+					.build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("recordPlayback() RPC failed: " + e.toString(), e);
+		}
 	}
 
 }

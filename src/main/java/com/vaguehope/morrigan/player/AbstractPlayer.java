@@ -209,12 +209,13 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public void setCurrentItem(final PlayItem item) {
+	public PlayItem setCurrentItem(final PlayItem item) {
 		final PlayItem old = this.currentItem.getAndSet(item);
 		if (!Objects.equals(old, item)) {
 			this.currentItemDurationSeconds.set(-1);
 		}
 		getListeners().currentItemChanged(item);
+		return old;
 	}
 
 	@Override

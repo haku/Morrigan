@@ -55,6 +55,7 @@ final class WatcherTask implements Runnable {
 
 	private final AtomicBoolean trackStarted = new AtomicBoolean(false);
 	private final AtomicBoolean trackEnded = new AtomicBoolean(false);
+	private volatile long startTime = 0L;
 
 	private volatile long lastElapsedSeconds = -1;
 	private volatile long lastDurationSeconds = -1;
@@ -79,6 +80,7 @@ final class WatcherTask implements Runnable {
 	public void cancel () {
 		final ScheduledFuture<?> sf = this.scheduledFuture.getAndSet(null);
 		if (sf != null) sf.cancel(false);
+		callEndOfTrack(false);
 	}
 
 	@Override
@@ -123,7 +125,7 @@ final class WatcherTask implements Runnable {
 		final String remoteUri = mi != null ? mi.getCurrentURI() : null;
 		if (remoteUri == null && probabblyBeenPlayingOk) {
 			LOG.info("Probably finished: " + uri);
-			callEndOfTrack();
+			callEndOfTrack(true);
 			cancel();
 			return;
 		}
@@ -153,7 +155,7 @@ final class WatcherTask implements Runnable {
 				|| ti.getCurrentTransportState() == TransportState.NO_MEDIA_PRESENT) {
 			if (probabblyBeenPlayingOk) {
 				LOG.info("Finished: " + uri);
-				callEndOfTrack();
+				callEndOfTrack(true);
 			}
 			cancel();
 		}
@@ -184,12 +186,18 @@ final class WatcherTask implements Runnable {
 	}
 
 	private void callStartOfTrack () {
-		if (this.trackStarted.compareAndSet(false, true)) this.playbackRecorder.recordStarted(this.item);
+		if (this.trackStarted.compareAndSet(false, true)) {
+			this.startTime = System.currentTimeMillis();
+			this.playbackRecorder.recordStarted(this.item);
+		}
 	}
 
-	private void callEndOfTrack () {
-		callStartOfTrack();
-		if (this.trackEnded.compareAndSet(false, true)) this.playbackRecorder.recordCompleted(this.item);
+	private void callEndOfTrack (final boolean completed) {
+		if (!this.trackStarted.get()) return;
+
+		if (this.trackEnded.compareAndSet(false, true)) {
+			this.playbackRecorder.recordCompleted(this.item, completed, this.startTime);
+		}
 	}
 
 	private void setFuture (final ScheduledFuture<?> scheduledFuture) {

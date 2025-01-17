@@ -220,7 +220,7 @@ public interface MediaList extends List<AbstractItem> {
 	/**
 	 * Adds 1.
 	 */
-	void incTrackEndCnt (MediaItem item) throws MorriganException;
+	void incTrackEndCnt (MediaItem item, boolean completed, long startTime) throws MorriganException;
 	void setTrackEndCnt (MediaItem item, long n) throws MorriganException;
 
 	void setTrackDuration (MediaItem item, int duration) throws MorriganException;

@@ -144,7 +144,7 @@ class PlaybackEngine implements IPlaybackEngine {
 	private void loadFile () throws PlaybackException {
 		this.playLock.lock();
 		try {
-			setStateAndCallListener(PlayState.LOADING);
+			setStateAndCallListener(PlayState.LOADING, false);
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player == null) {
 				player = new AudioPlayerComponent(this.vlcFactory);
@@ -160,7 +160,7 @@ class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		catch (Exception e) { // NOSONAR Report any error while loading files.
-			setStateAndCallListener(PlayState.STOPPED);
+			setStateAndCallListener(PlayState.STOPPED, false);
 			throw new PlaybackException("Failed to load '"+this.m_filepath+"'.", e);
 		}
 		finally {
@@ -180,15 +180,15 @@ class PlaybackEngine implements IPlaybackEngine {
 
 		@Override
 		public void stopped(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.STOPPED);
+			setStateAndCallListener(PlayState.STOPPED, false);
 		}
 		@Override
 		public void playing(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.PLAYING);
+			setStateAndCallListener(PlayState.PLAYING, false);
 		}
 		@Override
 		public void paused(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.PAUSED);
+			setStateAndCallListener(PlayState.PAUSED, false);
 		}
 
 		@Override
@@ -234,7 +234,7 @@ class PlaybackEngine implements IPlaybackEngine {
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player != null) {
 				player.mediaPlayer().controls().setPause(true);
-				setStateAndCallListener(PlayState.PAUSED);
+				setStateAndCallListener(PlayState.PAUSED, false);
 			}
 		}
 		finally {
@@ -251,7 +251,7 @@ class PlaybackEngine implements IPlaybackEngine {
 				 * May change it if it causes issues.
 				 */
 				player.mediaPlayer().controls().play();
-				setStateAndCallListener(PlayState.PLAYING);
+				setStateAndCallListener(PlayState.PLAYING, false);
 			}
 		}
 		finally {
@@ -266,7 +266,7 @@ class PlaybackEngine implements IPlaybackEngine {
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player != null) {
 				player.mediaPlayer().controls().stop();
-				setStateAndCallListener(PlayState.STOPPED);
+				setStateAndCallListener(PlayState.STOPPED, false);
 			}
 		}
 		finally {
@@ -286,13 +286,12 @@ class PlaybackEngine implements IPlaybackEngine {
 //	Listener helper methods.
 
 	private void callOnEndOfTrackHandler () {
-		setStateAndCallListener(PlayState.STOPPED);
-		if (this.m_listener!=null) this.m_listener.onEndOfTrack();
+		setStateAndCallListener(PlayState.STOPPED, true);
 	}
 
-	void setStateAndCallListener (PlayState state) {
+	void setStateAndCallListener (PlayState state, final boolean isEndOfTrack) {
 		this.m_playbackState = state;
-		if (this.m_listener != null) this.m_listener.statusChanged(state);
+		if (this.m_listener != null) this.m_listener.statusChanged(state, isEndOfTrack);
 	}
 
 	void callPositionListener(long position) {

@@ -182,7 +182,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	public void incTrackEndCnt (final MediaItem item, final long n) throws MorriganException {}
 
 	@Override
-	public void incTrackEndCnt (final MediaItem item) throws MorriganException {}
+	public void incTrackEndCnt(final MediaItem item, final boolean completed, final long startTime) throws MorriganException {}
 
 	@Override
 	public void setTrackDuration (final MediaItem item, final int duration) throws MorriganException {}

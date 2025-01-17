@@ -65,18 +65,25 @@ class DlnaToPlay {
 
 	private final AtomicBoolean trackStarted = new AtomicBoolean(false);
 	private final AtomicBoolean trackEnded = new AtomicBoolean(false);
+	private volatile long startTime = 0L;
 
 	public boolean isStarted () {
 		return this.trackStarted.get();
 	}
 
 	public void recordStartOfTrack() {
-		if (this.trackStarted.compareAndSet(false, true)) this.playbackRecorder.recordStarted(this.item);
+		if (this.trackStarted.compareAndSet(false, true)) {
+			this.startTime = System.currentTimeMillis();
+			this.playbackRecorder.recordStarted(this.item);
+		}
 	}
 
-	public void recordEndOfTrack() {
-		recordStartOfTrack();
-		if (this.trackEnded.compareAndSet(false, true)) this.playbackRecorder.recordCompleted(this.item);
+	public void recordEndOfTrack(final boolean completed) {
+		if (!this.trackStarted.get()) return;
+
+		if (this.trackEnded.compareAndSet(false, true)) {
+			this.playbackRecorder.recordCompleted(this.item, completed, this.startTime);
+		}
 	}
 
 }

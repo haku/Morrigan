@@ -30,10 +30,10 @@ public class PlaybackRecorder {
 		}, 5, TimeUnit.SECONDS);
 	}
 
-	public void recordCompleted(final PlayItem playItem) {
+	public void recordCompleted(final PlayItem playItem, final boolean completed, final long startTime) {
 		this.schEx.schedule(() -> {
 			try {
-				playItem.getList().incTrackEndCnt(playItem.getItem());
+				playItem.getList().incTrackEndCnt(playItem.getItem(), completed, startTime);
 			}
 			catch (MorriganException e) {
 				LOG.info("Failed to record track completed: " + ErrorHelper.getCauseTrace(e));

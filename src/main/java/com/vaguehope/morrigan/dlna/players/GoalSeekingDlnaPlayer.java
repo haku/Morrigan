@@ -201,6 +201,8 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 				// Which would really confuse things, so this flag is to send an explicit Stop
 				// to clean any old state from the renderer.
 				this.rendererNeedsCleaning = true;
+
+				if (prevToPlay != null && prevToPlay != this.goalToPlay) prevToPlay.recordEndOfTrack(false);
 			}
 			else if (obj instanceof TransportState) {
 				final TransportState transportState = (TransportState) obj;
@@ -300,7 +302,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			// Track ended event.
 			if (lopAtEnd) {
 				LOG.info("Assuming track was played to end: {} ({}s of {}s)", goToPlay.getId(), maxSecondsThatHaveBeenPlayed, goToPlay.getDurationSeconds());
-				this.goalToPlay.recordEndOfTrack();
+				goToPlay.recordEndOfTrack(true);
 
 				// Make the UI show that the end of the track was reached exactly.
 				getListeners().positionChanged(goToPlay.getDurationSeconds(), goToPlay.getDurationSeconds());
@@ -341,6 +343,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 					default:
 				}
 			}
+			goToPlay.recordEndOfTrack(false);
 			this.goalToPlay = null;
 			this.goalSeekToSeconds = null;
 			LOG.info("Cleared goal state.");
@@ -436,7 +439,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 		// track started event.  recordStartOfTrack() expects ignore multiple invocations.
 		if (renElapsedSeconds > MIN_POSITION_TO_RECORD_STARTED_SECONDS) {
-			this.goalToPlay.recordStartOfTrack();
+			goToPlay.recordStartOfTrack();
 		}
 
 		// External state can now reflect renderer state.

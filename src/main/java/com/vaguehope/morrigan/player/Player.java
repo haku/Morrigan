@@ -46,7 +46,8 @@ public interface Player {
 
 	PlayState getPlayState();
 
-	void setCurrentItem(PlayItem item);
+	// may return previous item.
+	PlayItem setCurrentItem(PlayItem item);
 	PlayItem getCurrentItem();
 
 	void setCurrentList(MediaList list);
