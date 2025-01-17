@@ -117,7 +117,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
-			LOG.debug("Loading '{}'...", item.getItem().getTitle());
+			LOG.debug("Loading: {}", item.getItem().getTitle());
 			final PlayItem prevItem = setCurrentItem(item);
 			if (prevItem != null) recordPlaybackOver(prevItem, false);
 
@@ -126,7 +126,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			engine.startPlaying();
 
 			this._currentTrackDuration = engine.getDuration();
-			LOG.debug("Started to play '{}'...", item.getItem().getTitle());
+			LOG.debug("Started to play: {}", item.getItem().getTitle());
 
 			this.playbackStartTime.set(System.currentTimeMillis());
 			this.schEx.submit(() -> getListeners().currentItemChanged(item));
