@@ -80,12 +80,12 @@ public class JwtIdentityTest {
 		final JwtParser parser = Jwts.parser().verifyWith(pubKey.toKey()).build();
 		final Jws<Claims> jws = parser.parseSignedClaims(header1.substring(JwtIdentity.BEARER_TYPE.length()).trim());
 
-		final Jwk<?> embeddedJwk = Jwks.parser().build().parse(jws.getPayload().get("jwk").toString());
+		final Jwk<?> embeddedJwk = Jwks.parser().build().parse(jws.getHeader().get("jwk").toString());
 		assertEquals(pubKey, embeddedJwk);
 
 		final String header2 = cap.getAllValues().get(1).get(JwtIdentity.AUTHORIZATION_METADATA_KEY);
 		final Jws<Claims> jws2 = parser.parseSignedClaims(header2.substring(JwtIdentity.BEARER_TYPE.length()).trim());
-		assertEquals(null, jws2.getPayload().get("jwk"));
+		assertEquals(null, jws2.getHeader().get("jwk"));
 	}
 
 }

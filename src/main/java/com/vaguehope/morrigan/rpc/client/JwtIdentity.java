@@ -76,7 +76,7 @@ public class JwtIdentity extends CallCredentials {
 				.subject(this.username);
 
 		if (this.sendPublicKeyRate.tryAcquire()) {
-			jwtBuilder.claim("jwk", this.publicJwk);
+			jwtBuilder.header().add("jwk", this.publicJwk);
 		}
 
 		final String jws = jwtBuilder
