@@ -10,6 +10,7 @@ import com.vaguehope.dlnatoad.rpc.MediaGrpc;
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.morrigan.Args.ArgsException;
 
+import io.grpc.CallCredentials;
 import io.grpc.ManagedChannel;
 
 public class RpcClient {
@@ -17,9 +18,11 @@ public class RpcClient {
 	private final List<RemoteInstance> remoteInstances;
 	private final Map<RemoteInstance, ManagedChannel> managedChannels = new ConcurrentHashMap<>();
 	private final Map<String, MediaBlockingStub> mediaBlockingStubs = new ConcurrentHashMap<>();
+	private final CallCredentials callCredentials;
 
-	public RpcClient(final List<RemoteInstance> remoteInstances) throws ArgsException {
+	public RpcClient(final List<RemoteInstance> remoteInstances, CallCredentials callCredentials) throws ArgsException {
 		this.remoteInstances = remoteInstances;
+		this.callCredentials = callCredentials;
 	}
 
 	public void start() {
@@ -50,7 +53,9 @@ public class RpcClient {
 	public MediaBlockingStub getMediaBlockingStub(final String rid) {
 		final MediaBlockingStub stub = this.mediaBlockingStubs.get(rid);
 		if (stub == null) throw new IllegalArgumentException("No stub found for: " + rid);
-		return stub.withDeadlineAfter(1, TimeUnit.MINUTES);
+		return stub
+				.withCallCredentials(this.callCredentials)
+				.withDeadlineAfter(1, TimeUnit.MINUTES);
 	}
 
 	private void startChannel(final RemoteInstance ri) {

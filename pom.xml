@@ -16,6 +16,7 @@
 		<antlr.version>4.13.2</antlr.version>
 		<grpc.version>1.69.1</grpc.version>
 		<jetty.version>9.4.45.v20220203</jetty.version>
+		<jjwt.version>0.12.6</jjwt.version>
 		<jupnp.version>3.0.3</jupnp.version>
 		<slf4j.version>2.0.16</slf4j.version>
 		<sshd.version>2.14.0</sshd.version>
@@ -218,6 +219,26 @@
 			<artifactId>annotations-api</artifactId>
 			<version>6.0.53</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-gson</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- DB -->
