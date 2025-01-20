@@ -154,10 +154,11 @@ public class HomeFace extends MenuFace {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
 			((Player) this.selectionAndScroll.selectedItem).pausePlaying();
 		}
-		else if (this.selectionAndScroll.selectedItem instanceof ListRef) {
+		else if (this.selectionAndScroll.selectedItem instanceof ListRefWithTitle) {
 			final Player player = getPlayer(gui, "Play List");
 			if (player != null) {
-				final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
+				final ListRefWithTitle item = (ListRefWithTitle) this.selectionAndScroll.selectedItem;
+				final MediaList db = this.dbHelper.resolveReference(item.getListRef());
 				playPlayItem(PlayItem.makeReady(db, null), player);
 			}
 		}
@@ -214,10 +215,11 @@ public class HomeFace extends MenuFace {
 	}
 
 	private void enqueueDb (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectionAndScroll.selectedItem instanceof ListRef) {
+		if (this.selectionAndScroll.selectedItem instanceof ListRefWithTitle) {
 			final Player player = getPlayer(gui, "Enqueue DB");
 			if (player != null) {
-				final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
+				ListRefWithTitle item = (ListRefWithTitle) this.selectionAndScroll.selectedItem;
+				final MediaList db = this.dbHelper.resolveReference(item.getListRef());
 				enqueuePlayItem(PlayItem.makeReady(db, null), player);
 			}
 		}
@@ -226,19 +228,21 @@ public class HomeFace extends MenuFace {
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
 			final MediaList list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
-			if (list instanceof MediaDb) {
+			if (list instanceof MediaList) {
 				this.dbHelper.askSearch(gui, list);
 			}
 		}
-		else if (this.selectionAndScroll.selectedItem instanceof ListRef) {
-			final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
+		else if (this.selectionAndScroll.selectedItem instanceof ListRefWithTitle) {
+			ListRefWithTitle item = (ListRefWithTitle) this.selectionAndScroll.selectedItem;
+			final MediaList db = this.dbHelper.resolveReference(item.getListRef());
 			this.dbHelper.askSearch(gui, db);
 		}
 	}
 
 	private void showProperties (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectionAndScroll.selectedItem instanceof ListRef) {
-			final MediaList db = this.dbHelper.resolveReference((ListRef) this.selectionAndScroll.selectedItem);
+		if (this.selectionAndScroll.selectedItem instanceof ListRefWithTitle) {
+			ListRefWithTitle item = (ListRefWithTitle) this.selectionAndScroll.selectedItem;
+			final MediaList db = this.dbHelper.resolveReference(item.getListRef());
 			if (db instanceof MediaDb) {
 				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, (MediaDb) db));
 			}
