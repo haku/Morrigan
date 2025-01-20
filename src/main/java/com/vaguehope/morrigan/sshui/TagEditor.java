@@ -24,12 +24,10 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 
 public class TagEditor extends DialogWindow {
 
@@ -181,7 +179,7 @@ public class TagEditor extends DialogWindow {
 			final String newTag = getText();
 			if (newTag == null || newTag.length() < 1) return;
 			try {
-				this.tagEditor.list.addTag(this.tagEditor.item, newTag, MediaTagType.MANUAL, (MediaTagClassification) null);
+				this.tagEditor.list.addTag(this.tagEditor.item, newTag);
 				setText("");
 				this.tagEditor.lstTags.reloadTags();
 			}

@@ -15,8 +15,6 @@ import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -490,7 +488,7 @@ public class MediaSqliteLayerTest {
 	private MediaItem mockMediaFileWithNameFragmentAndTags (final String nameFragment, final String... tags) throws Exception {
 		final MediaItem item = mockMediaTrackWithNameContaining(nameFragment);
 		for (final String tag : tags) {
-			this.undertest.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
+			this.undertest.addTag(item, tag);
 		}
 		return item;
 	}
@@ -513,7 +511,7 @@ public class MediaSqliteLayerTest {
 		final MediaItem item = this.undertest.getByFile(mediaFile);
 		assertNotNull(item);
 		assertEquals(mediaFile.getAbsolutePath(), item.getFilepath());
-		this.undertest.addTag(item, "noise_tag_" + System.nanoTime(), MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.undertest.addTag(item, "noise_tag_" + System.nanoTime());
 		this.expectedAllItems.add(item);
 		return item;
 	}

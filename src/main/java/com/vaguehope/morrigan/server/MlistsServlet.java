@@ -45,7 +45,6 @@ import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
@@ -380,7 +379,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_ADDTAG)) {
 			final String tag = StringHelper.trimToNull(req.getParameter(PARAM_TAG));
 			if (tag != null && tag.length() > 0) {
-				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
+				mmdb.addTag(item, tag);
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Tag '" + tag + "' added desu~");
 			}

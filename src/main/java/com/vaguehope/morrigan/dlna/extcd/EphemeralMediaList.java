@@ -84,21 +84,6 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public List<MediaTagClassification> getTagClassifications () throws MorriganException {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public void addTagClassification (final String classificationName) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
-	public MediaTagClassification getTagClassification (final String classificationName) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
 	public List<MediaTag> getTopTags (final int countLimit) throws MorriganException {
 		return Collections.emptyList();
 	}
@@ -134,7 +119,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public void addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws MorriganException {
+	public void addTag (final IDbItem item, final String tag) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

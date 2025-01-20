@@ -21,8 +21,6 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -273,7 +271,7 @@ public class PlayersServlet extends HttpServlet {
 				final MediaItem item = currentItem != null ? currentItem.getItem() : null;
 				final MediaList list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
-					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
+					list.addTag(item, tag);
 					writeResponse(req, resp, player);
 				}
 				else {

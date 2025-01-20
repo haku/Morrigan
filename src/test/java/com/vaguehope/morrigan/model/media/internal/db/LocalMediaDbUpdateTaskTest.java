@@ -31,7 +31,6 @@ import com.vaguehope.morrigan.model.media.MediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -162,13 +161,13 @@ public class LocalMediaDbUpdateTaskTest {
 		verify(this.taskEventListener).subTask("Found 1 albums");
 
 		final MediaItem i1 = this.testDb.getByFile(f1);
-		this.testDb.addTag(i1, "my tag", MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.testDb.addTag(i1, "my tag");
 		this.testDb.addTag(i1, "auto tag", MediaTagType.AUTOMATIC, "bar");
 		this.testDb.addTag(i1, "auto tag2", MediaTagType.AUTOMATIC, "foo");
 
-		this.testDb.addTag(i1, "deleted tag 1", MediaTagType.MANUAL, (MediaTagClassification) null);
-		this.testDb.addTag(i1, "deleted tag 2", MediaTagType.MANUAL, (MediaTagClassification) null);
-		this.testDb.addTag(i1, "deleted tag 3", MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.testDb.addTag(i1, "deleted tag 1");
+		this.testDb.addTag(i1, "deleted tag 2");
+		this.testDb.addTag(i1, "deleted tag 3");
 		final List<MediaTag> tags = this.testDb.getTags(i1);
 		int rmCount = 0;
 		for (final MediaTag t : tags) {
@@ -204,7 +203,7 @@ public class LocalMediaDbUpdateTaskTest {
 		runUpdateTask();
 
 		final MediaItem i1 = this.testDb.getByFile(f1);
-		this.testDb.addTag(i1, "deleted tag 1", MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.testDb.addTag(i1, "deleted tag 1");
 		final List<MediaTag> tags = this.testDb.getTags(i1);
 		int rmCount = 0;
 		for (final MediaTag t : tags) {

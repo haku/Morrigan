@@ -123,9 +123,6 @@ public interface MediaList extends List<AbstractItem> {
 	void copyItemFile (MediaItem item, OutputStream os) throws MorriganException;
 	File copyItemFile (MediaItem item, File targetDirectory) throws MorriganException;
 
-	List<MediaTagClassification> getTagClassifications () throws MorriganException;
-	void addTagClassification (String classificationName) throws MorriganException;
-	MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
 	List<MediaTag> getTopTags (int countLimit) throws MorriganException;
 	Map<String, MediaTag> tagSearch (String query, MatchMode mode, int resLimit) throws MorriganException;
 	boolean hasTagsIncludingDeleted (IDbItem item) throws MorriganException;
@@ -139,7 +136,7 @@ public interface MediaList extends List<AbstractItem> {
 	 */
 	ItemTags readTags (IDbItem item) throws MorriganException;
 
-	void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
+	void addTag (IDbItem item, String tag) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc, Date modified, boolean deleted) throws MorriganException;
 	void moveTags (IDbItem fromItem, IDbItem toItem) throws MorriganException;

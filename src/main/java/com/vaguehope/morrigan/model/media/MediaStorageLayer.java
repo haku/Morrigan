@@ -29,7 +29,6 @@ public interface MediaStorageLayer extends IGenericDbLayer {
 	void addSource (String source) throws DbException;
 	void removeSource (String source) throws DbException;
 
-	List<MediaTagClassification> getTagClassifications () throws DbException;
 	MediaTagClassification addTagClassification (String classificationName) throws DbException;
 	MediaTagClassification getTagClassification (String classificationName) throws DbException;
 	List<MediaTag> getTopTags (int countLimit) throws DbException;
@@ -37,7 +36,7 @@ public interface MediaStorageLayer extends IGenericDbLayer {
 	boolean hasTagsIncludingDeleted (IDbItem item) throws DbException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
 	List<MediaTag> getTags (IDbItem item, boolean includeDelete) throws DbException;
-	boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
+	boolean addTag (IDbItem item, String tag) throws DbException;
 	boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException;
 	boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc, Date modified, boolean deleted) throws DbException;
 	void moveTags (IDbItem fromItem, IDbItem toItem) throws DbException;

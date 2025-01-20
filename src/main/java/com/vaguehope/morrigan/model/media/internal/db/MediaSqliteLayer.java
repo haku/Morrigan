@@ -256,9 +256,6 @@ public class MediaSqliteLayer extends GenericSqliteLayer implements MediaStorage
 	private static final String SQL_TBL_TAGCLS_ADD =
 		"INSERT INTO tbl_tag_cls (cls) VALUES (?);";
 
-	private static final String SQL_TBL_TAGCLS_Q_ALL =
-		"SELECT id,cls FROM tbl_tag_cls;";
-
 	private static final String SQL_TBL_TAGCLS_Q_CLS =
 		"SELECT id,cls FROM tbl_tag_cls WHERE cls=?;";
 
@@ -648,8 +645,8 @@ public class MediaSqliteLayer extends GenericSqliteLayer implements MediaStorage
 	}
 
 	@Override
-	public boolean addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws DbException {
-		return _addTag(item, tag, type, mtc, true, null, false);
+	public boolean addTag (final IDbItem item, final String tag) throws DbException {
+		return _addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null, true, null, false);
 	}
 
 	private boolean _addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc, final boolean dateNow, final Date modified, final boolean deleted) throws DbException {
@@ -923,18 +920,6 @@ public class MediaSqliteLayer extends GenericSqliteLayer implements MediaStorage
 			final int n = ps.executeUpdate();
 			if (n < 1) throw new DbException("No update occured for addTagClassification('" + classificationName + "').");
 			return getTagClassification(classificationName);
-		}
-		catch (final SQLException e) {
-			throw new DbException(e);
-		}
-	}
-
-	@Override
-	public List<MediaTagClassification> getTagClassifications () throws DbException {
-		try (final Statement stat = getDbCon().createStatement()) {
-			try (final ResultSet rs = stat.executeQuery(SQL_TBL_TAGCLS_Q_ALL)) {
-				return _getTagClassification_parseRecordSet(rs);
-			}
 		}
 		catch (final SQLException e) {
 			throw new DbException(e);

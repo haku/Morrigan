@@ -39,7 +39,6 @@ import com.vaguehope.morrigan.model.media.internal.AbstractMediaList;
 import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
-import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
 import com.vaguehope.morrigan.player.OrderResolver;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -936,9 +935,9 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public void addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws MorriganException {
+	public void addTag (final IDbItem item, final String tag) throws MorriganException {
 		try {
-			this.dbLayer.addTag(item, tag, type, mtc);
+			this.dbLayer.addTag(item, tag, MediaTagType.MANUAL, null);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -989,36 +988,6 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	public void clearTags (final IDbItem item) throws MorriganException {
 		try {
 			this.dbLayer.clearTags(item);
-		}
-		catch (DbException e) {
-			throw new MorriganException(e);
-		}
-	}
-
-	@Override
-	public List<MediaTagClassification> getTagClassifications () throws MorriganException {
-		try {
-			return this.dbLayer.getTagClassifications();
-		}
-		catch (DbException e) {
-			throw new MorriganException(e);
-		}
-	}
-
-	@Override
-	public MediaTagClassification getTagClassification (final String classificationName) throws MorriganException {
-		try {
-			return this.dbLayer.getTagClassification(classificationName);
-		}
-		catch (DbException e) {
-			throw new MorriganException(e);
-		}
-	}
-
-	@Override
-	public void addTagClassification (final String classificationName) throws MorriganException {
-		try {
-			this.dbLayer.addTagClassification(classificationName);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -1121,7 +1090,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	@Override
 	public void markAsUnreadabled (final MediaItem mi) throws MorriganException {
 		setItemEnabled(mi, false);
-		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassificationImpl) null);
+		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
