@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralItem;
 import com.vaguehope.morrigan.dlna.extcd.Metadata;
@@ -17,10 +16,10 @@ public class RpcMediaItem extends EphemeralItem {
 	private final Metadata metadata;
 	private final List<MediaTag> tags;
 
-	public RpcMediaItem(final MediaItem rpcItem, List<MediaToadProto.MediaTag> tags, final Metadata metadata) {
+	public RpcMediaItem(final MediaItem rpcItem, final Metadata metadata) {
 		this.rpcItem = rpcItem;
 		this.metadata = metadata;
-		this.tags = RpcTag.convertTags(tags);
+		this.tags = RpcTag.convertTags(rpcItem.getTagList());
 	}
 
 	@Override

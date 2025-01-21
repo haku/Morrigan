@@ -201,7 +201,7 @@ public class RpcMediaSearchList extends RpcMediaList {
 		try {
 			final ChooseMediaReply resp = blockingStub().chooseMedia(req.build());
 			if (resp.getItemCount() < 1) return null;
-			return makeItem(resp.getItem(0), Collections.emptyList());
+			return makeItem(resp.getItem(0));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("chooseMedia() RPC failed: " + e.toString(), e);

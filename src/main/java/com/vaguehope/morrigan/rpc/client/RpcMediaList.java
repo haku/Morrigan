@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,7 +12,6 @@ import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
-import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaTag;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.RecordPlaybackRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
@@ -133,15 +131,15 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 		try {
 			final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
 			if (ret.getExistence() != MediaToadProto.FileExistance.EXISTS) return null;
-			return makeItem(ret.getItem(), ret.getTagList());
+			return makeItem(ret.getItem());
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("hasMedia() RPC failed: " + e.toString(), e);
 		}
 	}
 
-	protected RpcMediaItem makeItem(final MediaToadProto.MediaItem item, final List<MediaTag> tags) throws DbException {
-		return new RpcMediaItem(item, tags, this.metadataStorage.getMetadataProxy(item.getId()));
+	protected RpcMediaItem makeItem(final MediaToadProto.MediaItem item) throws DbException {
+		return new RpcMediaItem(item, this.metadataStorage.getMetadataProxy(item.getId()));
 	}
 
 	@Override
@@ -206,7 +204,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 		final List<MediaItem> items = new ArrayList<>(resp.getResultList().size());
 		for (final MediaToadProto.MediaItem i : resp.getResultList()) {
-			items.add(makeItem(i, Collections.emptyList()));
+			items.add(makeItem(i));
 		}
 		return items;
 	}
