@@ -98,18 +98,18 @@ public final class PrintingThingsHelper {
 		return s.toString();
 	}
 
-	public static String summariseItemWithPlayCounts (final MediaList list, final MediaItem item, final DateFormat dateFormat) throws MorriganException {
+	public static String summariseItemWithPlayCounts (final MediaItem item, final DateFormat dateFormat) throws MorriganException {
 		if (item.getStartCount() > 0 || item.getEndCount() > 0) {
 			return String.format("%s/%s %s %s",
 					item.getStartCount(), item.getEndCount(),
 					item.getDateLastPlayed() == null ? "" : dateFormat.format(item.getDateLastPlayed()),
-					PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag()));
+					PrintingThingsHelper.join(item.getTags(), ", ", t -> t.getTag()));
 		}
-		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
+		return PrintingThingsHelper.join(item.getTags(), ", ", t -> t.getTag());
 	}
 
 	public static String summariseItemTags (final MediaList list, final MediaItem item) throws MorriganException {
-		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
+		return PrintingThingsHelper.join(item.getTags(), ", ", t -> t.getTag());
 	}
 
 	public static String summariseTags (final Player player) {
@@ -118,7 +118,7 @@ public final class PrintingThingsHelper {
 			final MediaList list = playItem.getList();
 			if (list != null) {
 				try {
-					final List<MediaTag> tags = list.getTags(playItem.getItem()); // TODO cache this?
+					final List<MediaTag> tags = playItem.getItem().getTags(); // TODO cache this?
 					return join(tags, ", ", t -> t.getTag());
 				}
 				catch (final MorriganException e) {

@@ -236,7 +236,7 @@ public class JumpToDialog extends DialogWindow {
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new SetSearchResults(this.dlg, results));
 					}
 					else if (item instanceof MediaItem) {
-						final List<MediaTag> tags = this.dlg.db.getTags((MediaItem) item);
+						final List<MediaTag> tags = ((MediaItem) item).getTags();
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowTags(this.dlg, tags));
 					}
 					else {

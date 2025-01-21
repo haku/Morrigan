@@ -390,7 +390,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_RMTAG)) {
 			final String tag = req.getParameter(PARAM_TAG);
 			if (tag != null && tag.length() > 0) {
-				final List<MediaTag> tags = mmdb.getTags(item);
+				final List<MediaTag> tags = item.getTags();
 				boolean found = false;
 				for (final MediaTag mt : tags) {
 					if (mt.getType() == MediaTagType.MANUAL && mt.getClassification() == null && tag.equals(mt.getTag())) {

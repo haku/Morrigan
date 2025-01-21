@@ -168,7 +168,7 @@ public class LocalMediaDbUpdateTaskTest {
 		this.testDb.addTag(i1, "deleted tag 1");
 		this.testDb.addTag(i1, "deleted tag 2");
 		this.testDb.addTag(i1, "deleted tag 3");
-		final List<MediaTag> tags = this.testDb.getTags(i1);
+		final List<MediaTag> tags = i1.getTags();
 		int rmCount = 0;
 		for (final MediaTag t : tags) {
 			if (t.getTag().startsWith("deleted")) {
@@ -188,8 +188,8 @@ public class LocalMediaDbUpdateTaskTest {
 		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
 		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
 		final MediaItem i2 = this.testDb.getByFile(f2);
-		assertEquals("my tag", this.testDb.getTags(i2).get(0).getTag());
-		assertEquals("auto tag", this.testDb.getTags(i2).get(1).getTag());
+		assertEquals("my tag", i2.getTags().get(0).getTag());
+		assertEquals("auto tag", i2.getTags().get(1).getTag());
 		assertEquals(BigInteger.valueOf(2), i2.getMd5());
 		assertEquals(BigInteger.valueOf(22), i2.getSha1());
 	}
@@ -204,7 +204,7 @@ public class LocalMediaDbUpdateTaskTest {
 
 		final MediaItem i1 = this.testDb.getByFile(f1);
 		this.testDb.addTag(i1, "deleted tag 1");
-		final List<MediaTag> tags = this.testDb.getTags(i1);
+		final List<MediaTag> tags = i1.getTags();
 		int rmCount = 0;
 		for (final MediaTag t : tags) {
 			if (t.getTag().startsWith("deleted")) {

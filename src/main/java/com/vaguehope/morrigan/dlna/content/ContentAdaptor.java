@@ -251,7 +251,7 @@ public class ContentAdaptor {
 
 	private ContentNode makeDbAlbumNode (final String objectId, final ListRefWithTitle mlr, final MediaList db, final MediaAlbum album) throws MorriganException {
 		final Container c = makeContainer(dbSubNodeObjectId(mlr, DbSubNodeType.ALBUMS), objectId, mlr.getTitle());
-		addItemsToContainer(mlr, c, db, db.getAlbumItems(MediaType.TRACK, album));
+		addItemsToContainer(mlr, c, db.getAlbumItems(MediaType.TRACK, album));
 		return new ContentNode(c);
 	}
 
@@ -278,15 +278,15 @@ public class ContentAdaptor {
 	private ContentNode queryToContentNode (final String parentObjectId, final String objectId, final ListRefWithTitle mlr,
 			final MediaList db, final String term, final SortColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException, MorriganException {
 		final Container c = makeContainer(parentObjectId, objectId, mlr.getTitle());
-		addItemsToContainer(mlr, c, db, db.search(MediaType.TRACK, term, MAX_ITEMS, sortColumns, sortDirections, false));
+		addItemsToContainer(mlr, c, db.search(MediaType.TRACK, term, MAX_ITEMS, sortColumns, sortDirections, false));
 		return new ContentNode(c);
 	}
 
-	private void addItemsToContainer (final ListRefWithTitle mlr, final Container c, final MediaList db, final Collection<MediaItem> items) throws MorriganException {
+	private void addItemsToContainer (final ListRefWithTitle mlr, final Container c, final Collection<MediaItem> items) throws MorriganException {
 		for (final MediaItem item : items) {
 			final Item i = makeItem(c, mlr.getListRef(), item);
 			if (i != null) {
-				tagsToDescription(db, item, i);
+				tagsToDescription(item, i);
 				c.addItem(i);
 			}
 		}
@@ -307,7 +307,7 @@ public class ContentAdaptor {
 		for (final MediaItem item : results) {
 			final Item i = makeItem(parentContainer, mlr, item);
 			if (i != null) {
-				tagsToDescription(db, item, i);
+				tagsToDescription(item, i);
 				ret.add(i);
 			}
 		}
@@ -358,8 +358,8 @@ public class ContentAdaptor {
 		return item;
 	}
 
-	private static void tagsToDescription (final MediaList db, final MediaItem mediaItem, final Item item) throws MorriganException {
-		final List<MediaTag> tags = db.getTags(mediaItem);
+	private static void tagsToDescription (final MediaItem mediaItem, final Item item) throws MorriganException {
+		final List<MediaTag> tags = mediaItem.getTags();
 		if (tags != null && tags.size() > 0) {
 			StringBuilder s = null;
 			for (final MediaTag tag : tags) {

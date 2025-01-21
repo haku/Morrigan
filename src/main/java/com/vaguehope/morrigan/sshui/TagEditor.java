@@ -223,7 +223,7 @@ public class TagEditor extends DialogWindow {
 
 		public void reloadTags () throws MorriganException {
 			clearItems();
-			for (final MediaTag tag : this.tagEditor.list.getTags(this.tagEditor.item)) {
+			for (final MediaTag tag : this.tagEditor.item.getTags()) {
 				addItem(tag);
 			}
 		}

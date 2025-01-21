@@ -128,7 +128,6 @@ public interface MediaList extends List<AbstractItem> {
 	boolean hasTagsIncludingDeleted (IDbItem item) throws MorriganException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
 
-	List<MediaTag> getTags (IDbItem item) throws MorriganException;
 	List<MediaTag> getTagsIncludingDeleted (IDbItem item) throws MorriganException;
 
 	/**

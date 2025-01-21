@@ -104,11 +104,6 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public List<MediaTag> getTags (final IDbItem item) throws MorriganException {
-		return Collections.emptyList();
-	}
-
-	@Override
 	public List<MediaTag> getTagsIncludingDeleted (final IDbItem item) throws MorriganException {
 		return Collections.emptyList();
 	}

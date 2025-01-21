@@ -117,7 +117,7 @@ public class PlayerFace extends DefaultFace {
 		if (this.selectedItem instanceof PlayItem) {
 			final PlayItem playItem = (PlayItem) this.selectedItem;
 			if (playItem.isReady() && playItem.hasItem()) {
-				this.itemDetailsBar = PrintingThingsHelper.summariseItemWithPlayCounts(playItem.getList(), playItem.getItem(), this.dateFormat);
+				this.itemDetailsBar = PrintingThingsHelper.summariseItemWithPlayCounts(playItem.getItem(), this.dateFormat);
 			}
 			else {
 				this.itemDetailsBar = "(no track selected)";

@@ -253,7 +253,7 @@ public class OrderResolver {
 		final List<String> highPri = new ArrayList<>();
 		final List<String> lowPri = new ArrayList<>();
 
-		final List<String> currentItemsTags = manualTagsAsStrings(db.getTags(current));
+		final List<String> currentItemsTags = manualTagsAsStrings(current.getTags());
 
 		synchronized (this.recentlyFollowedTags) {
 			for (String lastTag : this.recentlyFollowedTags) {
