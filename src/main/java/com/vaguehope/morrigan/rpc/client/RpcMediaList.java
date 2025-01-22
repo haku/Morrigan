@@ -170,6 +170,9 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 			for (int i = 0; i < sortColumns.length; i++) {
 				final MediaToadProto.SortDirection dir = direction(sortDirections[i]);
 				switch (sortColumns[i]) {
+				case UNSPECIFIED:
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.UNSPECIFIED_ORDER).setDirection(dir).build());
+					break;
 				case FILE_PATH:
 					req.addSortBy(SortBy.newBuilder().setSortField(SortField.FILE_PATH).setDirection(dir).build());
 					break;
@@ -186,8 +189,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 					req.addSortBy(SortBy.newBuilder().setSortField(SortField.PLAYBACK_STARTED).setDirection(dir).build());
 					break;
 				case END_COUNT:
-				req.addSortBy(SortBy.newBuilder().setSortField(SortField.PLAYBACK_COMPLETED).setDirection(dir).build());
-				break;
+					req.addSortBy(SortBy.newBuilder().setSortField(SortField.PLAYBACK_COMPLETED).setDirection(dir).build());
+					break;
 				default:
 					throw new DbException("Unsupported sort column: " + sortColumns[i]);
 				}
