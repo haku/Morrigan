@@ -980,7 +980,7 @@
 
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+      MnApi.enqueueItems(item, null, selectedPlayer.pid, msgHandler, function(msg) {
         console.log(msg);
         hidePopup(menu);
         fetchAndDisplayQueue();
@@ -989,7 +989,7 @@
 
     $('.enqueue_top', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItemsTop(item, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+      MnApi.enqueueItemsTop(item, null, selectedPlayer.pid, msgHandler, function(msg) {
         console.log(msg);
         hidePopup(menu);
         fetchAndDisplayQueue();
@@ -1043,13 +1043,13 @@
 
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItems(selectedItems, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
+      MnApi.enqueueItems(selectedItems, null, selectedPlayer.pid, msgHandler, enqueueCb);
       showProgress(0, selectedItems.size);
     });
 
     $('.enqueue_top', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItemsTop(selectedItems, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
+      MnApi.enqueueItemsTop(selectedItems, null, selectedPlayer.pid, msgHandler, enqueueCb);
       showProgress(0, selectedItems.size);
     });
 
@@ -1068,7 +1068,7 @@
 
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItems(album, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+      MnApi.enqueueItems(album, null, selectedPlayer.pid, msgHandler, function(msg) {
         console.log(msg);
         hidePopup(menu);
         fetchAndDisplayQueue();
@@ -1077,7 +1077,7 @@
 
     $('.enqueue_top', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItemsTop(album, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+      MnApi.enqueueItemsTop(album, null, selectedPlayer.pid, msgHandler, function(msg) {
         console.log(msg);
         hidePopup(menu);
         fetchAndDisplayQueue();

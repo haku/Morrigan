@@ -101,7 +101,7 @@ MnApi = {};
 
     var trackNode = node.find('track');
     if (trackNode.length > 0) {
-      player.item = parseItemNode($(trackNode[0]), player.listRef, listView);
+      player.item = parseItemNode($(trackNode[0]), null, null);
     }
 
     player.monitors = [];
@@ -400,6 +400,11 @@ MnApi = {};
   }
 
   function parseItemNode(node, listRef, view) {
+    if (!listRef) {
+      var attr = node.find('link[rel="list"]').attr('href');
+      listRef = attr ? attr.replace('mlists/', '') : null;
+    }
+
     var item = {
       listRef: listRef,
       view: view,

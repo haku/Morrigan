@@ -78,7 +78,6 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_SEEK = "seek";
 	private static final String CMD_PLAYBACKORDER = "playbackorder";
 	private static final String CMD_TRANSCODE = "transcode";
-	private static final String CMD_ADDTAG = "addtag";
 
 	private static final String CMD_CLEAR = "clear";
 	private static final String CMD_SHUFFLE = "shuffle";
@@ -262,24 +261,6 @@ public class PlayersServlet extends HttpServlet {
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'order' parameter not set desu~");
-			}
-		}
-		else if (act.equals(CMD_ADDTAG)) {
-			final String tag = req.getParameter("tag");
-			if (tag != null && tag.length() > 0) {
-				final PlayItem currentItem = player.getCurrentItem();
-				final MediaItem item = currentItem != null ? currentItem.getItem() : null;
-				final MediaList list = currentItem != null ? currentItem.getList() : null;
-				if (item != null && list != null) {
-					list.addTag(item, tag);
-					writeResponse(req, resp, player);
-				}
-				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "no list or item to add tag to desu~");
-				}
-			}
-			else {
-				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
 			}
 		}
 		else {
@@ -474,21 +455,16 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "tracklisttitle", trackListTitle);
 
 		if (detailLevel == 1) {
-			final String trackLink;
 			final String filename;
 			final String filepath;
 			if (currentItem != null && currentItem.hasItem() && currentItem.isReady()) {
-				trackLink = MlistsServlet.fileLink(currentItem.getItem());
 				filename = currentItem.getItem().getTitle(); // FIXME This is a hack :s .
 				filepath = StringHelper.notBlank(currentItem.getItem().getFilepath()) ? currentItem.getItem().getFilepath() : NULL;
 			}
 			else {
-				trackLink = null;
 				filename = NULL;
 				filepath = NULL;
 			}
-
-			if (trackLink != null) FeedHelper.addLink(dw, trackLink, "track");
 
 			FeedHelper.addElement(dw, "trackfile", filepath);
 			FeedHelper.addElement(dw, "trackfilename", filename);
@@ -516,6 +492,10 @@ public class PlayersServlet extends HttpServlet {
 
 				dw.startElement("track");
 				MlistsServlet.fillInMediaItem(dw, currentItem.getList(), track, IncludeTags.YES, null, this.config);
+				if (currentItem.hasList()) {
+					final String trackListUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentItem.getListRef().toUrlForm();
+					FeedHelper.addLink(dw, trackListUrl, "list", "text/xml");
+				}
 				dw.endElement("track");
 			}
 		}
