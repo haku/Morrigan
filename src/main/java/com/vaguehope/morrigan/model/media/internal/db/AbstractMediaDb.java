@@ -910,7 +910,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public List<MediaTag> getTagsIncludingDeleted (final IDbItem item) throws MorriganException {
+	public List<MediaTag> getTagsIncludingDeleted (final MediaItem item) throws MorriganException {
 		try {
 			return this.dbLayer.getTags(item, true);
 		}
@@ -920,12 +920,12 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public ItemTags readTags (final IDbItem item) throws MorriganException {
+	public ItemTags readTags (final MediaItem item) throws MorriganException {
 		return ItemTagsImpl.forItem(this, item);
 	}
 
 	@Override
-	public void addTag (final IDbItem item, final String tag) throws MorriganException {
+	public void addTag (final MediaItem item, final String tag) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, MediaTagType.MANUAL, null);
 		}
@@ -965,7 +965,7 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public void removeTag (final MediaTag mt) throws MorriganException {
+	public void removeTag (final MediaItem item, final MediaTag mt) throws MorriganException {
 		try {
 			this.dbLayer.removeTag(mt);
 		}

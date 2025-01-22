@@ -123,23 +123,26 @@ public interface MediaList extends List<AbstractItem> {
 	void copyItemFile (MediaItem item, OutputStream os) throws MorriganException;
 	File copyItemFile (MediaItem item, File targetDirectory) throws MorriganException;
 
+	// TODO CLEANUP move tag methods that are only used by DBs to MediaDb.
+	// TODO move tag methods to MediaItem?
+
 	List<MediaTag> getTopTags (int countLimit) throws MorriganException;
 	Map<String, MediaTag> tagSearch (String query, MatchMode mode, int resLimit) throws MorriganException;
 	boolean hasTagsIncludingDeleted (IDbItem item) throws MorriganException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
 
-	List<MediaTag> getTagsIncludingDeleted (IDbItem item) throws MorriganException;
+	List<MediaTag> getTagsIncludingDeleted (MediaItem item) throws MorriganException;
 
 	/**
 	 * A replacement for getTags and getTagsIncludingDeleted that returns a helpful collection object.
 	 */
-	ItemTags readTags (IDbItem item) throws MorriganException;
+	ItemTags readTags (MediaItem item) throws MorriganException;
 
-	void addTag (IDbItem item, String tag) throws MorriganException;
+	void addTag (MediaItem item, String tag) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc, Date modified, boolean deleted) throws MorriganException;
 	void moveTags (IDbItem fromItem, IDbItem toItem) throws MorriganException;
-	void removeTag (MediaTag mt) throws MorriganException;
+	void removeTag (MediaItem item, MediaTag tag) throws MorriganException;
 	void clearTags (IDbItem item) throws MorriganException;
 
 	/**

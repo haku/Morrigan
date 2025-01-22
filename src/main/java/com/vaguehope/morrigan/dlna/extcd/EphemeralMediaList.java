@@ -20,6 +20,7 @@ import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -104,17 +105,17 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public List<MediaTag> getTagsIncludingDeleted (final IDbItem item) throws MorriganException {
+	public List<MediaTag> getTagsIncludingDeleted (final MediaItem item) throws MorriganException {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public ItemTags readTags (final IDbItem item) throws MorriganException {
-		return ItemTags.EMPTY;
+	public ItemTags readTags (final MediaItem item) throws MorriganException {
+		return ItemTagsImpl.forItem(this, item);
 	}
 
 	@Override
-	public void addTag (final IDbItem item, final String tag) throws MorriganException {
+	public void addTag (final MediaItem item, final String tag) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -134,7 +135,7 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public void removeTag (final MediaTag mt) throws MorriganException {
+	public void removeTag (final MediaItem item, final MediaTag mt) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

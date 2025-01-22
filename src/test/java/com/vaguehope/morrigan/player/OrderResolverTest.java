@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -164,7 +163,7 @@ public class OrderResolverTest {
 
 	private void addTag (final String tag, final MediaItem... items) throws MorriganException {
 		for (final MediaItem item : items) {
-			this.testDb.addTag(item, tag, MediaTagType.MANUAL, (String) null);
+			this.testDb.addTag(item, tag);
 		}
 	}
 

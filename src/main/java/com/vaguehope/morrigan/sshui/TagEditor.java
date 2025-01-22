@@ -233,7 +233,7 @@ public class TagEditor extends DialogWindow {
 			if (tag == null) return;
 			if (MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Delete Tag?", tag.toString(), MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes) return;
 			try {
-				this.tagEditor.list.removeTag(tag);
+				this.tagEditor.list.removeTag(this.tagEditor.item, tag);
 				this.tagEditor.txtNewTag.setText(tag.getTag());
 				this.tagEditor.lstTags.reloadTags();
 			}

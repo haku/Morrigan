@@ -17,6 +17,9 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SearchRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortBy;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.TagAction;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.TagChange;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.UpdateTagsRequest;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralMediaList;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -25,6 +28,7 @@ import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaList;
+import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.SortColumn;
 import com.vaguehope.morrigan.model.media.SortColumn.SortDirection;
 import com.vaguehope.morrigan.player.contentproxy.ContentProxy;
@@ -234,6 +238,48 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 		default:
 			return FileExistance.UNKNOWN;
 		}
+	}
+
+	@Override
+	public void addTag(final MediaItem item, final String tag) throws MorriganException {
+		try {
+			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
+					.addChange(TagChange.newBuilder()
+							.setId(item.getRemoteId())
+							.setAction(TagAction.ADD)
+							.addTag(MediaToadProto.MediaTag.newBuilder()
+									.setTag(tag)
+									.build())
+							.build())
+					.build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
+		}
+	}
+
+	@Override
+	public void removeTag (final MediaItem item, final MediaTag tag) throws MorriganException {
+		try {
+			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
+					.addChange(TagChange.newBuilder()
+							.setId(item.getRemoteId())
+							.setAction(TagAction.REMOVE)
+							.addTag(MediaToadProto.MediaTag.newBuilder()
+									.setTag(tag.getTag())
+									.setCls(tag.getClassification().getClassification())
+									.build())
+							.build())
+					.build());
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
+		}
+	}
+
+	@Override
+	public List<MediaTag> getTagsIncludingDeleted(final MediaItem item) throws MorriganException {
+		return item.getTags();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

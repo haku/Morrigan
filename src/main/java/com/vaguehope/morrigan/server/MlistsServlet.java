@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.ajax.JSON;
 import org.xml.sax.SAXException;
 
@@ -393,8 +394,10 @@ public class MlistsServlet extends HttpServlet {
 				final List<MediaTag> tags = item.getTags();
 				boolean found = false;
 				for (final MediaTag mt : tags) {
-					if (mt.getType() == MediaTagType.MANUAL && mt.getClassification() == null && tag.equals(mt.getTag())) {
-						mmdb.removeTag(mt);
+					if (mt.getType() == MediaTagType.MANUAL
+							&& (mt.getClassification() == null || StringUtils.isEmpty(mt.getClassification().getClassification()))
+							&& tag.equals(mt.getTag())) {
+						mmdb.removeTag(item, mt);
 						found = true;
 						break;
 					}

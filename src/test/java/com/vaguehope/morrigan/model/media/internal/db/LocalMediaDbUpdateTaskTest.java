@@ -172,7 +172,7 @@ public class LocalMediaDbUpdateTaskTest {
 		int rmCount = 0;
 		for (final MediaTag t : tags) {
 			if (t.getTag().startsWith("deleted")) {
-				this.testDb.removeTag(t);
+				this.testDb.removeTag(i1, t);
 				rmCount += 1;
 			}
 		}
@@ -208,7 +208,7 @@ public class LocalMediaDbUpdateTaskTest {
 		int rmCount = 0;
 		for (final MediaTag t : tags) {
 			if (t.getTag().startsWith("deleted")) {
-				this.testDb.removeTag(t);
+				this.testDb.removeTag(i1, t);
 				rmCount += 1;
 			}
 		}
