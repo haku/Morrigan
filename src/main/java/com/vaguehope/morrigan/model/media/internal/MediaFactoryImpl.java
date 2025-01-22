@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.model.media.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,9 +10,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
@@ -165,23 +161,4 @@ public class MediaFactoryImpl implements MediaFactory {
 		return new CopyToLocalMmdbTask(fromList, itemsToCopy, toDb, this.config);
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	@Override
-	public void readTrackTags (final MediaDb itemDb, final MediaItem mt, final File file) throws IOException, MorriganException {
-		try {
-			TrackTagHelper.readTrackTags(itemDb, mt, file);
-		}
-		catch (final TagException e) {
-			throw new MorriganException(e);
-		}
-		catch (final ReadOnlyFileException e) {
-			throw new MorriganException(e);
-		}
-		catch (final InvalidAudioFrameException e) {
-			throw new MorriganException(e);
-		}
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,7 +36,5 @@ public interface MediaFactory {
 	MorriganTask getLocalMixedMediaDbUpdateTask (MediaDb library);
 	MorriganTask getMediaFileCopyTask (MediaList mediaItemList, List<MediaItem> mediaSelection, File targetDirectory);
 	MorriganTask getNewCopyToLocalMmdbTask (MediaList fromList, Collection<MediaItem> itemsToCopy, MediaDb toDb);
-
-	void readTrackTags (MediaDb itemDb, MediaItem mlt, File file) throws IOException, MorriganException;
 
 }
