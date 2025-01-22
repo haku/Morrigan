@@ -455,30 +455,11 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "tracklisttitle", trackListTitle);
 
 		if (detailLevel == 1) {
-			final String filename;
-			final String filepath;
-			if (currentItem != null && currentItem.hasItem() && currentItem.isReady()) {
-				filename = currentItem.getItem().getTitle(); // FIXME This is a hack :s .
-				filepath = StringHelper.notBlank(currentItem.getItem().getFilepath()) ? currentItem.getItem().getFilepath() : NULL;
-			}
-			else {
-				filename = NULL;
-				filepath = NULL;
-			}
-
-			FeedHelper.addElement(dw, "trackfile", filepath);
-			FeedHelper.addElement(dw, "trackfilename", filename);
 			FeedHelper.addElement(dw, "playposition", p.getCurrentPosition());
 			FeedHelper.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 
 			if (currentItem != null && currentItem.hasItem() && currentItem.isReady()) {
 				final MediaItem track = currentItem.getItem();
-				FeedHelper.addElement(dw, "trackfilesize", track.getFileSize());
-				if (track.getMd5() != null) FeedHelper.addElement(dw, "trackhash", track.getMd5().toString(16));
-				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(track.isEnabled()));
-				FeedHelper.addElement(dw, "trackmissing", Boolean.toString(track.isMissing()));
-				FeedHelper.addElement(dw, "trackstartcount", String.valueOf(track.getStartCount()));
-				FeedHelper.addElement(dw, "trackendcount", String.valueOf(track.getEndCount()));
 
 				final List<MediaTag> tags = track.getTags();
 				if (tags != null) {
