@@ -46,6 +46,7 @@ public class RpcRemotesManager {
 	}
 
 	private static void setPrivateKeyFilePermissions(final File file) throws IOException {
+		if (!file.exists()) file.createNewFile();
 		// there does not appear to be any way to check current permissions, so can only set them to what they should be.
 		// only way to clear group and other bits seems to be to clear them all, then just set owner bits.
 		if (!file.setReadable(false, false) | !file.setReadable(true, true)) {
