@@ -1,28 +1,22 @@
 package com.vaguehope.morrigan.model.media.internal.db;
 
-import java.io.File;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.vaguehope.morrigan.model.media.ListRef;
+
 public final class MediaDbConfig {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final String filePath;
 	private final String filter;
 	private final int hash; // cache.
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public MediaDbConfig (String serial) {
-		this(fileFromSerial(serial), filterFromSerial(serial));
-	}
 
 	public MediaDbConfig (String filePath, String filterString) {
 		this.filePath = filePath;
 		this.filter = filterString;
 		this.hash = (filePath + filterString).hashCode();
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public String getFilePath () {
 		return this.filePath;
@@ -32,19 +26,10 @@ public final class MediaDbConfig {
 		return this.filter;
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public String getSerial () {
-		return getFilePath() + File.pathSeparator + (getFilter() == null ? "" : getFilter());
-	}
-
-	private static String fileFromSerial (String serial) {
-		return serial.substring(0, serial.indexOf(File.pathSeparator));
-	}
-
-	private static String filterFromSerial (String serial) {
-		int x = serial.indexOf(File.pathSeparator);
-		return x < serial.length() - 1 ? serial.substring(x + 1) : null;
+	public ListRef toListRef() {
+		final String name = LocalMediaDbHelper.listIdForFilepath(this.filePath);
+		if (StringUtils.isNotBlank(this.filter)) return ListRef.forLocalSearch(name, this.filter);
+		return ListRef.forLocal(name);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,17 +53,7 @@ public final class MediaDbConfig {
 
 	@Override
 	public String toString () {
-		return this.getClass().getSimpleName() + "[path=" + getFilePath() + " filter=" + (getFilter() == null ? "" : getFilter()) + " serial=" + getSerial() + "]";
+		return this.getClass().getSimpleName() + "[path=" + getFilePath() + " filter=" + getFilter() + "]";
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public static void main (String[] args) {
-		MediaDbConfig a = new MediaDbConfig("/path/var/foo", ":;abc");
-		System.out.println(a);
-		MediaDbConfig b = new MediaDbConfig(a.getSerial());
-		System.out.println(b);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

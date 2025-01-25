@@ -49,7 +49,7 @@ public class PlayerStateStorageTest {
 		final Config config = new Config(this.tmp.getRoot());
 		this.undertest = new PlayerStateStorage(this.mediaFactory, null, config);
 
-		this.listRef0 = ListRef.forLocal("some-db");
+		this.listRef0 = ListRef.forLocalSearch("some-db", "t=foo OR t=bar");
 		this.mediaList0 = mock(MediaList.class);
 		when(this.mediaList0.getListRef()).thenReturn(this.listRef0);
 		when(this.mediaList0.getListName()).thenReturn("list0");
@@ -94,9 +94,9 @@ public class PlayerStateStorageTest {
 
 		final File f = new File(this.tmp.getRoot(), "playerstate/playerid");
 		assertEquals("{\"playbackOrder\":\"BYLASTPLAYED\",\"transcode\":\"COMMON_AUDIO_ONLY\",\"position\":0,"
-				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\","
+				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\\u0026s\\u003dt%3Dfoo+OR+t%3Dbar\","
 				+ "\"item\":{"
-				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\",\"filepath\":\"some-filepath\",\"md5\":\"1234567890abcdef\",\"title\":\"item0\""
+				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\\u0026s\\u003dt%3Dfoo+OR+t%3Dbar\",\"filepath\":\"some-filepath\",\"md5\":\"1234567890abcdef\",\"title\":\"item0\""
 				+ "},"
 				+ "\"queue\":["
 				+ "{\"listRef\":\"STOP\"},"

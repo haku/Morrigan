@@ -12,8 +12,8 @@ public class ListRefTest {
 
 	@Test
 	public void itDoesLocal() throws Exception {
-		testRoundTrip("LOCAL:l=c%3A%2Ffoo%2Fbar.db", ListRef.forLocal("c:/foo/bar.db"));
-		testRoundTrip("LOCAL:l=c%3A%2Ffoo%2Fbar.db&s=a%3Db", ListRef.forLocalSearch("c:/foo/bar.db", "a=b"));
+		testRoundTrip("LOCAL:l=bar", ListRef.forLocal("bar"));
+		testRoundTrip("LOCAL:l=bar&s=a%3Db", ListRef.forLocalSearch("bar", "a=b"));
 	}
 
 	@Test

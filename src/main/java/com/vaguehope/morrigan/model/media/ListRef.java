@@ -46,12 +46,12 @@ public class ListRef implements Comparable<ListRef> {
 		return new ListRef(type, listId, nodeId, search);
 	}
 
-	public static ListRef forLocal(final String dbFilePath) {
-		return new ListRef(ListType.LOCAL, dbFilePath, null, null);
+	public static ListRef forLocal(final String dbName) {
+		return new ListRef(ListType.LOCAL, dbName, null, null);
 	}
 
-	public static ListRef forLocalSearch(final String dbFilePath, final String search) {
-		return new ListRef(ListType.LOCAL, dbFilePath, null, search);
+	public static ListRef forLocalSearch(final String dbName, final String search) {
+		return new ListRef(ListType.LOCAL, dbName, null, search);
 	}
 
 	public static ListRef forDlnaNode(final String listId, final String nodeId) {

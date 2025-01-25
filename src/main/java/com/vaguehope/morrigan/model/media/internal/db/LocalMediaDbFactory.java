@@ -42,12 +42,6 @@ public class LocalMediaDbFactory extends RecyclingFactory2<MediaDb, MediaDbConfi
 		return r;
 	}
 
-	public static MediaDb getMainBySerial (String serial) throws DbException {
-		MediaDbConfig config = new MediaDbConfig(serial);
-		MediaDb r = INSTANCE.manufacture(config);
-		return r;
-	}
-
 	/**
 	 * Returns a new instance of the DB. This should not be used in the UI. This
 	 * instance uses transactions. Changes will not propagate. This DB will not
