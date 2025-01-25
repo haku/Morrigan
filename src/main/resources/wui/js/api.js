@@ -313,11 +313,14 @@ MnApi = {};
       success : function(node) {
         // stuffing listRef everywhere seems silly, but seems to make everything else simpler.
         node.listRef = listRef;
-        node.parentNodeId = parentNodeId;  // for implementing ".." in the UI.  showing proper browing breadcome would hopefully make this not needed.
+        node.parentNodeId = parentNodeId;  // for implementing ".." in the UI.  showing proper browsing breadcrumb would hopefully make this not needed.
         node.nodes.forEach(n => n.listRef = listRef);
         node.items.forEach(i => {
           i.listRef = listRef;
           i.url = 'mlists/' + listRef + "/items/" + i.id;  // for now point to old handler so playback etc works.
+          i.tags = i.tags.filter((t) => t.c === "").map((t) => t.t);
+          i.startCount = i.starts;
+          i.endCount = i.ends;
         });
         onNode(node);
         msgHandler.onInfo('');

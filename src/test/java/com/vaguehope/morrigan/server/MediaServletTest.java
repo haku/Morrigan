@@ -77,7 +77,7 @@ public class MediaServletTest {
 				+ "\"title\":\"media-servlet-test-db\","
 				+ "\"nodes\":[{\"id\":\"node-id\",\"title\":\"node tile\",\"parentId\":\"0\"}],"
 				+ "\"items\":["
-				+ "{\"id\":\"/path/file.mp3\",\"title\":\"file.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890000,"
+				+ "{\"id\":\"/path/file.mp3\",\"title\":\"file.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"duration\":-1,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890000,"
 				+ "\"tags\":[{\"t\":\"some-tag\"}]}"
 				+ "]}\n");
 	}
@@ -122,8 +122,8 @@ public class MediaServletTest {
 		this.undertest.service(this.req, this.resp);
 		assertEquals(200, this.resp.getStatus());
 		assertOkJson("["
-				+ "{\"id\":\"/foo/bar/bat2.mp3\",\"title\":\"bat2.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890001,\"tags\":[{\"t\":\"foo\"}]},"
-				+ "{\"id\":\"/foo/bar/bat1.mp3\",\"title\":\"bat1.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890000,\"tags\":[{\"t\":\"foo\"}]}"
+				+ "{\"id\":\"/foo/bar/bat2.mp3\",\"title\":\"bat2.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"duration\":-1,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890001,\"tags\":[{\"t\":\"foo\"}]},"
+				+ "{\"id\":\"/foo/bar/bat1.mp3\",\"title\":\"bat1.mp3\",\"size\":0,\"added\":1234567890000,\"mimetype\":\"audio/mpeg\",\"enabled\":true,\"duration\":-1,\"starts\":0,\"ends\":0,\"lastplayed\":1234567890000,\"tags\":[{\"t\":\"foo\"}]}"
 				+ "]\n");
 	}
 

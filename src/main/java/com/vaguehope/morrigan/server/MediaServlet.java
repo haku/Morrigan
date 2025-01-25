@@ -235,6 +235,7 @@ public class MediaServlet extends HttpServlet {
 				j.addProperty("modified", dateToLong(src.getDateLastModified()));
 				j.addProperty("mimetype", src.getMimeType());
 				j.addProperty("enabled", src.isEnabled());
+				j.addProperty("duration", src.getDuration());
 				j.addProperty("starts", src.getStartCount());
 				j.addProperty("ends", src.getEndCount());
 				j.addProperty("lastplayed", dateToLong(src.getDateLastPlayed()));
