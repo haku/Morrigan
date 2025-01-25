@@ -418,7 +418,7 @@ public class PlayersServlet extends HttpServlet {
 
 		final PlayItem currentItem = p.getCurrentItem();
 
-		final String trackTitle = currentItem != null ? currentItem.resolveTitle(null) : "(empty)";
+		final String trackTitle = currentItem != null ? currentItem.getTitle() : "(empty)";
 		final String trackListTitle = currentItem != null ? currentItem.getListTitle() : "";
 
 		final Integer volume = p.getVoume();
@@ -496,7 +496,7 @@ public class PlayersServlet extends HttpServlet {
 
 		for (final PlayItem playItem : p.getQueue().getQueueList()) {
 			dw.startElement("entry");
-			FeedHelper.addElement(dw, "title", playItem.resolveTitle(null));
+			FeedHelper.addElement(dw, "title", playItem.getTitle());
 			FeedHelper.addElement(dw, "id", playItem.getId());
 
 			if (playItem.hasItem()) {

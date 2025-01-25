@@ -46,7 +46,7 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 			final PlayState currentState = p.getPlayState();
 			if (currentState != null) {
 				final PlayItem playItem = newItem != null ? newItem : p.getCurrentItem();
-				if (playItem != null) return currentState + " " + playItem.resolveTitle(null) + ".";
+				if (playItem != null) return currentState + " " + playItem.getTitle() + ".";
 				return currentState + ".";
 			}
 			return "Unknown.";

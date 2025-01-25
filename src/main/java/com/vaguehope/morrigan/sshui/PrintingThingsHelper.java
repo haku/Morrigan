@@ -78,7 +78,7 @@ public final class PrintingThingsHelper {
 	public static String playingItemTitle (final Player p) {
 		final PlayItem item = p.getCurrentItem();
 		if (item == null) return "";
-		return item.resolveTitle(null);
+		return item.getTitle();
 	}
 
 	public static String listTitleAndOrder(final Player p) {

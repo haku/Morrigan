@@ -96,11 +96,11 @@ public class PlayerStateStorageTest {
 		assertEquals("{\"playbackOrder\":\"BYLASTPLAYED\",\"transcode\":\"COMMON_AUDIO_ONLY\",\"position\":0,"
 				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\","
 				+ "\"item\":{"
-				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\",\"filepath\":\"some-filepath\",\"md5\":\"1234567890abcdef\",\"title\":\"list0/item0\""
+				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\",\"filepath\":\"some-filepath\",\"md5\":\"1234567890abcdef\",\"title\":\"item0\""
 				+ "},"
 				+ "\"queue\":["
 				+ "{\"listRef\":\"STOP\"},"
-				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"remoteId\":\"some-remote-id\",\"md5\":\"abcdef123456789\",\"title\":\"list1/item1\"},"
+				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"remoteId\":\"some-remote-id\",\"md5\":\"abcdef123456789\",\"title\":\"item1\"},"
 				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"filepath\":\"un path\",\"remoteId\":\"un id\",\"md5\":\"0\",\"title\":\"Unresolved: un title\"}"
 				+ "]}",
 				FileUtils.readFileToString(f, StandardCharsets.UTF_8));
@@ -117,7 +117,7 @@ public class PlayerStateStorageTest {
 
 		final PlayItem q0 = PlayItem.makeAction(PlayItemType.STOP);
 		q0.setId(0);
-		final PlayItem q1 = PlayItem.makeUnresolved(this.listRef1, null, "some-remote-id", BigInteger.valueOf(0xabcdef123456789L), "list1/item1");
+		final PlayItem q1 = PlayItem.makeUnresolved(this.listRef1, null, "some-remote-id", BigInteger.valueOf(0xabcdef123456789L), "item1");
 		q1.setId(1);
 		final PlayItem q2 = PlayItem.makeUnresolved(this.listRef1, "un path", "un id", BigInteger.ZERO, "Unresolved: un title");
 		q2.setId(2);

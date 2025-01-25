@@ -45,7 +45,7 @@ public abstract class PlayItem {
 	public abstract String getFilepath();
 	public abstract String getRemoteId();
 	public abstract BigInteger getMd5();
-	public abstract String resolveTitle(final MediaList relativeTo);
+	public abstract String getTitle();
 	public abstract String getListTitle();
 
 	public abstract PlayItem withoutId();
@@ -132,11 +132,10 @@ public abstract class PlayItem {
 		}
 
 		@Override
-		public String resolveTitle(final MediaList relativeTo) {
+		public String getTitle() {
 			if (this.type.isPseudo()) return this.type.toString();
 			if (this.item == null) return this.list.getListName();
-			if (this.list.equals(relativeTo)) return this.item.getTitle();
-			return this.list.getListName() + "/" + this.item.getTitle();
+			return this.item.getTitle();
 		}
 
 		@Override
@@ -291,7 +290,7 @@ public abstract class PlayItem {
 		}
 
 		@Override
-		public String resolveTitle(final MediaList relativeTo) {
+		public String getTitle() {
 			if (StringUtils.isNotBlank(this.title)) {
 				if (this.title.startsWith(TITLE_PREFIX)) return this.title;
 				return TITLE_PREFIX + this.title;

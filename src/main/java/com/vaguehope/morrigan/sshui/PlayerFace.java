@@ -427,7 +427,7 @@ public class PlayerFace extends DefaultFace {
 			}
 
 			// Item title.
-			final String name = item.resolveTitle(this.player.getCurrentList());
+			final String name = item.getTitle();
 			tg.putString(1, l, name);
 
 			// Rest of item title space if selected.

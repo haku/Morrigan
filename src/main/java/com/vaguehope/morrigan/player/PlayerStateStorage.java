@@ -135,7 +135,7 @@ public class PlayerStateStorage {
 				i.getFilepath(),
 				i.getRemoteId(),
 				md5 != null ? md5.toString(16) : "0",
-				i.resolveTitle(null));
+				i.getTitle());
 	}
 
 	private PlayItem fromQueueItem(final QueueItem i, final Map<ListRef, MediaList> listCache) throws DbException, MorriganException {
