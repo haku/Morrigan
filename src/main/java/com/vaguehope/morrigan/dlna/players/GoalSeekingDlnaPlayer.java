@@ -312,6 +312,8 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 				this.goalSeekToSeconds = null;
 				this.lastObservedPositionSeconds = Timestamped.old(0L); // Old skips WAIT_FOR_STOP_EVENT_TIMEOUT_SECONDS delay.
 
+				nextTrack();
+
 				return PlayState.STOPPED; // Made a change, so return.
 			}
 
