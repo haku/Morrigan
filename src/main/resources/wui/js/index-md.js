@@ -743,7 +743,7 @@
     });
 
     $('#db_sort_options').hide();
-    $('#db_title').text(count + ' DBs');
+    $('#db_title').text(count + ' Collections');
   }
 
   function makeDbItem(db) {
