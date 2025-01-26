@@ -602,6 +602,7 @@
 
     MnApi.getDbs(msgHandler, displayDbs);
     $('#db_title').text('Fetching...');
+    $('#db_subtitle').text('');
     $('#db_list').empty();
     // TODO show spinner.
   }
@@ -638,6 +639,7 @@
     MnApi.getNode(listRef, nodeId, parentNodeId, msgHandler, displayNode);
 
     $('#db_title').text('Fetching...');
+    $('#db_subtitle').text('');
     $('#db_list').empty();
 
     $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
@@ -682,6 +684,7 @@
     MnApi.getQuery(listRef, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, displayResults);
 
     $('#db_title').text('Fetching...');
+    $('#db_subtitle').text('');
     $('#db_list').empty();
     // TODO show spinner.
 
@@ -716,6 +719,7 @@
     MnApi.getTags(listRef, view, msgHandler, displayTags);
 
     $('#db_title').text('Fetching...');
+    $('#db_subtitle').text('');
     $('#db_list').empty();
     // TODO show spinner.
   }
@@ -730,6 +734,7 @@
     MnApi.getAlbums(listRef, view, msgHandler, displayAlbums);
 
     $('#db_title').text('Fetching...');
+    $('#db_subtitle').text('');
     $('#db_list').empty();
     // TODO show spinner.
   }
@@ -745,6 +750,7 @@
 
     $('#db_sort_options').hide();
     $('#db_title').text(count + ' Collections');
+    $('#db_subtitle').text('');
   }
 
   function makeDbItem(db) {
@@ -774,6 +780,7 @@
 
   function displayNode(node) {
     $('#db_title').text(node.title);
+    $('#db_subtitle').text('');
 
     var dbList = $('#db_list');
     dbList.empty();
@@ -913,6 +920,7 @@
 
   function displayTags(tags) {
     $('#db_title').text(tags.length + ' tags');
+    $('#db_subtitle').text('');
 
     var dbList = $('#db_list');
     dbList.empty();
@@ -938,6 +946,7 @@
 
   function displayAlbums(albums) {
     $('#db_title').text(albums.length + ' albums');
+    $('#db_subtitle').text('');
 
     var dbList = $('#db_list');
     dbList.empty();
