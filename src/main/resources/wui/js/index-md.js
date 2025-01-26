@@ -195,8 +195,10 @@
 
   function footerSearchClicked() {
     if (selectedPlayer && selectedPlayer.listRef) {
+      restoreSavedSearch(selectedPlayer.listRef);
       setDbTabToSearch(selectedPlayer.listRef, selectedPlayer.listView);
       $('#fixed_tab_db span').click();
+      $('#db_query').select();
       $('#db_query').focus();
     }
   }
@@ -608,9 +610,8 @@
     var prevQuery = JSON.parse(localStorage['query:' + listRef] || '{}');
 
     var query = prevQuery.query;
-    if (typeof(query) != "undefined") {
-      $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
-    }
+    if (typeof(query) == "undefined") query = "";
+    $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
 
     var sortColumn = prevQuery.sortColumn;
     if (sortColumn) $('#db_sort_column').val(sortColumn);
@@ -756,6 +757,7 @@
     if (db.hasRootNodes) {
       a.unbind().click(function(event) {
         event.preventDefault();
+        restoreSavedSearch(db.listRef);
         setDbTabToNode(db.listRef, "0", null);
       });
     }
