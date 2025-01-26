@@ -56,6 +56,7 @@ public class RpcMediaItem extends EphemeralItem {
 	public String getTitle() {
 		return this.rpcItem.getTitle();
 	}
+
 	@Override
 	public int getDuration() {
 		return (int) TimeUnit.MILLISECONDS.toSeconds(this.rpcItem.getDurationMillis());
@@ -103,6 +104,11 @@ public class RpcMediaItem extends EphemeralItem {
 	@Override
 	public List<MediaTag> getTags() throws MorriganException {
 		return this.tags;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("RpcMediaItem{%s, %s}", getRemoteId(), getTitle());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
