@@ -1,12 +1,7 @@
 package com.vaguehope.morrigan.sshui;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -33,7 +28,6 @@ public class DbPropertiesFace extends MenuFace {
 			"            G\tgo to end of list\n" +
 			"            r\trefresh\n" +
 			"            n\tadd new source\n" +
-			"            m\tadd new remote\n" +
 			"<delete> OR d\tremove source\n" +
 			"            u\trescan sources\n" +
 			"            t\tpre-run transcodes\n" +
@@ -48,7 +42,6 @@ public class DbPropertiesFace extends MenuFace {
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
 
 	private List<String> sources;
-	private List<Entry<String, URI>> remotes;
 
 	public DbPropertiesFace(
 			final FaceNavigation navigation,
@@ -65,7 +58,6 @@ public class DbPropertiesFace extends MenuFace {
 
 	private void refreshLists() throws MorriganException, DbException {
 		this.sources = this.db.getSources();
-		this.remotes = new ArrayList<>(this.db.getRemotes().entrySet());
 		refreshData();
 	}
 
@@ -76,9 +68,6 @@ public class DbPropertiesFace extends MenuFace {
 				.addSubmenu(this.lastActionMessage)
 				.addHeading("Sources")
 				.addList(this.sources, " (no media directories)", s -> " " + s)
-				.addHeading("")
-				.addHeading("Remotes")
-				.addList(this.remotes, " (no remotes)", r -> " " + r.getKey() + ": " + r.getValue())
 				.build();
 	}
 
@@ -107,9 +96,6 @@ public class DbPropertiesFace extends MenuFace {
 					case 'n':
 						askAddSource(gui);
 						return true;
-					case 'm':
-						askAddRemote(gui);
-						return true;
 					case 'u':
 						rescanSources();
 						return true;
@@ -132,49 +118,6 @@ public class DbPropertiesFace extends MenuFace {
 		}
 	}
 
-	private void askAddRemote (final WindowBasedTextGUI gui) throws Exception {
-		String name = null;
-		URI uri = null;
-
-		while (true) {
-			name = new TextInputDialogBuilder()
-					.setTitle("Local name for Remote")
-					.setDescription("Enter name:")
-					.setTextBoxSize(new TerminalSize(50, 1))
-					.setInitialContent(name != null ? name : "")
-					.build().showDialog(gui);
-			if (name == null) break;
-			if (name.length() > 0) break;
-		}
-		if (name == null) return;
-
-		String uriStr = null;
-		final URI existing = this.db.getRemote(name);
-		if (existing != null) uriStr = existing.toString();
-
-		while (true) {
-			uriStr = new TextInputDialogBuilder()
-					.setTitle("URI for Remote")
-					.setDescription("Enter URI:")
-					.setTextBoxSize(new TerminalSize(70, 1))
-					.setInitialContent(uriStr != null ? uriStr : "")
-					.build().showDialog(gui);
-			if (uriStr == null) break;
-			try {
-				uri = new URI(uriStr);
-				uri.toURL(); // For some actual validation.
-				break;
-			}
-			catch (final IllegalArgumentException e) {}
-			catch (final URISyntaxException e) {}
-			catch (final MalformedURLException e) {}
-		}
-		if (uri == null) return;
-
-		this.db.addRemote(name, uri);
-		refreshLists();
-	}
-
 	private void removeSource (final WindowBasedTextGUI gui) throws Exception {
 		if (this.selectionAndScroll.selectedItem == null) return;
 		if (this.selectionAndScroll.selectedItem instanceof String && this.sources != null) {
@@ -184,16 +127,6 @@ public class DbPropertiesFace extends MenuFace {
 			this.db.removeSource(source);
 			refreshLists();
 			fixSelectionAfterDeletion(this.sources, i);
-		}
-		else if (this.selectionAndScroll.selectedItem instanceof Entry && this.remotes != null) {
-			final int i = this.remotes.indexOf(this.selectionAndScroll.selectedItem);
-			final Entry<?, ?> entry = (Entry<?, ?>) this.selectionAndScroll.selectedItem;
-			if (MessageDialog.showMessageDialog(gui, "Remove Remote", String.format("%s (%s)", entry.getKey(), entry.getValue()),
-					MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes)
-				return;
-			this.db.rmRemote(entry.getKey().toString());
-			refreshLists();
-			fixSelectionAfterDeletion(this.remotes, i);
 		}
 	}
 

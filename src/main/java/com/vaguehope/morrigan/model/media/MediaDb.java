@@ -1,9 +1,7 @@
 package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
-import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -28,11 +26,6 @@ public interface MediaDb extends MediaList {
 	List<String> getSources () throws MorriganException;
 	void addSource (String source) throws MorriganException;
 	void removeSource (String source) throws MorriganException;
-
-	void addRemote(String name, URI uri) throws DbException;
-	void rmRemote(String name) throws DbException;
-	URI getRemote(String name) throws DbException;
-	Map<String, URI> getRemotes() throws DbException;
 
 	/**
 	 * Returns a copy of the main list updated with all items from the DB.

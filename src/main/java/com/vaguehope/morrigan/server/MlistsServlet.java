@@ -765,10 +765,6 @@ public class MlistsServlet extends HttpServlet {
 
 		if (ml instanceof MediaDb) {
 			final MediaDb db = (MediaDb) ml;
-			for (final String remote : db.getRemotes().keySet()) {
-				FeedHelper.addElement(dw, "remote", remote);
-			}
-
 			if (includeSrcs == IncludeSrcs.YES) {
 				for (final String s : db.getSources()) {
 					FeedHelper.addElement(dw, "src", s);
