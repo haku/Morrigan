@@ -48,8 +48,8 @@ public class LocalServer {
 		return this.uri;
 	}
 
-	public void dispose() {
-
+	public void dispose() throws Exception {
+		this.server.stop();
 	}
 
 }

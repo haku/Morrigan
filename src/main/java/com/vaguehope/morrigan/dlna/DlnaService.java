@@ -120,6 +120,9 @@ public class DlnaService {
 			@Override
 			public void run() {
 				DlnaService.this.upnpService.shutdown();
+				DlnaService.this.playerHolder.dispose();
+				DlnaService.this.contentDirectoryHolder.dispose();
+				DlnaService.this.mediaServer.dispose();
 			}
 		});
 

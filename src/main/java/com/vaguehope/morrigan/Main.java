@@ -130,12 +130,17 @@ public final class Main {
 		final LocalHostContentServer localHttpServer = new LocalHostContentServer(args.isPrintAccessLog());
 		localHttpServer.start();
 
-		final PlayerRegister playerRegister = new PlayerRegisterImpl(
+		final PlayerRegisterImpl playerRegister = new PlayerRegisterImpl(
 				new PlayerStateStorage(mediaFactory, playerEx, config),
 				mediaFactory,
 				config,
 				localHttpServer,
 				playerEx);
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			playerRegister.dispose();
+		}));
+
 		return playerRegister;
 	}
 
@@ -145,6 +150,10 @@ public final class Main {
 			final ServerPlayerContainer pc = new ServerPlayerContainer(a.getName());
 			final VlcEngineFactory engineFactory = new VlcEngineFactory(args.isVerboseLog(), a.getVlcArgs());
 			pc.setPlayer(playerRegister.makeLocal(pc.getPrefix(), pc.getName(), engineFactory));
+
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				pc.dispose();
+			}));
 		}
 	}
 
