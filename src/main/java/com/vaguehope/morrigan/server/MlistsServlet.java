@@ -728,18 +728,21 @@ public class MlistsServlet extends HttpServlet {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
 
-		List<MediaItem> items;
+		final List<MediaItem> items;
+		final long startNanos = System.nanoTime();
 		if (queryString != null) {
 			items = ml.search(MediaType.TRACK, queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			items = ml.getMediaItems();
 		}
+		final long queryDurationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 
 		dw.dataElement("title", ml.getListName());
 		dw.dataElement("uuid", ml.getUuid().toString());
 		if (queryString != null) dw.dataElement("query", queryString);
 		dw.dataElement("count", String.valueOf(items.size()));
+		dw.dataElement("querydurationmillis", String.valueOf(queryDurationMillis));
 
 		// TODO calculate these values from query results.
 		if (queryString == null) {

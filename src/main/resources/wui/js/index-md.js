@@ -804,8 +804,9 @@
     return row;
   }
 
-  function displayResults(results) {
+  function displayResults(results, queryDurMillis) {
     $('#db_title').text(results.length + ' items');
+    $('#db_subtitle').text(queryDurMillis + ' ms');
 
     var dbList = $('#db_list');
     dbList.empty();

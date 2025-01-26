@@ -382,9 +382,10 @@ MnApi = {};
         msgHandler.onInfo('Querying ' + listRef + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' disabled=' + includeDisabled + ' ...');
       },
       success : function(xml) {
+        var durMillis = $(xml).find('querydurationmillis').text();
         var itemsNode = $(xml).find('mlist');
         var items = parseItemsNode(itemsNode, listRef, view);
-        onItems(items);
+        onItems(items, durMillis);
         msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
