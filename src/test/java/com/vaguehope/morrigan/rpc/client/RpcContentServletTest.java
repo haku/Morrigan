@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.rpc.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -51,6 +51,23 @@ public class RpcContentServletTest {
 	}
 
 	@Test
+	public void itSupportsHead() throws Exception {
+		when(this.stub.hasMedia(HasMediaRequest.newBuilder().setId("my-item").build())).thenReturn(HasMediaReply.newBuilder()
+				.setExistence(FileExistance.EXISTS)
+				.setItem(MediaItem.newBuilder()
+						.setFileLength(1234567890)
+						.setMimeType("video/mp4")
+						.build())
+				.build());
+
+		this.undertest.doHead(this.req, this.resp, LIST_ID, "my-item");
+		assertEquals(200, this.resp.getStatus());
+		assertEquals("", this.resp.getOutputAsString());
+		assertEquals(1234567890, this.resp.getContentLength());
+		assertEquals("video/mp4", this.resp.getContentType());
+	}
+
+	@Test
 	public void itServesRequest() throws Exception {
 		when(this.stub.hasMedia(HasMediaRequest.newBuilder().setId("my-item").build())).thenReturn(HasMediaReply.newBuilder()
 				.setExistence(FileExistance.EXISTS)
@@ -67,6 +84,7 @@ public class RpcContentServletTest {
 		assertEquals(200, this.resp.getStatus());
 		assertEquals("0123456789", this.resp.getOutputAsString());
 		assertEquals(10, this.resp.getContentLength());
+		assertEquals("video/whatever", this.resp.getContentType());
 		assertEquals(null, this.resp.getHeader("Accept-Ranges"));
 		assertEquals(null, this.resp.getHeader("Content-Range"));
 	}

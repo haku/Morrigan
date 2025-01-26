@@ -23,15 +23,27 @@ public class ContentProxyServlet extends HttpServlet {
 	}
 
 	@Override
+	protected void doHead(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+		final TransientContentItem item = requestItem(req, resp);
+		if (item == null) return;
+		item.contentServer.doHead(req, resp, item.listId, item.itemId);
+	}
+
+	@Override
 	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+		final TransientContentItem item = requestItem(req, resp);
+		if (item == null) return;
+		item.contentServer.doGet(req, resp, item.listId, item.itemId);
+	}
+
+	private TransientContentItem requestItem(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final String pathId = StringUtils.removeStart(req.getPathInfo(), "/");
 		final TransientContentItem item = this.transientContentIds.resolve(pathId);
 		if (item == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid ID: " + pathId);
-			return;
+			return null;
 		}
-
-		item.contentServer.doGet(req, resp, item.listId, item.itemId);
+		return item;
 	}
 
 }
