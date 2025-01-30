@@ -38,9 +38,6 @@ def parseArgs() -> argparse.Namespace:
       '--library',
       help='Name of the library, e.g. "music".')
   parser.add_argument(
-      '--remote',
-      help='Name of the remote library, e.g. "music".')
-  parser.add_argument(
       '--includeautotags',
       action='store_true',
       help='Will include auto tags in sha1tags output.')
@@ -63,7 +60,7 @@ def getLibPath(lib: str) -> str:
     fail('--library not specified.')
   # TODO check lib exists in /mlists ?
   # TODO support other types?
-  return 'mlists/LOCALMMDB/%s.local.db3' % lib
+  return 'mlists/LOCAL:l=%s' % lib
 
 
 @addCommand
@@ -82,36 +79,6 @@ def sha1tags(args: argparse.Namespace) -> None:
     path += '?includeautotags=true'
   resp = callMn(args, path)
   print(resp.read().decode('utf-8'))
-
-
-@addCommand
-def listremotes(args: argparse.Namespace) -> None:
-  path = getLibPath(args.library)
-  resp = callMn(args, path)
-  xml = resp.read().decode('utf-8')
-  tree = ElementTree.fromstring(xml)
-  for r in tree.findall('remote'):
-    print(r.text)
-
-
-@addCommand
-def pullremote(args: argparse.Namespace) -> None:
-  remote = args.remote
-  if not remote:
-    fail('--remote not specified.')
-  path = getLibPath(args.library)
-  data = 'action=pull&remote=%s' % remote
-  resp = callMn(args, path, data=bytes(data, 'utf-8'))
-  body = resp.read().decode('utf-8')
-
-  taskid = None
-  for line in body.splitlines():
-    if line.startswith('id='):
-      taskid = line[3:]
-      break
-  if not taskid:
-    fail('Starting pull did not return a task id:\n%s' % body)
-  waitForTask(args, taskid)
 
 
 def waitForTask(args: argparse.Namespace, taskid: str):
