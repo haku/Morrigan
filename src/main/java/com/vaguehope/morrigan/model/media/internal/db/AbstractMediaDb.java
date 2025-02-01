@@ -605,17 +605,6 @@ public abstract class AbstractMediaDb extends AbstractMediaList implements Media
 	}
 
 	@Override
-	public void setItemEnabled (final MediaItem track, final boolean value, final Date lastModified) throws MorriganException {
-		super.setItemEnabled(track, value, lastModified);
-		try {
-			this.dbLayer.setEnabled(track, value, lastModified);
-		}
-		catch (DbException e) {
-			throw new MorriganException(e);
-		}
-	}
-
-	@Override
 	public void setItemMissing (final MediaItem track, final boolean value) throws MorriganException {
 		super.setItemMissing(track, value);
 		try {

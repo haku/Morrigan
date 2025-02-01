@@ -235,11 +235,6 @@ public abstract class EphemeralMediaList extends AbstractList<AbstractItem> impl
 	}
 
 	@Override
-	public void setItemEnabled (final MediaItem item, final boolean value, final Date lastModified) throws MorriganException {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	@Override
 	public void setItemMissing (final MediaItem item, final boolean value) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}

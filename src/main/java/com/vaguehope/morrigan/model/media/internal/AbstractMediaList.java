@@ -281,13 +281,6 @@ public abstract class AbstractMediaList extends AbstractList<AbstractItem> imple
 	}
 
 	@Override
-	public void setItemEnabled (final MediaItem track, final boolean value, final Date lastModified) throws MorriganException {
-		track.setEnabled(value, lastModified);
-		getChangeEventCaller().mediaItemsUpdated(track);
-		setDirtyState(DirtyState.METADATA);
-	}
-
-	@Override
 	public void setItemMissing (final MediaItem track, final boolean value) throws MorriganException {
 		track.setMissing(value);
 		getChangeEventCaller().mediaItemsUpdated(track);

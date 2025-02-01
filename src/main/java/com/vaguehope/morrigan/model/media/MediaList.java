@@ -111,7 +111,6 @@ public interface MediaList extends List<AbstractItem> {
 	void setItemSha1 (MediaItem item, BigInteger sha1) throws MorriganException;
 	void setItemDateLastModified (MediaItem item, Date date) throws MorriganException;
 	void setItemEnabled (MediaItem item, boolean value) throws MorriganException;
-	void setItemEnabled (MediaItem item, boolean value, Date lastModified) throws MorriganException;
 	void setItemMissing (MediaItem item, boolean value) throws MorriganException;
 	void setRemoteLocation (MediaItem track, String remoteLocation) throws MorriganException; // TODO unused?
 	void persistTrackData (MediaItem track) throws MorriganException;
