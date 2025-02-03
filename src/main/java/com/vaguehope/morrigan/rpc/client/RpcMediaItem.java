@@ -1,7 +1,9 @@
 package com.vaguehope.morrigan.rpc.client;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
@@ -17,9 +19,13 @@ public class RpcMediaItem extends EphemeralItem {
 	private final List<MediaTag> tags;
 
 	public RpcMediaItem(final MediaItem rpcItem, final Metadata metadata) {
+		this(rpcItem, metadata, RpcTag.convertTags(rpcItem.getTagList()));
+	}
+
+	public RpcMediaItem(final MediaItem rpcItem, final Metadata metadata, final List<MediaTag> tags) {
 		this.rpcItem = rpcItem;
 		this.metadata = metadata;
-		this.tags = RpcTag.convertTags(rpcItem.getTagList());
+		this.tags = tags;
 	}
 
 	@Override
@@ -76,6 +82,11 @@ public class RpcMediaItem extends EphemeralItem {
 	}
 
 	@Override
+	public boolean isEnabled() {
+		return !this.rpcItem.getExcluded();
+	}
+
+	@Override
 	public boolean isPlayable() {
 		final String mt = getMimeType();
 		if (mt == null) return false;
@@ -109,6 +120,41 @@ public class RpcMediaItem extends EphemeralItem {
 	@Override
 	public String toString() {
 		return String.format("RpcMediaItem{%s, %s}", getRemoteId(), getTitle());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.rpcItem.getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof RpcMediaItem)) return false;
+		final RpcMediaItem that = (RpcMediaItem) obj;
+		return Objects.equals(this.rpcItem, that.rpcItem)
+				&& Objects.equals(this.tags, that.tags);
+	}
+
+	public RpcMediaItem withTag(final MediaTag newTag) {
+		final ArrayList<MediaTag> newTags = new ArrayList<>(this.tags);
+		newTags.add(newTag);
+		return new RpcMediaItem(this.rpcItem, this.metadata, newTags);
+	}
+
+	public RpcMediaItem withoutTag(final MediaTag rmTag) {
+		final ArrayList<MediaTag> newTags = new ArrayList<>(this.tags);
+		newTags.remove(rmTag);
+		if (newTags.size() == this.tags.size()) throw new IllegalArgumentException("Failed to remove tag: " + rmTag);
+		return new RpcMediaItem(this.rpcItem, this.metadata, newTags);
+	}
+
+	public RpcMediaItem withEnabled(final boolean value) {
+		final MediaItem newItem = MediaItem.newBuilder(this.rpcItem)
+				.setExcluded(value)
+				.build();
+		return new RpcMediaItem(newItem, this.metadata, this.tags);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

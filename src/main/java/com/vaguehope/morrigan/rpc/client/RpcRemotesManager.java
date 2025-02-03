@@ -24,6 +24,7 @@ public class RpcRemotesManager {
 	private final MediaFactory mediaFactory;
 	private final Config config;
 	private final RpcContentServlet rpcContentServer;
+	private final RpcItemCache itemCache;
 
 	public RpcRemotesManager(final Args args, final MediaFactory mediaFactory, final Config config) throws ArgsException, IOException {
 		this(RemoteInstance.fromArgs(args), mediaFactory, config, args.isPrintAccessLog());
@@ -35,6 +36,7 @@ public class RpcRemotesManager {
 		this.mediaFactory = mediaFactory;
 		this.config = config;
 		this.rpcContentServer = new RpcContentServlet(this.rpcClient);
+		this.itemCache = new RpcItemCache();
 	}
 
 	private static JwtIdentity makeCredentials(final Config config) throws IOException {
@@ -70,7 +72,7 @@ public class RpcRemotesManager {
 			final ListRef ref = ListRef.forRpcNode(ri.getLocalIdentifier(), ListRef.RPC_ROOT_NODE_ID);
 			final MediaStorageLayer storageLayer = this.mediaFactory.getStorageLayerWithNewItemFactory(getMetadataDbPath(ri.getLocalIdentifier()).getAbsolutePath());
 			final MetadataStorage storage = new MetadataStorage(storageLayer);
-			this.mediaFactory.addExternalList(new RpcMediaNodeList(ref, "", ri, this.rpcClient, this.rpcContentServer, storage));
+			this.mediaFactory.addExternalList(new RpcMediaNodeList(ref, "", ri, this.rpcClient, this.itemCache, this.rpcContentServer, storage));
 		}
 	}
 

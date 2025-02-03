@@ -2,14 +2,17 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.ExcludedChange;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.HasMediaRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.RecordPlaybackRequest;
@@ -19,6 +22,7 @@ import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortBy;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.SortField;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.TagAction;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.TagChange;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.UpdateExcludedRequest;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.UpdateTagsRequest;
 import com.vaguehope.morrigan.dlna.extcd.EphemeralMediaList;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
@@ -40,16 +44,26 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	protected final ListRef listRef;
 	protected final RemoteInstance ri;
+	protected final RpcItemCache itemCache;
 	private final RpcClient rpcClient;
 	private final MetadataStorage metadataStorage;
 	private final RpcContentServlet rpcContentServer;
 
 	private volatile boolean neverRead = true;
+	protected volatile List<String> mediaItemIds = Collections.emptyList();
+	private volatile long durationOfLastRead = -1;
 
-	public RpcMediaList(final ListRef listRef, final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage metadataStorage) {
+	public RpcMediaList(
+			final ListRef listRef,
+			final RemoteInstance ri,
+			final RpcClient rpcClient,
+			final RpcItemCache itemCache,
+			final RpcContentServlet rpcContentServer,
+			final MetadataStorage metadataStorage) {
 		this.listRef = listRef;
 		this.ri = ri;
 		this.rpcClient = rpcClient;
+		this.itemCache = itemCache;
 		this.rpcContentServer = rpcContentServer;
 		this.metadataStorage = metadataStorage;
 	}
@@ -91,7 +105,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public MediaList makeNode(final String nodeId, final String title) throws MorriganException {
 		final ListRef ref = ListRef.forRpcNode(this.listRef.getListId(), nodeId);
-		return new RpcMediaNodeList(ref, title, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
+		return new RpcMediaNodeList(ref, title, this.ri, this.rpcClient, this.itemCache, this.rpcContentServer, this.metadataStorage);
 	}
 
 	@Override
@@ -102,7 +116,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public MediaList makeView(final String filter) throws MorriganException {
 		final ListRef ref = ListRef.forRpcSearch(this.listRef.getListId(), filter);
-		return new RpcMediaSearchList(ref, this.ri, this.rpcClient, this.rpcContentServer, this.metadataStorage);
+		return new RpcMediaSearchList(ref, this.ri, this.rpcClient, this.itemCache, this.rpcContentServer, this.metadataStorage);
 	}
 
 	protected MediaBlockingStub blockingStub() {
@@ -117,6 +131,22 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public void forceRead() throws MorriganException {
 		this.neverRead = false;
+	}
+
+	protected void setMediaItems(final List<MediaItem> items, final long durationOfLastRead) {
+		this.itemCache.putAll(items);
+		this.mediaItemIds = items.stream().map(i -> i.getRemoteId()).collect(Collectors.toList());
+		this.durationOfLastRead = durationOfLastRead;
+	}
+
+	@Override
+	public List<MediaItem> getMediaItems() {
+		return this.itemCache.getForIds(this.mediaItemIds);
+	}
+
+	@Override
+	public long getDurationOfLastRead() {
+		return this.durationOfLastRead;
 	}
 
 	@Override
@@ -243,15 +273,18 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public void addTag(final MediaItem item, final String tag) throws MorriganException {
 		try {
+			final MediaToadProto.MediaTag mediaTag = MediaToadProto.MediaTag.newBuilder()
+					.setTag(tag)
+					.build();
 			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
 					.addChange(TagChange.newBuilder()
 							.setId(item.getRemoteId())
 							.setAction(TagAction.ADD)
-							.addTag(MediaToadProto.MediaTag.newBuilder()
-									.setTag(tag)
-									.build())
+							.addTag(mediaTag)
 							.build())
 					.build());
+
+			this.itemCache.put(((RpcMediaItem) item).withTag(new RpcTag(mediaTag)));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
@@ -261,16 +294,19 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public void removeTag (final MediaItem item, final MediaTag tag) throws MorriganException {
 		try {
+			final MediaToadProto.MediaTag mediaTag = MediaToadProto.MediaTag.newBuilder()
+					.setTag(tag.getTag())
+					.setCls(tag.getClassification().getClassification())
+					.build();
 			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
 					.addChange(TagChange.newBuilder()
 							.setId(item.getRemoteId())
 							.setAction(TagAction.REMOVE)
-							.addTag(MediaToadProto.MediaTag.newBuilder()
-									.setTag(tag.getTag())
-									.setCls(tag.getClassification().getClassification())
-									.build())
+							.addTag(mediaTag)
 							.build())
 					.build());
+
+			this.itemCache.put(((RpcMediaItem) item).withoutTag(new RpcTag(mediaTag)));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
@@ -280,6 +316,24 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public List<MediaTag> getTagsIncludingDeleted(final MediaItem item) throws MorriganException {
 		return item.getTags();
+	}
+
+	@Override
+	public void setItemEnabled(final MediaItem item, final boolean value) throws MorriganException {
+		try {
+			final boolean exluded = !value;
+			blockingStub().updateExcluded(UpdateExcludedRequest.newBuilder()
+					.addChange(ExcludedChange.newBuilder()
+							.setId(item.getRemoteId())
+							.setExcluded(exluded)
+							.build())
+					.build());
+
+			this.itemCache.put(((RpcMediaItem) item).withEnabled(exluded));
+		}
+		catch (final StatusRuntimeException e) {
+			throw new MorriganException("updateExcluded() RPC failed: " + e.toString(), e);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

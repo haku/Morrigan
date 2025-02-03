@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.rpc.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -14,6 +15,7 @@ import com.vaguehope.dlnatoad.rpc.MediaGrpc.MediaBlockingStub;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeReply;
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.ListNodeRequest;
+import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaTag;
 import com.vaguehope.morrigan.dlna.extcd.MetadataStorage;
 import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
@@ -29,16 +31,17 @@ public class RpcMediaNodeListTest {
 		final ListRef ref = ListRef.forRpcNode("target", "nodeid");
 		final RemoteInstance ri = mock(RemoteInstance.class);
 		final RpcClient rpcClient = mock(RpcClient.class);
+		final RpcItemCache itemCache = new RpcItemCache();
 		this.blockingStub = mock(MediaBlockingStub.class);
 		final MetadataStorage metadataStorage = mock(MetadataStorage.class);
 		when(ri.getLocalIdentifier()).thenReturn("target");
 		when(rpcClient.getMediaBlockingStub("target")).thenReturn(this.blockingStub);
-		this.undertest = new RpcMediaNodeList(ref, "title", ri, rpcClient, null, metadataStorage);
+		this.undertest = new RpcMediaNodeList(ref, "title", ri, rpcClient, itemCache, null, metadataStorage);
 	}
 
 	@Test
 	public void itImplementsEquals() throws Exception {
-		final RpcMediaNodeList other = new RpcMediaNodeList(this.undertest.getListRef(), "whatever", null, null, null, null);
+		final RpcMediaNodeList other = new RpcMediaNodeList(this.undertest.getListRef(), "whatever", null, null, null, null, null);
 		assertEquals(other, this.undertest);
 	}
 
@@ -63,6 +66,55 @@ public class RpcMediaNodeListTest {
 		assertEquals(i1.getId(), this.undertest.chooseItem(PlaybackOrder.SEQUENTIAL, prevItem).getRemoteId());
 
 		assertEquals(i1.getId(), this.undertest.chooseItem(PlaybackOrder.SEQUENTIAL, null).getRemoteId());
+	}
+
+	@Test
+	public void itAddsTag() throws Exception {
+		final MediaToadProto.MediaItem i1 = MediaToadProto.MediaItem.newBuilder().setId("item 1").build();
+		when(this.blockingStub.listNode(any(ListNodeRequest.class))).thenReturn(ListNodeReply.newBuilder()
+				.addItem(i1).build());
+		this.undertest.read();
+		final MediaItem item = (MediaItem) this.undertest.get(0);
+
+		this.undertest.addTag(item, "new tag");
+		final MediaItem newItem = (MediaItem) this.undertest.get(0);
+		assertEquals("new tag", newItem.getTags().get(0).getTag());
+	}
+
+	@Test
+	public void itRemovesTag() throws Exception {
+		final MediaToadProto.MediaItem i1 = MediaToadProto.MediaItem.newBuilder()
+				.setId("item 1")
+				.addTag(MediaTag.newBuilder().setTag("the tag").build())
+				.addTag(MediaTag.newBuilder().setTag("the other tag").build())
+				.build();
+		when(this.blockingStub.listNode(any(ListNodeRequest.class))).thenReturn(ListNodeReply.newBuilder()
+				.addItem(i1).build());
+		this.undertest.read();
+		final MediaItem item = (MediaItem) this.undertest.get(0);
+
+		this.undertest.removeTag(item, item.getTags().get(0));
+		final MediaItem newItem = (MediaItem) this.undertest.get(0);
+		assertThat(newItem.getTags(), hasSize(1));
+		assertEquals("the other tag", newItem.getTags().get(0).getTag());
+	}
+
+	@Test
+	public void itSetsItemEnabled() throws Exception {
+		final MediaToadProto.MediaItem i1 = MediaToadProto.MediaItem.newBuilder().setId("item 1").build();
+		when(this.blockingStub.listNode(any(ListNodeRequest.class))).thenReturn(ListNodeReply.newBuilder()
+				.addItem(i1).build());
+		this.undertest.read();
+		final MediaItem item = (MediaItem) this.undertest.get(0);
+		assertEquals(true, item.isEnabled());
+
+		this.undertest.setItemEnabled(item, false);
+		final MediaItem newItem1 = (MediaItem) this.undertest.get(0);
+		assertEquals(false, newItem1.isEnabled());
+
+		this.undertest.setItemEnabled(newItem1, true);
+		final MediaItem newItem2 = (MediaItem) this.undertest.get(0);
+		assertEquals(true, newItem2.isEnabled());
 	}
 
 }

@@ -25,11 +25,16 @@ public class RpcMediaNodeList extends RpcMediaList {
 
 	private volatile String title;
 	private volatile List<MediaNode> mediaNodes = Collections.emptyList();
-	private volatile List<MediaItem> mediaItems = Collections.emptyList();
-	private volatile long durationOfLastRead = -1;
 
-	public RpcMediaNodeList(final ListRef listRef, final String title, final RemoteInstance ri, final RpcClient rpcClient, final RpcContentServlet rpcContentServer, final MetadataStorage storage) {
-		super(listRef, ri, rpcClient, rpcContentServer, storage);
+	public RpcMediaNodeList(
+			final ListRef listRef,
+			final String title,
+			final RemoteInstance ri,
+			final RpcClient rpcClient,
+			final RpcItemCache itemCache,
+			final RpcContentServlet rpcContentServer,
+			final MetadataStorage storage) {
+		super(listRef, ri, rpcClient, itemCache, rpcContentServer, storage);
 		this.title = title;
 	}
 
@@ -67,14 +72,8 @@ public class RpcMediaNodeList extends RpcMediaList {
 		}
 
 		this.mediaNodes = nodes;
-		this.mediaItems = items;
-		this.durationOfLastRead = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+		setMediaItems(items, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 		super.forceRead();
-	}
-
-	@Override
-	public long getDurationOfLastRead() {
-		return this.durationOfLastRead;
 	}
 
 	@Override
@@ -85,7 +84,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 
 	@Override
 	public int size() {
-		return this.mediaNodes.size() + this.mediaItems.size();
+		return this.mediaNodes.size() + this.mediaItemIds.size();
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public class RpcMediaNodeList extends RpcMediaList {
 			return this.mediaNodes.get(index);
 		}
 		index -= this.mediaNodes.size();
-		return this.mediaItems.get(index);
+		return this.itemCache.getForId(this.mediaItemIds.get(index));
 	}
 
 	@Override
@@ -103,15 +102,13 @@ public class RpcMediaNodeList extends RpcMediaList {
 	}
 
 	@Override
-	public List<MediaItem> getMediaItems() {
-		return this.mediaItems;
-	}
-
-	@Override
 	public int indexOf(final Object o) {
 		final int i = this.mediaNodes.indexOf(o);
 		if (i >= 0) return i;
-		return this.mediaItems.indexOf(o);
+
+		if (!(o instanceof MediaItem)) return -1;
+		final MediaItem mi = (MediaItem) o;
+		return this.mediaItemIds.indexOf(mi.getRemoteId());
 	}
 
 	@Override
@@ -136,20 +133,20 @@ public class RpcMediaNodeList extends RpcMediaList {
 
 	private MediaItem chooseSequential(final MediaItem previousItem) throws MorriganException {
 		read();
-		if (this.mediaItems.size() < 1) return null;
-		if (previousItem == null) return this.mediaItems.get(0);
+		if (this.mediaItemIds.size() < 1) return null;
+		if (previousItem == null) return this.itemCache.getForId(this.mediaItemIds.get(0));
 
 		int prevIndex = -1;
-		for (int i = 0; i < this.mediaItems.size(); i++) {
-			if (this.mediaItems.get(i).getRemoteId().equals(previousItem.getRemoteId())) {
+		for (int i = 0; i < this.mediaItemIds.size(); i++) {
+			if (this.mediaItemIds.get(i).equals(previousItem.getRemoteId())) {
 				prevIndex = i;
 				break;
 			}
 		}
 
 		if (prevIndex < 0) return null;
-		final int i = prevIndex < this.mediaItems.size() - 1 ? prevIndex + 1 : 0;
-		return this.mediaItems.get(i);
+		final int i = prevIndex < this.mediaItemIds.size() - 1 ? prevIndex + 1 : 0;
+		return this.itemCache.getForId(this.mediaItemIds.get(i));
 	}
 
 }

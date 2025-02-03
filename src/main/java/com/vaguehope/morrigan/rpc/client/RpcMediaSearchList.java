@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.rpc.client;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -27,8 +26,6 @@ public class RpcMediaSearchList extends RpcMediaList {
 
 	private static final int MAX_VIEW_SIZE = 10000;  // this is just a guess.
 
-	private volatile List<MediaItem> mediaItems = Collections.emptyList();
-	private volatile long durationOfLastRead = -1;
 	private volatile SortColumn sortColumn = null;
 	private volatile SortDirection sortDirection = SortDirection.ASC;
 	private volatile List<SortColumn> supportSortColumns = null;
@@ -38,19 +35,15 @@ public class RpcMediaSearchList extends RpcMediaList {
 			final ListRef listRef,
 			final RemoteInstance ri,
 			final RpcClient rpcClient,
+			final RpcItemCache itemCache,
 			final RpcContentServlet rpcContentServer,
 			final MetadataStorage metadataStorage) {
-		super(listRef, ri, rpcClient, rpcContentServer, metadataStorage);
+		super(listRef, ri, rpcClient, itemCache, rpcContentServer, metadataStorage);
 	}
 
 	@Override
 	public String getListName() {
 		return super.getListName() + "{" + this.listRef.getSearch() + "}";
-	}
-
-	@Override
-	public List<MediaItem> getMediaItems() {
-		return this.mediaItems;
 	}
 
 	@Override
@@ -114,32 +107,29 @@ public class RpcMediaSearchList extends RpcMediaList {
 	@Override
 	public void forceRead() throws MorriganException {
 		final long start = System.nanoTime();
-		this.mediaItems = search(MediaType.TRACK, this.listRef.getSearch(), MAX_VIEW_SIZE,
+		final List<MediaItem> items = search(MediaType.TRACK, this.listRef.getSearch(), MAX_VIEW_SIZE,
 				new SortColumn[] { getSortColumn() },
 				new SortDirection[] { this.sortDirection },
 				false);
-		this.durationOfLastRead = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+		setMediaItems(items, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 		super.forceRead();
 	}
 
 	@Override
-	public long getDurationOfLastRead() {
-		return this.durationOfLastRead;
-	}
-
-	@Override
 	public int size() {
-		return this.mediaItems.size();
+		return this.mediaItemIds.size();
 	}
 
 	@Override
 	public AbstractItem get(final int index) {
-		return this.mediaItems.get(index);
+		return this.itemCache.getForId(this.mediaItemIds.get(index));
 	}
 
 	@Override
 	public int indexOf(final Object o) {
-		return this.mediaItems.indexOf(o);
+		if (!(o instanceof MediaItem)) return -1;
+		final MediaItem mi = (MediaItem) o;
+		return this.mediaItemIds.indexOf(mi.getRemoteId());
 	}
 
 	@Override

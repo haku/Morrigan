@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.rpc.client;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,6 +58,25 @@ public class RpcTag implements MediaTag {
 		final Date bm = b.getModified();
 		if (bm == null) return true;
 		return this.rpcTag.getModifiedMillis() > bm.getTime();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("RpcTag{%s}", this.rpcTag);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.rpcTag);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof RpcTag)) return false;
+		final RpcTag that = (RpcTag) obj;
+		return Objects.equals(this.rpcTag, that.rpcTag);
 	}
 
 	private static class MTC implements MediaTagClassification {

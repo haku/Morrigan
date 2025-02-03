@@ -34,17 +34,18 @@ public class RpcMediaSearchListTest {
 		final ListRef ref = ListRef.forRpcSearch("target", "my search");
 		final RemoteInstance ri = mock(RemoteInstance.class);
 		final RpcClient rpcClient = mock(RpcClient.class);
+		final RpcItemCache itemCache = new RpcItemCache();
 		final RpcContentServlet contentServer = mock(RpcContentServlet.class);
 		final MetadataStorage metadataStorage = mock(MetadataStorage.class);
 		this.blockingStub = mock(MediaBlockingStub.class);
 		when(ri.getLocalIdentifier()).thenReturn("target");
 		when(rpcClient.getMediaBlockingStub("target")).thenReturn(this.blockingStub);
-		this.undertest = new RpcMediaSearchList(ref, ri, rpcClient, contentServer, metadataStorage);
+		this.undertest = new RpcMediaSearchList(ref, ri, rpcClient, itemCache, contentServer, metadataStorage);
 	}
 
 	@Test
 	public void itImplementsEquals() throws Exception {
-		final RpcMediaSearchList other = new RpcMediaSearchList(this.undertest.getListRef(), null, null, null, null);
+		final RpcMediaSearchList other = new RpcMediaSearchList(this.undertest.getListRef(), null, null, null, null, null);
 		assertEquals(other, this.undertest);
 	}
 
