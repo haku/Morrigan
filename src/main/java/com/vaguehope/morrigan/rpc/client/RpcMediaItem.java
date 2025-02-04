@@ -146,7 +146,7 @@ public class RpcMediaItem extends EphemeralItem {
 	public RpcMediaItem withoutTag(final MediaTag rmTag) {
 		final ArrayList<MediaTag> newTags = new ArrayList<>(this.tags);
 		newTags.remove(rmTag);
-		if (newTags.size() == this.tags.size()) throw new IllegalArgumentException("Failed to remove tag: " + rmTag);
+		if (newTags.size() == this.tags.size()) throw new IllegalArgumentException("Failed to remove tag: " + rmTag + " from: " + newTags);
 		return new RpcMediaItem(this.rpcItem, this.metadata, newTags);
 	}
 

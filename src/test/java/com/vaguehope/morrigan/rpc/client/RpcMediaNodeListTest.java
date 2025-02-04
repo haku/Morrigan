@@ -85,7 +85,7 @@ public class RpcMediaNodeListTest {
 	public void itRemovesTag() throws Exception {
 		final MediaToadProto.MediaItem i1 = MediaToadProto.MediaItem.newBuilder()
 				.setId("item 1")
-				.addTag(MediaTag.newBuilder().setTag("the tag").build())
+				.addTag(MediaTag.newBuilder().setTag("the tag").setModifiedMillis(1234567890L).build())
 				.addTag(MediaTag.newBuilder().setTag("the other tag").build())
 				.build();
 		when(this.blockingStub.listNode(any(ListNodeRequest.class))).thenReturn(ListNodeReply.newBuilder()

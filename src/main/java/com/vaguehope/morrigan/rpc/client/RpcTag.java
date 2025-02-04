@@ -14,35 +14,39 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 
 public class RpcTag implements MediaTag {
 
-	private final MediaToadProto.MediaTag rpcTag;
+	private final MediaToadProto.MediaTag protoTag;
 
 	public static List<MediaTag> convertTags(final List<MediaToadProto.MediaTag> tags) {
 		return tags.stream().map(t -> new RpcTag(t)).collect(ImmutableList.toImmutableList());
 	}
 
 	public RpcTag(final MediaToadProto.MediaTag rpcTag) {
-		this.rpcTag = rpcTag;
+		this.protoTag = rpcTag;
+	}
+
+	public MediaToadProto.MediaTag getProtoTag() {
+		return this.protoTag;
 	}
 
 	@Override
 	public String getTag() {
-		return this.rpcTag.getTag();
+		return this.protoTag.getTag();
 	}
 
 	@Override
 	public MediaTagType getType() {
-		if (StringUtils.isNotBlank(this.rpcTag.getCls())) return MediaTagType.AUTOMATIC;
+		if (StringUtils.isNotBlank(this.protoTag.getCls())) return MediaTagType.AUTOMATIC;
 		return MediaTagType.MANUAL;
 	}
 
 	@Override
 	public MediaTagClassification getClassification() {
-		return new MTC(this.rpcTag.getCls());
+		return new MTC(this.protoTag.getCls());
 	}
 
 	@Override
 	public Date getModified() {
-		return new Date(this.rpcTag.getModifiedMillis());
+		return new Date(this.protoTag.getModifiedMillis());
 	}
 
 	@Override
@@ -53,21 +57,21 @@ public class RpcTag implements MediaTag {
 	@Override
 	public boolean isNewerThan(final MediaTag b) {
 		if (b == null) return true;
-		if (this.rpcTag.getModifiedMillis() <= 0) return false;
+		if (this.protoTag.getModifiedMillis() <= 0) return false;
 
 		final Date bm = b.getModified();
 		if (bm == null) return true;
-		return this.rpcTag.getModifiedMillis() > bm.getTime();
+		return this.protoTag.getModifiedMillis() > bm.getTime();
 	}
 
 	@Override
 	public String toString() {
-		return String.format("RpcTag{%s}", this.rpcTag);
+		return String.format("RpcTag{%s}", this.protoTag.toString().replace("\n", " "));
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.rpcTag);
+		return Objects.hash(this.protoTag);
 	}
 
 	@Override
@@ -76,7 +80,7 @@ public class RpcTag implements MediaTag {
 		if (this == obj) return true;
 		if (!(obj instanceof RpcTag)) return false;
 		final RpcTag that = (RpcTag) obj;
-		return Objects.equals(this.rpcTag, that.rpcTag);
+		return Objects.equals(this.protoTag, that.protoTag);
 	}
 
 	private static class MTC implements MediaTagClassification {

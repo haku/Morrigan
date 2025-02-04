@@ -274,18 +274,18 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public void addTag(final MediaItem item, final String tag) throws MorriganException {
 		try {
-			final MediaToadProto.MediaTag mediaTag = MediaToadProto.MediaTag.newBuilder()
+			final MediaToadProto.MediaTag protoTag = MediaToadProto.MediaTag.newBuilder()
 					.setTag(tag)
 					.build();
 			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
 					.addChange(TagChange.newBuilder()
 							.setId(item.getRemoteId())
 							.setAction(TagAction.ADD)
-							.addTag(mediaTag)
+							.addTag(protoTag)
 							.build())
 					.build());
 
-			this.itemCache.put(((RpcMediaItem) item).withTag(new RpcTag(mediaTag)));
+			this.itemCache.put(((RpcMediaItem) item).withTag(new RpcTag(protoTag)));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
@@ -295,19 +295,16 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	@Override
 	public void removeTag (final MediaItem item, final MediaTag tag) throws MorriganException {
 		try {
-			final MediaToadProto.MediaTag mediaTag = MediaToadProto.MediaTag.newBuilder()
-					.setTag(tag.getTag())
-					.setCls(tag.getClassification().getClassification())
-					.build();
+			final MediaToadProto.MediaTag protoTag = ((RpcTag) tag).getProtoTag();
 			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
 					.addChange(TagChange.newBuilder()
 							.setId(item.getRemoteId())
 							.setAction(TagAction.REMOVE)
-							.addTag(mediaTag)
+							.addTag(protoTag)
 							.build())
 					.build());
 
-			this.itemCache.put(((RpcMediaItem) item).withoutTag(new RpcTag(mediaTag)));
+			this.itemCache.put(((RpcMediaItem) item).withoutTag(tag));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
