@@ -459,7 +459,10 @@ public class PlayersServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 
 			if (currentItem != null && currentItem.hasItem() && currentItem.isReady()) {
-				final MediaItem track = currentItem.getItem();
+				final MediaItem track =
+						currentItem.hasList()
+						? currentItem.getList().getByFile(currentItem.getItem().getId())
+						: currentItem.getItem();
 
 				final List<MediaTag> tags = track.getTags();
 				if (tags != null) {

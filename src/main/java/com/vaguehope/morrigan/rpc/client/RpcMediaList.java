@@ -150,6 +150,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public FileExistance hasFile(final String identifer) throws MorriganException {
+		// TODO is it worth caching misses?
+		if (this.itemCache.getIfFresh(identifer) != null) return FileExistance.EXISTS;
 		try {
 			final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
 			return convertExistance(ret.getExistence());
@@ -161,6 +163,8 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public MediaItem getByFile(final String identifer) throws MorriganException {
+		final MediaItem freshCache = this.itemCache.getIfFresh(identifer);
+		if (freshCache != null) return freshCache;
 		try {
 			final HasMediaReply ret = blockingStub().hasMedia(HasMediaRequest.newBuilder().setId(identifer).build());
 			if (ret.getExistence() != MediaToadProto.FileExistance.EXISTS) return null;
