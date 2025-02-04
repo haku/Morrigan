@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
@@ -55,6 +57,14 @@ public interface MediaItem extends AbstractItem, IDbItem {
 	boolean hasRemoteLocation();
 	String getRemoteLocation();
 	boolean setRemoteLocation(String remoteLocation);
+
+	/**
+	 * matches MediaList's hasFile() and getByFile().
+	 * never null.
+	 */
+	default String getId() {
+		return StringUtils.firstNonBlank(getRemoteId(), getFilepath());
+	}
 
 	/**
 	 * May return null.

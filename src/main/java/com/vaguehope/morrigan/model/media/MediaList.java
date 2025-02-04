@@ -181,13 +181,13 @@ public interface MediaList extends List<AbstractItem> {
 
 	/**
 	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
-	 * has to match getByFile();
+	 * has to match getByFile() and MediaItem.getId().
 	 */
 	FileExistance hasFile (String identifer) throws MorriganException, DbException;
 
 	/**
 	 * identifer (previously filepath) is anything the list identifies entries by, eg could also be an ID.
-	 * has to match hasFile();
+	 * has to match hasFile() and MediaItem.getId().
 	 */
 	MediaItem getByFile (String identifer) throws MorriganException;
 

@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.SerializationException;
-import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -228,7 +227,7 @@ public class MediaServlet extends HttpServlet {
 		public JsonElement serialize(final MediaItem src, final Type typeOfSrc, final JsonSerializationContext context) {
 			try {
 				final JsonObject j = new JsonObject();
-				j.addProperty("id", StringUtils.firstNonBlank(src.getRemoteId(), src.getFilepath()));
+				j.addProperty("id", src.getId());
 				j.addProperty("title", src.getTitle());
 				j.addProperty("size", src.getFileSize());
 				j.addProperty("added", dateToLong(src.getDateAdded()));
