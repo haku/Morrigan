@@ -134,7 +134,6 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	protected void setMediaItems(final List<MediaItem> items, final long durationOfLastRead) {
-		this.itemCache.putAll(items);
 		this.mediaItemIds = items.stream().map(i -> i.getRemoteId()).collect(Collectors.toList());
 		this.durationOfLastRead = durationOfLastRead;
 	}
@@ -173,7 +172,9 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 	}
 
 	protected RpcMediaItem makeItem(final MediaToadProto.MediaItem item) throws DbException {
-		return new RpcMediaItem(item, this.metadataStorage.getMetadataProxy(item.getId()));
+		final RpcMediaItem mi = new RpcMediaItem(item, this.metadataStorage.getMetadataProxy(item.getId()));
+		this.itemCache.put(mi);
+		return mi;
 	}
 
 	@Override
