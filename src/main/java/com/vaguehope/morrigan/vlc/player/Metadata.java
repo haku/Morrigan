@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.playbackimpl.vlc;
+package com.vaguehope.morrigan.vlc.player;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

@@ -19,7 +19,6 @@ import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
-import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerRegisterImpl;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
@@ -36,6 +35,7 @@ import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.LogHelper;
 import com.vaguehope.morrigan.vlc.discovery.VlcDiscovery;
+import com.vaguehope.morrigan.vlc.player.VlcEngineFactory;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
