@@ -243,6 +243,29 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		this.playbackRecorder.recordCompleted(item, completed, startTime);
 	}
 
+	@Override
+	public Integer getVoume() {
+		final IPlaybackEngine eng = getPlaybackEngine(true);
+		if (eng == null) return null;
+		final int volume = eng.getVolume();
+		if (volume == -1) return null;
+		return volume;
+	}
+
+	@Override
+	public Integer getVoumeMaxValue() {
+		final IPlaybackEngine eng = getPlaybackEngine(true);
+		if (eng == null) return null;
+		return eng.getVolumeMaxValue();
+	}
+
+	@Override
+	public void setVolume(final int newVolume) {
+		final IPlaybackEngine eng = getPlaybackEngine(true);
+		if (eng == null) return;
+		eng.setVolume(newVolume);
+	}
+
 	private final IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
 
 		@Override

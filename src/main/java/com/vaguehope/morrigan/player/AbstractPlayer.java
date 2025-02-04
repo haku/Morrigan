@@ -270,21 +270,6 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public Integer getVoume () {
-		return null;
-	}
-
-	@Override
-	public Integer getVoumeMaxValue () {
-		return null;
-	}
-
-	@Override
-	public void setVolume (final int newVolume) {
-		throw new UnsupportedOperationException("setVolume not implemented.");
-	}
-
-	@Override
 	public void setTranscode (final Transcode transcode) {
 		if (transcode == null) throw new IllegalArgumentException("Transcode can not be null.");
 		final Transcode old = this.transcode.getAndSet(transcode);

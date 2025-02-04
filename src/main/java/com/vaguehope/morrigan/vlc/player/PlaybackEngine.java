@@ -123,6 +123,24 @@ class PlaybackEngine implements IPlaybackEngine {
 		this.m_listener = listener;
 	}
 
+	@Override
+	public int getVolume() {
+		final AudioPlayerComponent player = this.playerRef.get();
+		if (player == null) return -1;
+		return player.mediaPlayer().audio().volume();
+	}
+
+	@Override
+	public int getVolumeMaxValue() {
+		return 200;
+	}
+
+	@Override
+	public void setVolume(int newVolume) {
+		final AudioPlayerComponent player = this.playerRef.get();
+		if (player != null) player.mediaPlayer().audio().setVolume(newVolume);
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local play-back methods.
 

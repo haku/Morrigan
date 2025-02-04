@@ -118,4 +118,10 @@ public interface IPlaybackEngine {
 	 */
 	void setStatusListener (IPlaybackStatusListener listener);
 
+	/**
+	 * Returns -1 if not implemented.
+	 */
+	int getVolume();
+	int getVolumeMaxValue();
+	void setVolume(int newVolume);
 }

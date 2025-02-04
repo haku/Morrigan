@@ -157,4 +157,19 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		}
 	}
 
+	@Override
+	public Integer getVoume () {
+		return null;
+	}
+
+	@Override
+	public Integer getVoumeMaxValue () {
+		return null;
+	}
+
+	@Override
+	public void setVolume (final int newVolume) {
+		throw new UnsupportedOperationException("setVolume not implemented.");
+	}
+
 }
