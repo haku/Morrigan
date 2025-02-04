@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.playbackimpl.vlc;
+package com.vaguehope.morrigan.vlc.player;
 
 import static org.junit.Assert.assertTrue;
 
@@ -10,9 +10,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.vaguehope.morrigan.vlc.player.Metadata;
-import com.vaguehope.morrigan.vlc.player.VlcEngineFactory;
 
 public class MetadataTest {
 
