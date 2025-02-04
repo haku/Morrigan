@@ -35,6 +35,7 @@ import com.vaguehope.morrigan.tasks.AsyncTasksRegisterImpl;
 import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.LogHelper;
+import com.vaguehope.morrigan.vlc.discovery.VlcDiscovery;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -117,6 +118,12 @@ public final class Main {
 		if (args.getRemotes().size() > 0) {
 			final RpcRemotesManager remotes = new RpcRemotesManager(args, mediaFactory, config);
 			remotes.start();
+		}
+
+		if (args.isVlcDiscovery()) {
+			final ScheduledExecutorService disSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("dis"));
+			final VlcDiscovery vlcDiscovery = new VlcDiscovery(args, playerRegister, disSchEx);
+			vlcDiscovery.start();
 		}
 
 		new CountDownLatch(1).await();  // Block forever.

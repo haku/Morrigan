@@ -22,6 +22,7 @@ public class Args {
 	@Option(name = "--ssh", usage = "Local port to bind SSH UI to.") private int sshPort = -1;
 	@Option(name = "--sshinterface", usage = "Hostname or IP address of interface to bind to, supersedes --interface for ssh.") private List<String> sshIfaces;
 	@Option(name = "--remote", usage = "Local identifier and HTTP(S) address of remote instance.", metaVar = "https://example.com/|my-rpc-remote-name") private List<String> remotes;
+	@Option(name = "--vlcdiscovery", usage = "Use VLC discovery to find renderers.") private boolean vlcDiscovery;
 	@Option(name = "--webroot", usage = "Override static file location, useful for UI dev.") private String webRoot;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
 	@Option(name = "--accesslog", usage = "Print access log line at end of each request.") private boolean printAccessLog;
@@ -101,6 +102,10 @@ public class Args {
 	public List<String> getRemotes() {
 		if (this.remotes == null) return Collections.emptyList();
 		return this.remotes;
+	}
+
+	public boolean isVlcDiscovery() {
+		return this.vlcDiscovery;
 	}
 
 	public File getWebRoot() throws ArgsException {
