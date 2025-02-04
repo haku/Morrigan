@@ -244,8 +244,8 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 	}
 
 	@Override
-	public Integer getVoume() {
-		final IPlaybackEngine eng = getPlaybackEngine(true);
+	public Integer getVolume() {
+		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng == null) return null;
 		final int volume = eng.getVolume();
 		if (volume == -1) return null;
@@ -253,15 +253,15 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 	}
 
 	@Override
-	public Integer getVoumeMaxValue() {
-		final IPlaybackEngine eng = getPlaybackEngine(true);
+	public Integer getVolumeMaxValue() {
+		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng == null) return null;
 		return eng.getVolumeMaxValue();
 	}
 
 	@Override
 	public void setVolume(final int newVolume) {
-		final IPlaybackEngine eng = getPlaybackEngine(true);
+		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng == null) return;
 		eng.setVolume(newVolume);
 	}

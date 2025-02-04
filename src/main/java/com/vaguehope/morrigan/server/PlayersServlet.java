@@ -218,7 +218,7 @@ public class PlayersServlet extends HttpServlet {
 			if (volumeRaw != null && volumeRaw.length() > 0) {
 				final int volume = Integer.parseInt(volumeRaw); // TODO handle ex?
 				if (volumeRaw.startsWith("+") || volumeRaw.startsWith("-")) {
-					player.setVolume(player.getVoume() + volume);
+					player.setVolume(player.getVolume() + volume);
 				}
 				else {
 					player.setVolume(volume);
@@ -421,8 +421,8 @@ public class PlayersServlet extends HttpServlet {
 		final String trackTitle = currentItem != null ? currentItem.getTitle() : "(empty)";
 		final String trackListTitle = currentItem != null ? currentItem.getListTitle() : "";
 
-		final Integer volume = p.getVoume();
-		final Integer volumeMaxValue = p.getVoumeMaxValue();
+		final Integer volume = p.getVolume();
+		final Integer volumeMaxValue = p.getVolumeMaxValue();
 
 		final long queueVersion = p.getQueue().getVersion();
 		final int queueLength = p.getQueue().getQueueList().size();

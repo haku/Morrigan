@@ -60,8 +60,8 @@ public final class PrintingThingsHelper {
 	}
 
 	public static String volumeMsg(final Player p) {
-		final Integer vol = p.getVoume();
-		final Integer maxVol = p.getVoumeMaxValue();
+		final Integer vol = p.getVolume();
+		final Integer maxVol = p.getVolumeMaxValue();
 		if (vol == null) return "";
 
 		String msg = "Vol " + vol;

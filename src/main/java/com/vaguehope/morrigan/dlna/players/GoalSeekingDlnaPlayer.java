@@ -486,14 +486,14 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 	}
 
 	@Override
-	public Integer getVoume () {
+	public Integer getVolume () {
 		final Integer goal = this.goalRenderVolume;
 		if (goal != null) return goal;
 		return this.renderVolume;
 	}
 
 	@Override
-	public Integer getVoumeMaxValue () {
+	public Integer getVolumeMaxValue () {
 		if (this.renderingControl == null) return null;
 		return this.renderingControl.getVolumeMaxValue();
 	}

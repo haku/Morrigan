@@ -92,8 +92,8 @@ public interface Player {
 	/**
 	 * Returns null if not implemented.
 	 */
-	Integer getVoume();
-	Integer getVoumeMaxValue();
+	Integer getVolume();
+	Integer getVolumeMaxValue();
 	void setVolume(int newVolume);
 
 	/**

@@ -158,12 +158,12 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 	}
 
 	@Override
-	public Integer getVoume () {
+	public Integer getVolume () {
 		return null;
 	}
 
 	@Override
-	public Integer getVoumeMaxValue () {
+	public Integer getVolumeMaxValue () {
 		return null;
 	}
 

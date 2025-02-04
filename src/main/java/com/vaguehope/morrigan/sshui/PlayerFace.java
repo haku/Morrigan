@@ -277,11 +277,11 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	private void setRelativeVolume(final int offset) {
-		final Integer curVol = this.player.getVoume();
+		final Integer curVol = this.player.getVolume();
 		if (curVol == null) return;
 
 		int newVol = curVol + offset;
-		newVol = Math.min(newVol, this.player.getVoumeMaxValue());
+		newVol = Math.min(newVol, this.player.getVolumeMaxValue());
 		newVol = Math.max(newVol, 0);
 		this.player.setVolume(newVol);
 	}
