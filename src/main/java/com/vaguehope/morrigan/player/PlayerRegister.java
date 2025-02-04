@@ -18,4 +18,6 @@ public interface PlayerRegister extends PlayerReader {
 	 */
 	Player makeLocal(String prefix, String name, PlaybackEngineFactory playbackEngineFactory);
 
+	Player make(String id, String name, PlaybackEngineFactory playbackEngineFactory);
+
 }

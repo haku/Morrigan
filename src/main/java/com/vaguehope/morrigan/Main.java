@@ -121,8 +121,7 @@ public final class Main {
 		}
 
 		if (args.isVlcDiscovery()) {
-			final ScheduledExecutorService disSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("dis"));
-			final VlcDiscovery vlcDiscovery = new VlcDiscovery(args, playerRegister, disSchEx);
+			final VlcDiscovery vlcDiscovery = new VlcDiscovery(args, playerRegister);
 			vlcDiscovery.start();
 		}
 

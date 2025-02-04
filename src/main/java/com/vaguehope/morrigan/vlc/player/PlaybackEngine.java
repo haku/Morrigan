@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
@@ -22,13 +23,15 @@ class PlaybackEngine implements IPlaybackEngine {
 	private final AtomicBoolean stopPlaying = new AtomicBoolean();
 
 	private final MediaPlayerFactory vlcFactory;
+	private final Consumer<MediaPlayer> prepPlayer;
 
 	private String m_filepath = null;
 	private IPlaybackStatusListener m_listener = null;
 	private PlayState m_playbackState = PlayState.STOPPED;
 
-	public PlaybackEngine (MediaPlayerFactory vlcFactory) {
+	public PlaybackEngine (MediaPlayerFactory vlcFactory, final Consumer<MediaPlayer> prepPlayer) {
 		this.vlcFactory = vlcFactory;
+		this.prepPlayer = prepPlayer;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,6 +151,7 @@ class PlaybackEngine implements IPlaybackEngine {
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player == null) {
 				player = new AudioPlayerComponent(this.vlcFactory);
+				if (this.prepPlayer != null) this.prepPlayer.accept(player.mediaPlayer());
 				this.playerRef.set(player);
 				player.mediaPlayer().events().addMediaPlayerEventListener(this.mediaEventListener);
 			}

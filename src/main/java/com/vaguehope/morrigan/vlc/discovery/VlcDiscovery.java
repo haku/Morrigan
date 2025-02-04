@@ -1,16 +1,22 @@
 package com.vaguehope.morrigan.vlc.discovery;
 
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.Args;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.server.boot.ServerPlayerContainer;
+import com.vaguehope.morrigan.vlc.player.VlcEngineFactory;
 
+import io.jsonwebtoken.lang.Collections;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.renderer.RendererDiscoverer;
 import uk.co.caprica.vlcj.player.renderer.RendererDiscovererDescription;
 import uk.co.caprica.vlcj.player.renderer.RendererDiscovererEventListener;
@@ -22,12 +28,11 @@ public class VlcDiscovery {
 
 	private final boolean verbose;
 	private final PlayerRegister playerRegister;
-	private final ScheduledExecutorService schEx;
+	private final Map<String, Player> players = new ConcurrentHashMap<>();
 
-	public VlcDiscovery(final Args args, final PlayerRegister playerRegister, final ScheduledExecutorService schEx) {
+	public VlcDiscovery(final Args args, final PlayerRegister playerRegister) {
 		this.verbose = args.isVerboseLog();
 		this.playerRegister = playerRegister;
-		this.schEx = schEx;
 	}
 
 	public void start() {
@@ -44,23 +49,42 @@ public class VlcDiscovery {
 			return;
 		}
 		LOG.info("started: {}", rdd.name());
+	}
 
-		if (this.verbose) {
-			this.schEx.scheduleWithFixedDelay(() -> {
-				LOG.info("known: {}", dis.list().rendererItems());
-			}, 1, 1, TimeUnit.MINUTES);
+	private void makePlayer(final RendererItem item) {
+		final Consumer<MediaPlayer> prepPlayer = (p) -> p.setRenderer(item);
+		final VlcEngineFactory engineFactory = new VlcEngineFactory(this.verbose, Collections.emptyList(), prepPlayer);
+		final Player player = this.playerRegister.make(makeId(item.name()), item.name(), engineFactory);
+
+		final ServerPlayerContainer pc = new ServerPlayerContainer(item.name());
+		pc.setPlayer(player);
+	}
+
+	private void removePlayer(final RendererItem item) {
+		final Player player = this.players.get(item.name());
+		if (player != null) {
+			this.playerRegister.unregister(player);
+			player.dispose();
 		}
+	}
+
+	private static String makeId(String name) {
+		return name.replaceAll("[^a-zA-Z0-9]", "_");
 	}
 
 	private class DisListener implements RendererDiscovererEventListener {
 		@Override
 		public void rendererDiscovererItemAdded(final RendererDiscoverer rendererDiscoverer, final RendererItem itemAdded) {
 			LOG.info("found: {}", itemAdded);
+			itemAdded.hold();
+			makePlayer(itemAdded);
 		}
 
 		@Override
 		public void rendererDiscovererItemDeleted(final RendererDiscoverer rendererDiscoverer, final RendererItem itemDeleted) {
 			LOG.info("lost: {}", itemDeleted);
+			removePlayer(itemDeleted);
+			itemDeleted.release();
 		}
 	}
 

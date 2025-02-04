@@ -116,8 +116,13 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 
 	@Override
 	public Player makeLocal (final String prefix, final String name, PlaybackEngineFactory playbackEngineFactory) {
+		return make(nextIndex(prefix), name, playbackEngineFactory);
+	}
+
+	@Override
+	public Player make(final String id, final String name, PlaybackEngineFactory playbackEngineFactory) {
 		final LocalPlayer p = new LocalPlayer(
-				nextIndex(prefix),
+				id,
 				name,
 				this,
 				this.mediaFactory,

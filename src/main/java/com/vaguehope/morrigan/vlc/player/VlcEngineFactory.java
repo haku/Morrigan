@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
 public class VlcEngineFactory implements PlaybackEngineFactory {
 
@@ -31,7 +33,14 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 			"--http-reconnect",
 	}));
 
+	private final Consumer<MediaPlayer> prepPlayer;
+
 	public VlcEngineFactory(final boolean verbose, final List<String> extraVlcArgs) {
+		this(verbose, extraVlcArgs, null);
+	}
+
+	public VlcEngineFactory(final boolean verbose, final List<String> extraVlcArgs, final Consumer<MediaPlayer> prepPlayer) {
+		this.prepPlayer = prepPlayer;
 		final List<String> vlcArgs = new ArrayList<>(VLC_ARGS);
 
 		if (!verbose) {
@@ -55,7 +64,7 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 
 	@Override
 	public IPlaybackEngine newPlaybackEngine() {
-		return new PlaybackEngine(this.factory);
+		return new PlaybackEngine(this.factory, this.prepPlayer);
 	}
 
 	MediaPlayerFactory getMediaPlayerFactory() {
