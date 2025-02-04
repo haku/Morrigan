@@ -277,6 +277,9 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public void addTag(final MediaItem item, final String tag) throws MorriganException {
+		final MediaItem latestItem = this.itemCache.getForId(item.getId());
+		if (latestItem == null) throw new IllegalArgumentException("Not in cache: " + item.getId());
+
 		try {
 			final MediaToadProto.MediaTag protoTag = MediaToadProto.MediaTag.newBuilder()
 					.setTag(tag)
@@ -289,7 +292,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 							.build())
 					.build());
 
-			this.itemCache.put(((RpcMediaItem) item).withTag(new RpcTag(protoTag)));
+			this.itemCache.put(((RpcMediaItem) latestItem).withTag(new RpcTag(protoTag)));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
@@ -298,6 +301,9 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public void removeTag (final MediaItem item, final MediaTag tag) throws MorriganException {
+		final MediaItem latestItem = this.itemCache.getForId(item.getId());
+		if (latestItem == null) throw new IllegalArgumentException("Not in cache: " + item.getId());
+
 		try {
 			final MediaToadProto.MediaTag protoTag = ((RpcTag) tag).getProtoTag();
 			blockingStub().updateTags(UpdateTagsRequest.newBuilder()
@@ -308,7 +314,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 							.build())
 					.build());
 
-			this.itemCache.put(((RpcMediaItem) item).withoutTag(tag));
+			this.itemCache.put(((RpcMediaItem) latestItem).withoutTag(tag));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateTags() RPC failed: " + e.toString(), e);
@@ -322,6 +328,9 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 
 	@Override
 	public void setItemEnabled(final MediaItem item, final boolean value) throws MorriganException {
+		final MediaItem latestItem = this.itemCache.getForId(item.getId());
+		if (latestItem == null) throw new IllegalArgumentException("Not in cache: " + item.getId());
+
 		try {
 			final boolean exluded = !value;
 			blockingStub().updateExcluded(UpdateExcludedRequest.newBuilder()
@@ -331,7 +340,7 @@ public abstract class RpcMediaList extends EphemeralMediaList {
 							.build())
 					.build());
 
-			this.itemCache.put(((RpcMediaItem) item).withEnabled(exluded));
+			this.itemCache.put(((RpcMediaItem) latestItem).withEnabled(exluded));
 		}
 		catch (final StatusRuntimeException e) {
 			throw new MorriganException("updateExcluded() RPC failed: " + e.toString(), e);

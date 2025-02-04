@@ -115,16 +115,14 @@ public final class PrintingThingsHelper {
 	public static String summariseTags (final Player player) {
 		final PlayItem playItem = player.getCurrentItem();
 		if (playItem != null && playItem.isReady() && playItem.hasListAndItem()) {
-			final MediaList list = playItem.getList();
-			if (list != null) {
-				try {
-					final List<MediaTag> tags = playItem.getItem().getTags(); // TODO cache this?
-					return join(tags, ", ", t -> t.getTag());
-				}
-				catch (final MorriganException e) {
-					LOG.warn("Failed to read tags: " + playItem, e);
-					return "(tags unavailable)";
-				}
+			try {
+				final MediaItem item = playItem.getList().getByFile(playItem.getItem().getId());
+				final List<MediaTag> tags = item.getTags();
+				return join(tags, ", ", t -> t.getTag());
+			}
+			catch (final MorriganException e) {
+				LOG.warn("Failed to read tags: " + playItem, e);
+				return "(tags unavailable)";
 			}
 		}
 		return "";
