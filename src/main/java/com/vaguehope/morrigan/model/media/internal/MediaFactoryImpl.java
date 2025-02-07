@@ -49,11 +49,11 @@ public class MediaFactoryImpl implements MediaFactory {
 
 		ret.addAll(LocalMediaDbHelper.getAllLocalDbs(this.config));
 		for (final MediaDb db : this.addedLocals.values()) {
-			ret.add(new ListRefWithTitle(db.getListRef(), db.getListName()));
+			ret.add(new ListRefWithTitle(db.getListRef(), db.getLongListName()));
 		}
 
 		for (final MediaList list : this.externalListsByListRef.values()) {
-			ret.add(new ListRefWithTitle(list.getListRef(), list.getListName()));
+			ret.add(new ListRefWithTitle(list.getListRef(), list.getLongListName()));
 		}
 
 		return ret;
