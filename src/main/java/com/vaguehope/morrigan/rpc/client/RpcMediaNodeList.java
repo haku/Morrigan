@@ -79,7 +79,13 @@ public class RpcMediaNodeList extends RpcMediaList {
 	@Override
 	public String getListName() {
 		if (StringUtils.isBlank(this.title)) return super.getListName();
-		return super.getListName() + ": " + this.title;
+		return this.title;
+	}
+
+	@Override
+	public String getLongListName() {
+		if (StringUtils.isBlank(this.title)) return this.listRef.getListId();
+		return this.listRef.getListId() + ": " + this.title;
 	}
 
 	@Override

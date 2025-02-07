@@ -26,6 +26,14 @@ public interface MediaList extends List<AbstractItem> {
 
 	ListRef getListRef();
 	String getListName();
+
+	/**
+	 * Might include additional context, such as the server name.
+	 */
+	default String getLongListName() {
+		return getListName();
+	}
+
 	UUID getUuid();
 
 	DirtyState getDirtyState ();

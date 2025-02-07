@@ -114,7 +114,7 @@ public class DbFace extends DefaultFace {
 
 	@Override
 	public String getTitle() {
-		return this.list.getListName();
+		return this.list.getLongListName();
 	}
 
 	public void restoreSavedScroll () throws MorriganException {
@@ -539,7 +539,7 @@ public class DbFace extends DefaultFace {
 	private void writeDbToScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		int l = top;
 
-		String summary = String.format("%s: %s", this.list.getListRef().getType().getUiTitle(), this.list.getListName());
+		String summary = String.format("%s: %s", this.list.getListRef().getType().getUiTitle(), this.list.getLongListName());
 		if (this.lastRefreshError != null) {
 			summary += ": " + this.lastRefreshError;
 		}

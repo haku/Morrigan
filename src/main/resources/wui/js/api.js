@@ -301,7 +301,7 @@ MnApi = {};
     });
   }
 
-  MnApi.getNode = function(listRef, nodeId, parentNodeId, msgHandler, onNode) {
+  MnApi.getNode = function(listRef, nodeId, msgHandler, onNode) {
     $.ajax({
       type : 'GET',
       cache : false,
@@ -313,7 +313,6 @@ MnApi = {};
       success : function(node) {
         // stuffing listRef everywhere seems silly, but seems to make everything else simpler.
         node.listRef = listRef;
-        node.parentNodeId = parentNodeId;  // for implementing ".." in the UI.  showing proper browsing breadcrumb would hopefully make this not needed.
         node.nodes.forEach(n => n.listRef = listRef);
         node.items.forEach(i => {
           i.listRef = listRef;

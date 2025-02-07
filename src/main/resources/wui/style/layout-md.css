@@ -222,6 +222,37 @@ footer.maybehide {
 }
 
 /* DBs list */
+#db_breadcrumbs {
+  display: block;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+#db_breadcrumbs:empty {
+    display: none;
+}
+#db_breadcrumbs .crumb {
+  display: inline-block;
+  line-height: 1.3em;
+  padding: 0.3em;
+  font-weight: normal;
+  font-size: 125%;
+}
+#db_breadcrumbs a:link,
+#db_breadcrumbs a:visited,
+#db_breadcrumbs a:active,
+#db_breadcrumbs a:focus,
+#db_breadcrumbs a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+#db_breadcrumbs .crumb:before {
+  content: '>';
+  padding-right: 0.6em;
+}
+#db_breadcrumbs .crumb:first-of-type:before {
+  display: none;
+}
+
 #db_fab {
   position: fixed;
   font-size: inherit;

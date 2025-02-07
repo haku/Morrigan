@@ -629,18 +629,17 @@
     });
   }
 
-  function setDbTabToNode(listRef, nodeId, parentNodeId) {
+  function setDbTabToNode(listRef, nodeId) {
     currentDbListRef = listRef;
     currentDbNodeId = nodeId;
     currentDbQuery = null;
     currentDbResults = null;
     $('#db_fab').hide();
 
-    MnApi.getNode(listRef, nodeId, parentNodeId, msgHandler, displayNode);
-
     $('#db_title').text('Fetching...');
     $('#db_subtitle').text('');
     $('#db_list').empty();
+    MnApi.getNode(listRef, nodeId, msgHandler, displayNode);
 
     $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
     $('#db_query').off('keyup').on('keyup', function(event) {
@@ -686,6 +685,7 @@
     $('#db_title').text('Fetching...');
     $('#db_subtitle').text('');
     $('#db_list').empty();
+    $('#db_breadcrumbs').empty();
     // TODO show spinner.
 
     $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
@@ -751,6 +751,7 @@
     $('#db_sort_options').hide();
     $('#db_title').text(count + ' Collections');
     $('#db_subtitle').text('');
+    $('#db_breadcrumbs').empty();
   }
 
   function makeDbItem(db) {
@@ -764,7 +765,7 @@
       a.unbind().click(function(event) {
         event.preventDefault();
         restoreSavedSearch(db.listRef);
-        setDbTabToNode(db.listRef, "0", null);
+        setDbTabToNode(db.listRef, "0");
       });
     }
     else {
@@ -785,20 +786,13 @@
     var dbList = $('#db_list');
     dbList.empty();
 
-    if (node.parentNodeId) {
-      dbList.append(makeNodeItem({
-        "listRef": node.listRef,
-        "id": node.parentNodeId,
-        "title": "..",
-      }));
-    }
     node.nodes.forEach(n => {
-      dbList.append(makeNodeItem(n, node.nodeId));
+      dbList.append(makeNodeItem(n, node));
     });
     displayItems(node.items);
   }
 
-  function makeNodeItem(node, parentNodeId) {
+  function makeNodeItem(node, parentNode) {
     var a = $('<a class="clickable title" href="">');
     a.text(node.title);
 
@@ -807,7 +801,17 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
-      setDbTabToNode(node.listRef, node.id, parentNodeId);
+      setDbTabToNode(node.listRef, node.id);
+
+      var crumb = $('<a class="crumb" href="">');
+      crumb.text(parentNode.title);
+      crumb.unbind().click(function(event) {
+        event.preventDefault();
+        setDbTabToNode(parentNode.listRef, parentNode.nodeId);
+        crumb.nextAll().remove();
+        crumb.remove();
+      });
+      $('#db_breadcrumbs').append(crumb);
     });
 
     return row;
