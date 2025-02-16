@@ -239,7 +239,6 @@
     });
 
     $('#mnu_tags').click(tagsClicked);
-    $('#mnu_stop_after').click(stopAfterClicked);
     $('#mnu_clear_queue').click(clearQueueClicked);
     $('#mnu_shuffle_queue').click(shuffleQueueClicked);
     $('#mnu_enqueue_view').click(enqueueViewClicked);
@@ -261,7 +260,8 @@
       $('#submnu_transcode').append(li);
     });
 
-    $('#queue_add_view').click(queueAddViewClicked);
+    $('#queue_head_add').click(queueAddHeadViewClicked);
+    $('#queue_tail_add').click(queueAddTailViewClicked);
 
     $('#volume_down').click(function() { setRelativeVolume(-3); });
     $('#volume_up').click(function() { setRelativeVolume(3); });
@@ -273,11 +273,6 @@
   function tagsClicked() {
     if (!selectedPlayer || !selectedPlayer.item) return;
     showTagEditor(selectedPlayer.item);
-  }
-
-  function stopAfterClicked() {
-    if (!selectedPlayer) return;
-    MnApi.writeQueueItem(selectedPlayer.pid, null, 'add_stop_top', msgHandler, displayQueue);
   }
 
   function clearQueueClicked() {
@@ -303,7 +298,7 @@
   }
 
   function addSavedViewsToMenu(savedViews) {
-    var menu = $('#queue_add_view_menu');
+    var menu = $('#queue_tail_add_menu');
     $.each(savedViews, function(index, item) {
       var addToQueue = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
       if (item.name && item.listref && (item.query || item.query === '')) {
@@ -320,8 +315,17 @@
     });
   }
 
-  function queueAddViewClicked() {
-    showPopup($('#queue_add_view_menu'));
+  function queueAddHeadViewClicked() {
+    const menu = $('#queue_head_add_menu');
+    $('.add_stop', menu).unbind().click(() => {
+      if (!selectedPlayer) return;
+      MnApi.writeQueueItem(selectedPlayer.pid, null, 'add_stop_top', msgHandler, displayQueue);
+      hidePopup(menu);
+    });
+    showPopup(menu);
+  }
+  function queueAddTailViewClicked() {
+    showPopup($('#queue_tail_add_menu'));
   }
 
   function enqueueViewClicked() {

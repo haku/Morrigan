@@ -39,7 +39,6 @@
         </button>
         <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="demo-menu-lower-right">
           <li class="mdl-menu__item mnu_item_queue" id="mnu_tags">Tags</li>
-          <li class="mdl-menu__item mnu_item_queue" id="mnu_stop_after">Stop After</li>
           <li class="mdl-menu__item mnu_item_queue" id="mnu_playback_order">Playback Order...</li>
           <li class="mdl-menu__item mnu_item_queue" id="mnu_transcode">Transcode...</li>
           <li class="mdl-menu__item mnu_item_queue" id="mnu_shuffle_queue">Shuffle Queue</li>
@@ -100,13 +99,19 @@
           <span id="track_time" style="flex-grow: 0; align-self: center;">0:00 / 0:00</span>
         </p>
         <p id="queue_info">(queue info)</p>
+        <div class="queue_head_action_buttons">
+          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="queue_head_add">
+            <i class="material-icons">add</i>
+            <label> Add</label>
+          </button>
+        </div>
         <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="queue_list">
         </ol>
         <div style="height: 2em;"></div>
-        <div class="queue_action_buttons">
-          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="queue_add_view">
+        <div class="queue_tail_action_buttons">
+          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="queue_tail_add">
             <i class="material-icons">add</i>
-            <label> Add View</label>
+            <label> Add</label>
           </button>
         </div>
         <div style="height: 2em;"></div>
@@ -200,8 +205,13 @@
     <button class="mdl-button mdl-js-button mdl-js-ripple-effect remove">Remove</button>
   </div>
 
-  <div class="popup" style="display: none;" id="queue_add_view_menu">
-    <p class="title">Add View</p>
+  <div class="popup" style="display: none;" id="queue_head_add_menu">
+    <p class="title">Add to Queue Head</p>
+    <span class="separator"></span>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect add_stop">Stop</button>
+  </div>
+  <div class="popup" style="display: none;" id="queue_tail_add_menu">
+    <p class="title">Add to Queue Tail</p>
     <span class="separator"></span>
   </div>
 

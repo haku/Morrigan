@@ -336,7 +336,8 @@ footer.maybehide {
 #track_tags {
   line-height: 1.3em;
 }
-.queue_action_buttons {
+.queue_head_action_buttons,
+.queue_tail_action_buttons {
   display: flex;
   justify-content: center;
 }
