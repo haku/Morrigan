@@ -322,6 +322,16 @@
       MnApi.writeQueueItem(selectedPlayer.pid, null, 'add_stop_top', msgHandler, displayQueue);
       hidePopup(menu);
     });
+    $('.add_block', menu).unbind().click(() => {
+      if (!selectedPlayer) return;
+      MnApi.writeQueueItem(selectedPlayer.pid, null, 'add_block_top', msgHandler, displayQueue);
+      hidePopup(menu);
+    });
+    $('.add_bypass', menu).unbind().click(() => {
+      if (!selectedPlayer) return;
+      MnApi.writeQueueItem(selectedPlayer.pid, null, 'add_bypass_top', msgHandler, displayQueue);
+      hidePopup(menu);
+    });
     showPopup(menu);
   }
   function queueAddTailViewClicked() {

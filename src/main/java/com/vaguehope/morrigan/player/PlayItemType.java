@@ -8,7 +8,9 @@ import java.util.Map;
 public enum PlayItemType {
 
 	PLAYABLE(false),
-	STOP(true);
+	STOP(true),
+	BLOCK(true),
+	BYPASS(true);
 
 	private final boolean isPseudo;
 

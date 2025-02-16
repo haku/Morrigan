@@ -31,7 +31,9 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	public PlayItem makeMetaItem (final PlayItemType type) {
 		switch (type) {
 			case STOP:
-				return PlayItem.makeAction(PlayItemType.STOP);
+			case BLOCK:
+			case BYPASS:
+				return PlayItem.makeAction(type);
 			default:
 				throw new IllegalArgumentException("Not a meta type: " + type);
 		}
@@ -138,12 +140,15 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	@Override
 	public PlayItem takeFromQueue () {
 		synchronized (this.queue) {
-			if (!this.queue.isEmpty()) {
-				final PlayItem item = this.queue.remove(0);
-				callQueueChangedListeners();
-				return item;
-			}
-			return null;
+			if (this.queue.isEmpty()) return null;
+
+			final PlayItem item = this.queue.get(0);
+			if (item.getType() == PlayItemType.BLOCK) return item;  // so it can signal stop.
+			if (item.getType() == PlayItemType.BYPASS) return null;  // behave like queue is empty.
+
+			this.queue.remove(0);
+			callQueueChangedListeners();
+			return item;
 		}
 	}
 

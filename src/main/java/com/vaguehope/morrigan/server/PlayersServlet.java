@@ -82,6 +82,8 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_CLEAR = "clear";
 	private static final String CMD_SHUFFLE = "shuffle";
 	private static final String CMD_ADD_STOP_TOP = "add_stop_top";
+	private static final String CMD_ADD_BLOCK_TOP = "add_block_top";
+	private static final String CMD_ADD_BYPASS_TOP = "add_bypass_top";
 	private static final String CMD_TOP = "top";
 	private static final String CMD_UP = "up";
 	private static final String CMD_REMOVE = "remove";
@@ -283,6 +285,14 @@ public class PlayersServlet extends HttpServlet {
 		}
 		else if (act.equals(CMD_ADD_STOP_TOP)) {
 			player.getQueue().addToQueueTop(player.getQueue().makeMetaItem(PlayItemType.STOP));
+			printPlayerQueue(resp, player);
+		}
+		else if (act.equals(CMD_ADD_BLOCK_TOP)) {
+			player.getQueue().addToQueueTop(player.getQueue().makeMetaItem(PlayItemType.BLOCK));
+			printPlayerQueue(resp, player);
+		}
+		else if (act.equals(CMD_ADD_BYPASS_TOP)) {
+			player.getQueue().addToQueueTop(player.getQueue().makeMetaItem(PlayItemType.BYPASS));
 			printPlayerQueue(resp, player);
 		}
 		else {

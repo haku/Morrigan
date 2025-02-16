@@ -300,6 +300,7 @@ public abstract class AbstractPlayer implements Player {
 		if (item.getType().isPseudo()) {
 			switch (item.getType()) {
 				case STOP:
+				case BLOCK:
 					stopPlaying();
 					return;
 				default:
