@@ -214,6 +214,7 @@ public class PlayerControlBridgeAVTransportService extends AbstractAVTransportSe
 			break;
 		case PAUSED:
 			actions.add(TransportAction.Play);
+			actions.add(TransportAction.Pause); // so HA can pause an already paused player.
 			actions.add(TransportAction.Stop);
 			actions.add(TransportAction.Seek);
 			actions.add(TransportAction.Next);
