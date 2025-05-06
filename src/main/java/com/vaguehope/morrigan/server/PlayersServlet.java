@@ -474,7 +474,7 @@ public class PlayersServlet extends HttpServlet {
 						? currentItem.getList().getByFile(currentItem.getItem().getId())
 						: currentItem.getItem();
 
-				final List<MediaTag> tags = track.getTags();
+				final List<MediaTag> tags = track != null ? track.getTags() : null;
 				if (tags != null) {
 					for (final MediaTag tag : tags) {
 						FeedHelper.addElement(dw, "tracktag", tag.getTag(), new String[][] {
@@ -485,7 +485,9 @@ public class PlayersServlet extends HttpServlet {
 				}
 
 				dw.startElement("track");
-				MlistsServlet.fillInMediaItem(dw, currentItem.getList(), track, IncludeTags.YES, null, this.config);
+				if (track != null) {
+					MlistsServlet.fillInMediaItem(dw, currentItem.getList(), track, IncludeTags.YES, null, this.config);
+				}
 				if (currentItem.hasList()) {
 					final String trackListUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentItem.getListRef().toUrlForm();
 					FeedHelper.addLink(dw, trackListUrl, "list", "text/xml");
