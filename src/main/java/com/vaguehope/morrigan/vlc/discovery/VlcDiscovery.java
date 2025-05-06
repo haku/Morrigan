@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.vlc.discovery;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -28,9 +29,12 @@ public class VlcDiscovery {
 
 	private final boolean verbose;
 	private final PlayerRegister playerRegister;
+	private final Executor executor;
+
 	private final Map<String, Player> players = new ConcurrentHashMap<>();
 
-	public VlcDiscovery(final Args args, final PlayerRegister playerRegister) {
+	public VlcDiscovery(final Args args, final PlayerRegister playerRegister, final Executor executor) {
+		this.executor = executor;
 		this.verbose = args.isVerboseLog();
 		this.playerRegister = playerRegister;
 	}
@@ -53,7 +57,7 @@ public class VlcDiscovery {
 
 	private void makePlayer(final RendererItem item) {
 		final Consumer<MediaPlayer> prepPlayer = (p) -> p.setRenderer(item);
-		final VlcEngineFactory engineFactory = new VlcEngineFactory(this.verbose, Collections.emptyList(), prepPlayer);
+		final VlcEngineFactory engineFactory = new VlcEngineFactory(this.executor, this.verbose, Collections.emptyList(), prepPlayer);
 		final Player player = this.playerRegister.make(makeId(item.name()), item.name(), engineFactory);
 
 		final ServerPlayerContainer pc = new ServerPlayerContainer(item.name());

@@ -80,13 +80,15 @@ public final class Main {
 		}
 
 		final Config config = Config.fromArgs(args);
-		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
-		final VlcEngineFactory infoPlaybackEngineFactory = new VlcEngineFactory(args.isVerboseLog(), Collections.emptyList());
+		final ScheduledExecutorService playerEx = makePlayerEx();
+		final VlcEngineFactory infoPlaybackEngineFactory = new VlcEngineFactory(playerEx, args.isVerboseLog(), Collections.emptyList());
 		final MediaFactory mediaFactory = new MediaFactoryImpl(config, infoPlaybackEngineFactory);
-		final PlayerRegister playerRegister = makePlayerRegister(config, args, mediaFactory);
+		final PlayerRegister playerRegister = makePlayerRegister(config, args, playerEx, mediaFactory);
+
+		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory);
 		final Transcoder transcoder = new Transcoder("srv");
-		makeLocalPlayers(args, playerRegister);
+		makeLocalPlayers(args, playerRegister, playerEx);
 
 		final MorriganServer httpServer;
 		final ServerConfig serverConfig = new ServerConfig(config, args);
@@ -121,18 +123,21 @@ public final class Main {
 		}
 
 		if (args.isVlcDiscovery()) {
-			final VlcDiscovery vlcDiscovery = new VlcDiscovery(args, playerRegister);
+			final VlcDiscovery vlcDiscovery = new VlcDiscovery(args, playerRegister, playerEx);
 			vlcDiscovery.start();
 		}
 
 		new CountDownLatch(1).await();  // Block forever.
 	}
 
-	private static PlayerRegister makePlayerRegister(final Config config, Args args, final MediaFactory mediaFactory) throws MorriganException {
+	private static ScheduledExecutorService makePlayerEx() {
 		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
 		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
 		playerEx.allowCoreThreadTimeOut(true);
+		return playerEx;
+	}
 
+	private static PlayerRegister makePlayerRegister(final Config config, Args args, final ScheduledExecutorService playerEx, final MediaFactory mediaFactory) throws MorriganException {
 		final LocalHostContentServer localHttpServer = new LocalHostContentServer(args.isPrintAccessLog());
 		localHttpServer.start();
 
@@ -150,11 +155,11 @@ public final class Main {
 		return playerRegister;
 	}
 
-	private static void makeLocalPlayers(final Args args, final PlayerRegister playerRegister) {
+	private static void makeLocalPlayers(final Args args, final PlayerRegister playerRegister, final ScheduledExecutorService playerEx) {
 		for (final ServerPlayerArgs a : args.getServerPlayers()) {
 			LOG.info("Making local player '{}' with vlc args: {}", a.getName(), a.getVlcArgs());
 			final ServerPlayerContainer pc = new ServerPlayerContainer(a.getName());
-			final VlcEngineFactory engineFactory = new VlcEngineFactory(args.isVerboseLog(), a.getVlcArgs());
+			final VlcEngineFactory engineFactory = new VlcEngineFactory(playerEx, args.isVerboseLog(), a.getVlcArgs());
 			pc.setPlayer(playerRegister.makeLocal(pc.getPrefix(), pc.getName(), engineFactory));
 
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {

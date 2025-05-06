@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -33,13 +34,15 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 			"--http-reconnect",
 	}));
 
+	private final Executor executor;
 	private final Consumer<MediaPlayer> prepPlayer;
 
-	public VlcEngineFactory(final boolean verbose, final List<String> extraVlcArgs) {
-		this(verbose, extraVlcArgs, null);
+	public VlcEngineFactory(final Executor executor, final boolean verbose, final List<String> extraVlcArgs) {
+		this(executor, verbose, extraVlcArgs, null);
 	}
 
-	public VlcEngineFactory(final boolean verbose, final List<String> extraVlcArgs, final Consumer<MediaPlayer> prepPlayer) {
+	public VlcEngineFactory(final Executor executor, final boolean verbose, final List<String> extraVlcArgs, final Consumer<MediaPlayer> prepPlayer) {
+		this.executor = executor;
 		this.prepPlayer = prepPlayer;
 		final List<String> vlcArgs = new ArrayList<>(VLC_ARGS);
 
@@ -64,7 +67,7 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 
 	@Override
 	public IPlaybackEngine newPlaybackEngine() {
-		return new PlaybackEngine(this.factory, this.prepPlayer);
+		return new PlaybackEngine(this.factory, this.executor, this.prepPlayer);
 	}
 
 	MediaPlayerFactory getMediaPlayerFactory() {

@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.vlc.player;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,14 +24,16 @@ class PlaybackEngine implements IPlaybackEngine {
 	private final AtomicBoolean stopPlaying = new AtomicBoolean();
 
 	private final MediaPlayerFactory vlcFactory;
+	private final Executor executor;
 	private final Consumer<MediaPlayer> prepPlayer;
 
 	private String m_filepath = null;
 	private IPlaybackStatusListener m_listener = null;
 	private PlayState m_playbackState = PlayState.STOPPED;
 
-	public PlaybackEngine (MediaPlayerFactory vlcFactory, final Consumer<MediaPlayer> prepPlayer) {
+	public PlaybackEngine (final MediaPlayerFactory vlcFactory, final Executor executor, final Consumer<MediaPlayer> prepPlayer) {
 		this.vlcFactory = vlcFactory;
+		this.executor = executor;
 		this.prepPlayer = prepPlayer;
 	}
 
@@ -193,34 +196,36 @@ class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Event handlers.
 
-	private MediaPlayerEventListener mediaEventListener = new MediaPlayerEventAdapter () {
+	private final MediaPlayerEventListener mediaEventListener = new MediaPlayerEventAdapter () {
 
 		@Override
 		public void finished(MediaPlayer mediaPlayer) {
-			if (mediaPlayer == PlaybackEngine.this.playerRef.get().mediaPlayer()) handleEosEvent("g");
+			if (mediaPlayer == PlaybackEngine.this.playerRef.get().mediaPlayer()) {
+				PlaybackEngine.this.executor.execute(() -> handleEosEvent());
+			}
 		}
 
 		@Override
 		public void stopped(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.STOPPED, false);
+			PlaybackEngine.this.executor.execute(() -> setStateAndCallListener(PlayState.STOPPED, false));
 		}
 		@Override
 		public void playing(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.PLAYING, false);
+			PlaybackEngine.this.executor.execute(() -> setStateAndCallListener(PlayState.PLAYING, false));
 		}
 		@Override
 		public void paused(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.PAUSED, false);
+			PlaybackEngine.this.executor.execute(() -> setStateAndCallListener(PlayState.PAUSED, false));
 		}
 
 		@Override
 		public void timeChanged (MediaPlayer mediaPlayer, long newTime) {
-			callPositionListener(newTime / 1000);
+			PlaybackEngine.this.executor.execute(() -> callPositionListener(newTime / 1000));
 		}
 
 		@Override
 		public void lengthChanged (MediaPlayer mediaPlayer, long newLength) {
-			callDurationListener((int) (newLength / 1000));
+			PlaybackEngine.this.executor.execute(() -> callDurationListener((int) (newLength / 1000)));
 		}
 
 		@Override
@@ -296,7 +301,7 @@ class PlaybackEngine implements IPlaybackEngine {
 		}
 	}
 
-	void handleEosEvent (String debugType) {
+	void handleEosEvent () {
 		if (!this.stopPlaying.get()) {
 			if (this.atEos.compareAndSet(false, true)) {
 				callOnEndOfTrackHandler();

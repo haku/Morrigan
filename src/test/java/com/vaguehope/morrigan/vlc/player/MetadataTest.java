@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.concurrent.ForkJoinPool;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,7 +18,7 @@ public class MetadataTest {
 
 	@Before
 	public void before() throws Exception {
-		this.factory = new VlcEngineFactory(true, Collections.emptyList());
+		this.factory = new VlcEngineFactory(ForkJoinPool.commonPool(), true, Collections.emptyList());
 	}
 
 	@After
