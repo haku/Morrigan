@@ -18,6 +18,7 @@
 		<jetty.version>9.4.57.v20241219</jetty.version>
 		<jjwt.version>0.12.6</jjwt.version>
 		<jupnp.version>3.0.3</jupnp.version>
+		<protobuf-java.version>4.31.0</protobuf-java.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<sshd.version>2.15.0</sshd.version>
 
@@ -139,19 +140,30 @@
 
 			<!-- https://github.com/grpc/grpc-java/?tab=readme-ov-file#generated-code -->
 			<plugin>
-				<groupId>org.xolstice.maven.plugins</groupId>
+				<groupId>io.github.ascopes</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.6.1</version>
+				<version>3.2.1</version>
+
 				<configuration>
-					<protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
-					<pluginId>grpc-java</pluginId>
-					<pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+					<protocVersion>${protobuf-java.version}</protocVersion>
+					<sourceDirectories>
+						<sourceDirectory>${project.basedir}/src/main/proto</sourceDirectory>
+					</sourceDirectories>
+
+					<binaryMavenPlugins>
+						<binaryMavenPlugin>
+							<groupId>io.grpc</groupId>
+							<artifactId>protoc-gen-grpc-java</artifactId>
+							<version>${grpc.version}</version>
+							<options>@generated=omit</options>
+						</binaryMavenPlugin>
+					</binaryMavenPlugins>
 				</configuration>
+
 				<executions>
 					<execution>
 						<goals>
-							<goal>compile</goal>
-							<goal>compile-custom</goal>
+							<goal>generate</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -195,6 +207,12 @@
 		</dependency>
 
 		<!-- RPC -->
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>${protobuf-java.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>io.grpc</groupId>
