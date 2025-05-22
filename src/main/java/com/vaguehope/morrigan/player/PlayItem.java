@@ -161,7 +161,6 @@ public abstract class PlayItem {
 		@Override
 		public PlayItem withAltFile(final File newAltFile) {
 			if (newAltFile == null) throw new IllegalArgumentException("Missing altFile.");
-			if (this.altFile != null) throw new IllegalArgumentException("Already has altFile: " + this.altFile);
 			return new ReadyPlayItem(this.type, this.list, this.item, newAltFile);
 		}
 
