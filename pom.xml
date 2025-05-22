@@ -182,6 +182,29 @@
 		</extensions>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>offline</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.github.ascopes</groupId>
+						<artifactId>protobuf-maven-plugin</artifactId>
+						<configuration>
+							<protocVersion>PATH</protocVersion>
+							<binaryMavenPlugins></binaryMavenPlugins>
+							<binaryPathPlugins>
+								<binaryPathPlugin>
+									<name>protoc-gen-grpc-java</name>
+								</binaryPathPlugin>
+							</binaryPathPlugins>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<dependencies>
 
 		<!-- CLI -->
