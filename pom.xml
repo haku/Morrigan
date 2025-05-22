@@ -192,7 +192,7 @@
 						<artifactId>protobuf-maven-plugin</artifactId>
 						<configuration>
 							<protocVersion>PATH</protocVersion>
-							<binaryMavenPlugins></binaryMavenPlugins>
+							<binaryMavenPlugins combine.self="override"></binaryMavenPlugins>
 							<binaryPathPlugins>
 								<binaryPathPlugin>
 									<name>protoc-gen-grpc-java</name>
