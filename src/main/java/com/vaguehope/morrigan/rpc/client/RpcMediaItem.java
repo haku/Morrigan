@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.dlnatoad.rpc.MediaToadProto.MediaItem;
-import com.vaguehope.morrigan.dlna.extcd.EphemeralItem;
 import com.vaguehope.morrigan.dlna.extcd.Metadata;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.EphemeralItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 
 public class RpcMediaItem extends EphemeralItem {

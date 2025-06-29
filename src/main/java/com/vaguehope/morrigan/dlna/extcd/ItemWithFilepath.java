@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.EphemeralItem;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.EphemeralItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.util.StringHelper;
 

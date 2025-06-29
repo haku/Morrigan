@@ -21,6 +21,7 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.UrlItem;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -84,6 +85,7 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_ADD_STOP_TOP = "add_stop_top";
 	private static final String CMD_ADD_BLOCK_TOP = "add_block_top";
 	private static final String CMD_ADD_BYPASS_TOP = "add_bypass_top";
+	private static final String CMD_ADD_URL = "add_url";
 	private static final String CMD_TOP = "top";
 	private static final String CMD_UP = "up";
 	private static final String CMD_REMOVE = "remove";
@@ -294,6 +296,17 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals(CMD_ADD_BYPASS_TOP)) {
 			player.getQueue().addToQueueTop(player.getQueue().makeMetaItem(PlayItemType.BYPASS));
 			printPlayerQueue(resp, player);
+		}
+		else if (act.equals(CMD_ADD_URL)) {
+			final String raw = req.getParameter("url");
+			if (raw != null && raw.length() > 0) {
+				player.getQueue().addToQueueTop(PlayItem.makeReady(null, new UrlItem(raw)));
+				printPlayerQueue(resp, player);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'volume' parameter not set desu~");
+			}
+
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '" + act + "' desu~");

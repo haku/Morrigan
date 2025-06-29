@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.dlna.extcd;
+package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -12,20 +12,8 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.AbstractItem;
-import com.vaguehope.morrigan.model.media.DirtyState;
-import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.ItemTags;
-import com.vaguehope.morrigan.model.media.MatchMode;
-import com.vaguehope.morrigan.model.media.MediaAlbum;
-import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
-import com.vaguehope.morrigan.model.media.MediaList;
-import com.vaguehope.morrigan.model.media.MediaListChangeListener;
-import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 
 public abstract class EphemeralMediaList extends AbstractList<AbstractItem> implements MediaList {

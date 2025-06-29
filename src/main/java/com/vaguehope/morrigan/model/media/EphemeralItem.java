@@ -1,11 +1,9 @@
-package com.vaguehope.morrigan.dlna.extcd;
+package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
-
-import com.vaguehope.morrigan.model.media.MediaItem;
 
 public abstract class EphemeralItem implements MediaItem {
 

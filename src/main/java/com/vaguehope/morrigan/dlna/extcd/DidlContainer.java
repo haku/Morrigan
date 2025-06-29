@@ -7,6 +7,7 @@ import java.util.List;
 import org.jupnp.support.model.container.Container;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.EphemeralItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 
 public class DidlContainer extends EphemeralItem {

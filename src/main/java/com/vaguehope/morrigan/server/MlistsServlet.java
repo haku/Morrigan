@@ -796,7 +796,7 @@ public class MlistsServlet extends HttpServlet {
 		final Transcode transcode = Transcode.parse(transcodeStr);
 		if (transcode != Transcode.NONE) {
 			if (mi instanceof MediaItem) {
-				if (tags == null) tags = ml.readTags(mi);
+				if (tags == null && ml != null) tags = ml.readTags(mi);
 				final TranscodeProfile tProfile = transcode.profileForItem(new TranscodeContext(config), mi, tags);
 				if (tProfile != null) {
 					title = tProfile.getTranscodedTitle();
@@ -824,7 +824,7 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
 		}
 
-		if (mi instanceof MediaItem) {
+		if (mi instanceof MediaItem && mi.getMediaType() != null) {
 			FeedHelper.addElement(dw, "type", mi.getMediaType().getN());
 		}
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
@@ -852,9 +852,9 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		if (includeTags == IncludeTags.YES || includeTags == IncludeTags.YES_INCLUDING_DELETED) {
-			if (tags == null) tags = ml.readTags(mi);
+			if (tags == null && ml != null) tags = ml.readTags(mi);
 			if (includeTags == IncludeTags.YES_INCLUDING_DELETED) {
-				for (final MediaTag tag : tags.tagsIncludingDeleted()) {
+				if (tags != null) for (final MediaTag tag : tags.tagsIncludingDeleted()) {
 					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
 						{ "t", String.valueOf(tag.getType().getIndex()) },
 						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
@@ -864,7 +864,7 @@ public class MlistsServlet extends HttpServlet {
 				}
 			}
 			else {
-				for (final MediaTag tag : tags.tagsIncludingDeleted()) {
+				if (tags != null) for (final MediaTag tag : tags.tagsIncludingDeleted()) {
 					if (!tag.isDeleted()) {
 						FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
 							{ "t", String.valueOf(tag.getType().getIndex()) },

@@ -17,6 +17,7 @@ import org.jupnp.support.model.container.Container;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.AbstractItem;
+import com.vaguehope.morrigan.model.media.EphemeralMediaList;
 import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaItem;
