@@ -50,20 +50,22 @@ public class PlayerState {
 		final String listRef;
 		final String filepath;
 		final String remoteId;
+		final String remoteLocation;
 		final String md5;
 		final String title;
 
-		public QueueItem(final String listRef, final String filepath, final String remoteId, final String md5, final String title) {
+		public QueueItem(final String listRef, final String filepath, final String remoteId, final String remoteLocation, final String md5, final String title) {
 			this.listRef = listRef;
 			this.filepath = filepath;
 			this.remoteId = remoteId;
+			this.remoteLocation = remoteLocation;
 			this.md5 = md5;
 			this.title = title;
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.listRef, this.filepath, this.remoteId, this.md5, this.title);
+			return Objects.hash(this.listRef, this.filepath, this.remoteId, this.remoteLocation, this.md5, this.title);
 		}
 
 		@Override
@@ -76,6 +78,7 @@ public class PlayerState {
 			return Objects.equals(this.listRef, that.listRef)
 					&& Objects.equals(this.filepath, this.filepath)
 					&& Objects.equals(this.remoteId, this.remoteId)
+					&& Objects.equals(this.remoteLocation, this.remoteLocation)
 					&& Objects.equals(this.md5, that.md5)
 					&& Objects.equals(this.title, that.title);
 		}

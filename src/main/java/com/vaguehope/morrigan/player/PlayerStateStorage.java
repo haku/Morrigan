@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaList;
+import com.vaguehope.morrigan.model.media.UrlItem;
 import com.vaguehope.morrigan.player.PlayerState.QueueItem;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.ExceptionHelper;
@@ -125,7 +127,7 @@ public class PlayerStateStorage {
 		if (i == null) return null;
 
 		if (i.getType().isPseudo()) {
-			return new QueueItem(i.getType().name(), null, null, null, null);
+			return new QueueItem(i.getType().name(), null, null, null, null, null);
 		}
 
 		final ListRef listRef = i.getListRef();
@@ -134,12 +136,18 @@ public class PlayerStateStorage {
 				listRef != null ? listRef.toUrlForm() : null,
 				i.getFilepath(),
 				i.getRemoteId(),
+				i.getRemoteLocation(),
 				md5 != null ? md5.toString(16) : "0",
 				i.getTitle());
 	}
 
 	private PlayItem fromQueueItem(final QueueItem i, final Map<ListRef, MediaList> listCache) throws DbException, MorriganException {
 		if (i == null) return null;
+
+		if (StringUtils.isNoneBlank(i.remoteLocation)) {
+			return PlayItem.makeReady(null, new UrlItem(i.remoteLocation));
+		}
+
 		if (StringHelper.blank(i.listRef)) return null;
 
 		final PlayItemType type = PlayItemType.parse(i.listRef);

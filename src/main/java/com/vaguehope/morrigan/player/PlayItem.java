@@ -44,6 +44,7 @@ public abstract class PlayItem {
 
 	public abstract String getFilepath();
 	public abstract String getRemoteId();
+	public abstract String getRemoteLocation();
 	public abstract BigInteger getMd5();
 	public abstract String getTitle();
 	public abstract String getListTitle();
@@ -123,6 +124,12 @@ public abstract class PlayItem {
 		public String getRemoteId() {
 			if (this.item == null) return null;
 			return this.item.getRemoteId();
+		}
+
+		@Override
+		public String getRemoteLocation() {
+			if (this.item == null) return null;
+			return this.item.getRemoteLocation();
 		}
 
 		@Override
@@ -281,6 +288,11 @@ public abstract class PlayItem {
 		@Override
 		public String getRemoteId() {
 			return this.remoteId;
+		}
+
+		@Override
+		public String getRemoteLocation() {
+			return null;
 		}
 
 		@Override

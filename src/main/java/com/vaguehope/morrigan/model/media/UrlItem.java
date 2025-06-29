@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,6 +49,20 @@ public class UrlItem extends EphemeralItem {
 	@Override
 	public boolean isPlayable() {
 		return true;
+	}
+
+	@Override
+	public int hashCode () {
+		return Objects.hash(this.url);
+	}
+
+	@Override
+	public boolean equals (final Object obj) {
+		if (obj == this) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof UrlItem)) return false;
+		final UrlItem that = (UrlItem) obj;
+		return Objects.equals(this.url, that.url);
 	}
 
 // - - - - - - - -

@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.player;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +22,7 @@ import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.MediaList;
+import com.vaguehope.morrigan.model.media.UrlItem;
 import com.vaguehope.morrigan.transcode.Transcode;
 
 public class PlayerStateStorageTest {
@@ -86,10 +87,11 @@ public class PlayerStateStorageTest {
 		this.queue.addToQueue(PlayItem.makeAction(PlayItemType.STOP));
 		this.queue.addToQueue(this.playItem1);
 		this.queue.addToQueue(PlayItem.makeUnresolved(this.listRef1, "un path", "un id", BigInteger.ZERO, "un title"));
+		this.queue.addToQueue(PlayItem.makeReady(null, new UrlItem("https://example.com/path")));
 	}
 
 	@Test
-	public void itDoesEmptyList() throws Exception {
+	public void itDoesSimplePlayerAndQueue() throws Exception {
 		this.undertest.writeState(this.player);
 
 		final File f = new File(this.tmp.getRoot(), "playerstate/playerid");
@@ -101,7 +103,8 @@ public class PlayerStateStorageTest {
 				+ "\"queue\":["
 				+ "{\"listRef\":\"STOP\"},"
 				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"remoteId\":\"some-remote-id\",\"md5\":\"abcdef123456789\",\"title\":\"item1\"},"
-				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"filepath\":\"un path\",\"remoteId\":\"un id\",\"md5\":\"0\",\"title\":\"Unresolved: un title\"}"
+				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"filepath\":\"un path\",\"remoteId\":\"un id\",\"md5\":\"0\",\"title\":\"Unresolved: un title\"},"
+				+ "{\"remoteLocation\":\"https://example.com/path\",\"md5\":\"0\",\"title\":\"https://example.com/path\"}"
 				+ "]}",
 				FileUtils.readFileToString(f, StandardCharsets.UTF_8));
 
@@ -121,7 +124,9 @@ public class PlayerStateStorageTest {
 		q1.setId(1);
 		final PlayItem q2 = PlayItem.makeUnresolved(this.listRef1, "un path", "un id", BigInteger.ZERO, "Unresolved: un title");
 		q2.setId(2);
-		assertThat(newPlayer.getQueue().getQueueList(), contains(q0, q1, q2));
+		final PlayItem q3 = PlayItem.makeReady(null, new UrlItem("https://example.com/path"));
+		q3.setId(3);
+		assertThat(newPlayer.getQueue().getQueueList(), contains(q0, q1, q2, q3));
 	}
 
 }
