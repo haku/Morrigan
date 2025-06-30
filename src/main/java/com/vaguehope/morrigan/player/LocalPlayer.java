@@ -96,7 +96,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 	int _currentTrackDuration = -1; // In seconds.
 
 	@Override
-	protected void loadAndPlay (final PlayItem item, final long playFromPositionMillis) throws MorriganException {
+	protected void loadAndPlay (final PlayItem item, final long playFromPositionMillis, final boolean startPaused) throws MorriganException {
 		final String mediaLocation;
 		if (item.hasAltFile()) {
 			mediaLocation = item.getAltFile().getAbsolutePath();
@@ -123,15 +123,15 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 			engine.setFile(mediaLocation);
 			engine.loadTrack();
-			engine.startPlaying();
 			if (playFromPositionMillis > 0L) engine.setPositionMillis(playFromPositionMillis);
+			if (!startPaused) engine.startPlaying();
 
 			this._currentTrackDuration = engine.getDuration();
 			LOG.debug("Started to play: {}", item.getItem().getTitle());
 
 			this.playbackStartTime.set(System.currentTimeMillis());
 			this.schEx.submit(() -> getListeners().currentItemChanged(item));
-			this.playbackRecorder.recordStarted(item);
+			if (playFromPositionMillis <= 0L) this.playbackRecorder.recordStarted(item);
 			this.schEx.submit(() -> saveState());
 		} // END synchronized.
 	}
@@ -211,7 +211,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			}
 			else if (playbackState == PlayState.STOPPED) {
 				final PlayItem ci = getCurrentItem();
-				if (ci != null) loadAndStartPlaying(ci, 0L);
+				if (ci != null) loadAndStartPlaying(ci, 0L, false);
 			}
 			else {
 				getListeners().onException(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
@@ -239,6 +239,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		}
 	}
 
+	@Deprecated
 	protected void internal_seekTo (final double d) throws MorriganException {
 		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
@@ -320,7 +321,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				try {
 					final PlayItem nextItemToPlay = findNextItemToPlay();
 					if (nextItemToPlay != null) {
-						loadAndStartPlaying(nextItemToPlay, 0L);
+						loadAndStartPlaying(nextItemToPlay, 0L, false);
 					}
 					else {
 						LOG.info("No more tracks to play.");

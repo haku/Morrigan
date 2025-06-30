@@ -33,7 +33,7 @@ public interface Player {
 	/**
 	 * May be async.
 	 */
-	void loadAndStartPlaying(final PlayItem item, final long playFromPositionMillis);
+	void loadAndStartPlaying(final PlayItem item, final long playFromPositionMillis, final boolean startPaused);
 
 	void pausePlaying();
 

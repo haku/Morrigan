@@ -263,7 +263,7 @@ public class HomeFace extends MenuFace {
 	}
 
 	protected void playPlayItem (final PlayItem playItem, final Player player) {
-		player.loadAndStartPlaying(playItem, 0L);
+		player.loadAndStartPlaying(playItem, 0L, false);
 		// TODO protect against long item names?
 		this.lastActionMessage.setLastActionMessage(String.format("Playing %s in %s.", playItem, player.getName()));
 	}

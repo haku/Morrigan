@@ -110,7 +110,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 			}
 			else if (playState == PlayState.STOPPED) {
 				final PlayItem ci = getCurrentItem();
-				if (ci != null) loadAndStartPlaying(ci, 0L);
+				if (ci != null) loadAndStartPlaying(ci, 0L, false);
 			}
 			else {
 				LOG.warn("Asked to pause when state is {}, do not know what to do.", playState);

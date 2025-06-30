@@ -47,12 +47,19 @@ public class PlayerStateStorage {
 	}
 
 	public void writeState(final Player player) {
+		final PlayState playState = player.getPlayState();
+		final long positionMillis = playState == PlayState.PLAYING || playState == PlayState.PAUSED || playState == PlayState.LOADING
+				? TimeUnit.SECONDS.toMillis(player.getCurrentPosition())
+				: 0L;
+		final boolean isPlaying = playState == PlayState.PLAYING || playState == PlayState.LOADING;
+
 		final List<QueueItem> queue = player.getQueue().getQueueList().stream().map(i -> toQueueItem(i)).collect(Collectors.toList());
+
 		final PlayerState playerState = new PlayerState(
 				player.getPlaybackOrder(),
 				player.getTranscode(),
-				TimeUnit.SECONDS.toMillis(player.getCurrentPosition()),
-				player.getPlayState() == PlayState.PLAYING,
+				positionMillis,
+				isPlaying,
 				player.getCurrentList() != null ? player.getCurrentList().getListRef().toUrlForm() : null,
 				toQueueItem(player.getCurrentItem()),
 				queue);
@@ -114,8 +121,8 @@ public class PlayerStateStorage {
 				}
 			}
 
-			if (state.isPlaying && player.getCurrentItem() != null) {
-				player.loadAndStartPlaying(player.getCurrentItem(), state.positionMillis);
+			if ((state.isPlaying || state.positionMillis > 0L) && player.getCurrentItem() != null) {
+				player.loadAndStartPlaying(player.getCurrentItem(), state.positionMillis, !state.isPlaying);
 			}
 
 			LOG.info("Restorted state for player {}.", player.getId());
