@@ -118,7 +118,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	protected void loadAndPlay (final PlayItem item) throws DlnaException, IOException {
+	protected void loadAndPlay (final PlayItem item, final long playFromPositionMillis) throws DlnaException, IOException {
 		final DlnaPlayingParams playingParams = this.dlnaPlayingParamsFactory.make(item);
 		dlnaPlay(item, playingParams);
 
@@ -143,7 +143,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 		state.addItemsToQueue(getQueue());
 
 		if (state.isPlaying() && state.getCurrentItem() != null) {
-			loadAndStartPlaying(state.getCurrentItem());
+			loadAndStartPlaying(state.getCurrentItem(), 0L);
 		}
 
 		markStateRestoreAttempted();

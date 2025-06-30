@@ -361,7 +361,7 @@ public class MlistsServlet extends HttpServlet {
 				resp.setContentType("text/plain");
 				mmdb.read();
 				if (action.equals(CMD_PLAY)) {
-					player.loadAndStartPlaying(mmdb, item);
+					player.loadAndStartPlaying(mmdb, item, 0L);
 					resp.getWriter().println("Item playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {

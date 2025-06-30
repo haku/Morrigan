@@ -122,6 +122,20 @@ class PlaybackEngine implements IPlaybackEngine {
 	}
 
 	@Override
+	public void setPositionMillis(final long millis) {
+		this.playLock.lock();
+		try {
+			AudioPlayerComponent player = this.playerRef.get();
+			if (player != null) {
+				player.mediaPlayer().controls().setTime(millis);
+			}
+		}
+		finally {
+			this.playLock.unlock();
+		}
+	}
+
+	@Override
 	public void setStatusListener(IPlaybackStatusListener listener) {
 		this.m_listener = listener;
 	}

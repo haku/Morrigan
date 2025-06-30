@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.dlna.players;
 
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jupnp.controlpoint.ControlPoint;
@@ -109,7 +110,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 			}
 			else if (playState == PlayState.STOPPED) {
 				final PlayItem ci = getCurrentItem();
-				if (ci != null) loadAndStartPlaying(ci);
+				if (ci != null) loadAndStartPlaying(ci, 0L);
 			}
 			else {
 				LOG.warn("Asked to pause when state is {}, do not know what to do.", playState);
@@ -150,6 +151,18 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		checkAlive();
 		try {
 			this.avTransport.seek((long) (getCurrentTrackDuration() * d));
+			getListeners().afterSeek();
+		}
+		catch (final DlnaException e) {
+			getListeners().onException(e);
+		}
+	}
+
+	@Override
+	public void setPositionMillis(long millis) {
+		checkAlive();
+		try {
+			this.avTransport.seek(TimeUnit.MILLISECONDS.toSeconds(millis));
 			getListeners().afterSeek();
 		}
 		catch (final DlnaException e) {

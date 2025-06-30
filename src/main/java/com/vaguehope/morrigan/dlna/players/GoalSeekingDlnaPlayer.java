@@ -521,7 +521,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		}
 		else if (playState == PlayState.STOPPED) {
 			final PlayItem ci = getCurrentItem();
-			if (ci != null) loadAndStartPlaying(ci);
+			if (ci != null) loadAndStartPlaying(ci, 0L);
 		}
 		else {
 			LOG.warn("Asked to pause when state is {}, do not know what to do.", playState);
@@ -540,6 +540,11 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			final long seekToSeconds = (long) (durationSeconds * seekToProportion);
 			this.eventQueue.add(Long.valueOf(seekToSeconds));
 		}
+	}
+
+	@Override
+	public void setPositionMillis(final long millis) {
+		this.eventQueue.add(TimeUnit.MILLISECONDS.toSeconds(millis));
 	}
 
 	// Visible for testing.

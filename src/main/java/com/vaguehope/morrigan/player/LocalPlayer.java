@@ -96,7 +96,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 	int _currentTrackDuration = -1; // In seconds.
 
 	@Override
-	protected void loadAndPlay (final PlayItem item) throws MorriganException {
+	protected void loadAndPlay (final PlayItem item, final long playFromPositionMillis) throws MorriganException {
 		final String mediaLocation;
 		if (item.hasAltFile()) {
 			mediaLocation = item.getAltFile().getAbsolutePath();
@@ -124,6 +124,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			engine.setFile(mediaLocation);
 			engine.loadTrack();
 			engine.startPlaying();
+			if (playFromPositionMillis > 0L) engine.setPositionMillis(playFromPositionMillis);
 
 			this._currentTrackDuration = engine.getDuration();
 			LOG.debug("Started to play: {}", item.getItem().getTitle());
@@ -187,6 +188,17 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		}
 	}
 
+	@Override
+	public void setPositionMillis(final long millis) {
+		final IPlaybackEngine eng = getPlaybackEngine(false);
+		if (eng == null) return;
+
+		synchronized (eng) {
+			eng.setPositionMillis(millis);
+			getListeners().afterSeek();
+		}
+	}
+
 	private void internal_pausePlaying () throws MorriganException {
 		final IPlaybackEngine eng = getPlaybackEngine(true);
 		synchronized (eng) {
@@ -199,7 +211,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			}
 			else if (playbackState == PlayState.STOPPED) {
 				final PlayItem ci = getCurrentItem();
-				if (ci != null) loadAndStartPlaying(ci);
+				if (ci != null) loadAndStartPlaying(ci, 0L);
 			}
 			else {
 				getListeners().onException(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
@@ -308,7 +320,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				try {
 					final PlayItem nextItemToPlay = findNextItemToPlay();
 					if (nextItemToPlay != null) {
-						loadAndStartPlaying(nextItemToPlay);
+						loadAndStartPlaying(nextItemToPlay, 0L);
 					}
 					else {
 						LOG.info("No more tracks to play.");

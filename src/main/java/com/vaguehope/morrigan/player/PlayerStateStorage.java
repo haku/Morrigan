@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ListRef;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -50,7 +51,8 @@ public class PlayerStateStorage {
 		final PlayerState playerState = new PlayerState(
 				player.getPlaybackOrder(),
 				player.getTranscode(),
-				player.getCurrentPosition(),
+				TimeUnit.SECONDS.toMillis(player.getCurrentPosition()),
+				player.getPlayState() == PlayState.PLAYING,
 				player.getCurrentList() != null ? player.getCurrentList().getListRef().toUrlForm() : null,
 				toQueueItem(player.getCurrentItem()),
 				queue);
@@ -92,7 +94,6 @@ public class PlayerStateStorage {
 			final PlayerState state = this.gson.fromJson(json, PlayerState.class);
 			if (state.playbackOrder != null) player.setPlaybackOrder(state.playbackOrder);
 			if (state.transcode != null) player.setTranscode(state.transcode);
-			if (state.position > 0) LOG.info("TODO restore position: " + state.position);
 
 			final Map<ListRef, MediaList> listCache = new HashMap<>();
 
@@ -111,6 +112,10 @@ public class PlayerStateStorage {
 					final PlayItem pi = fromQueueItem(qi, listCache);
 					if (pi != null) player.getQueue().addToQueue(pi);
 				}
+			}
+
+			if (state.isPlaying && player.getCurrentItem() != null) {
+				player.loadAndStartPlaying(player.getCurrentItem(), state.positionMillis);
 			}
 
 			LOG.info("Restorted state for player {}.", player.getId());

@@ -95,7 +95,7 @@ public class PlayerStateStorageTest {
 		this.undertest.writeState(this.player);
 
 		final File f = new File(this.tmp.getRoot(), "playerstate/playerid");
-		assertEquals("{\"playbackOrder\":\"BYLASTPLAYED\",\"transcode\":\"COMMON_AUDIO_ONLY\",\"position\":0,"
+		assertEquals("{\"playbackOrder\":\"BYLASTPLAYED\",\"transcode\":\"COMMON_AUDIO_ONLY\",\"positionMillis\":0,\"isPlaying\":false,"
 				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\\u0026s\\u003dt%3Dfoo+OR+t%3Dbar\","
 				+ "\"item\":{"
 				+ "\"listRef\":\"LOCAL:l\\u003dsome-db\\u0026s\\u003dt%3Dfoo+OR+t%3Dbar\",\"filepath\":\"some-filepath\",\"md5\":\"1234567890abcdef\",\"title\":\"item0\""

@@ -28,12 +28,12 @@ public interface Player {
 	/**
 	 * May be async.
 	 */
-	void loadAndStartPlaying(MediaList list, MediaItem track);
+	void loadAndStartPlaying(MediaList list, MediaItem track, final long playFromPositionMillis);
 
 	/**
 	 * May be async.
 	 */
-	void loadAndStartPlaying(final PlayItem item);
+	void loadAndStartPlaying(final PlayItem item, final long playFromPositionMillis);
 
 	void pausePlaying();
 
@@ -83,7 +83,10 @@ public interface Player {
 	 * Takes a percentage of duration.
 	 * @param d a double where 0 <= d <= 1.
 	 */
+	@Deprecated
 	void seekTo(double d);
+
+	void setPositionMillis(final long millis);
 
 	PlaybackOrder getPlaybackOrder();
 	PlaybackOrder getPlaybackOrderOverride();

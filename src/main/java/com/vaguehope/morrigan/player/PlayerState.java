@@ -9,7 +9,8 @@ public class PlayerState {
 
 	final PlaybackOrder playbackOrder;
 	final Transcode transcode;
-	final long position;
+	final long positionMillis;
+	final boolean isPlaying;
 	final String listRef;
 	final QueueItem item;
 	final List<QueueItem> queue;
@@ -17,13 +18,15 @@ public class PlayerState {
 	public PlayerState(
 			final PlaybackOrder playbackOrder,
 			final Transcode transcode,
-			final long position,
+			final long positionMillis,
+			final boolean isPlaying,
 			final String listRef,
 			final QueueItem item,
 			final List<QueueItem> queue) {
 		this.playbackOrder = playbackOrder;
 		this.transcode = transcode;
-		this.position = position;
+		this.positionMillis = positionMillis;
+		this.isPlaying = isPlaying;
 		this.listRef = listRef;
 		this.item = item;
 		this.queue = queue;
@@ -31,7 +34,7 @@ public class PlayerState {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.playbackOrder, this.transcode, this.position);
+		return Objects.hash(this.playbackOrder, this.transcode, this.positionMillis, this.isPlaying, this.listRef, this.item, this.queue);
 	}
 
 	@Override
@@ -43,7 +46,11 @@ public class PlayerState {
 
 		return Objects.equals(this.playbackOrder, that.playbackOrder)
 				&& Objects.equals(this.transcode, that.transcode)
-				&& Objects.equals(this.position, that.position);
+				&& Objects.equals(this.positionMillis, that.positionMillis)
+				&& Objects.equals(this.isPlaying, that.isPlaying)
+				&& Objects.equals(this.listRef, that.listRef)
+				&& Objects.equals(this.item, that.item)
+				&& Objects.equals(this.queue, that.queue);
 	}
 
 	public static class QueueItem {

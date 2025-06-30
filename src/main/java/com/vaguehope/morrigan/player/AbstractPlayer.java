@@ -284,16 +284,16 @@ public abstract class AbstractPlayer implements Player {
 
 	@Override
 	public final void loadAndStartPlaying (final MediaList list) {
-		loadAndStartPlaying(list, null);
+		loadAndStartPlaying(list, null, 0);
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final MediaList list, final MediaItem track) {
-		loadAndStartPlaying(PlayItem.makeReady(list, track));
+	public final void loadAndStartPlaying (final MediaList list, final MediaItem track, final long playFromPositionMillis) {
+		loadAndStartPlaying(PlayItem.makeReady(list, track), playFromPositionMillis);
 	}
 
 	@Override
-	public final void loadAndStartPlaying (final PlayItem item) {
+	public final void loadAndStartPlaying (final PlayItem item, final long playFromPositionMillis) {
 		checkAlive();
 		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
 
@@ -319,7 +319,7 @@ public abstract class AbstractPlayer implements Player {
 			pi = pi.withItem(track);
 		}
 
-		loadAndStartPlayingTrack(pi);
+		loadAndStartPlayingTrack(pi, playFromPositionMillis);
 	}
 
 	@Override
@@ -335,7 +335,7 @@ public abstract class AbstractPlayer implements Player {
 		getListeners().playStateChanged(getPlayState());
 	}
 
-	private final Future<?> loadAndStartPlayingTrack (final PlayItem argItem) {
+	private final Future<?> loadAndStartPlayingTrack (final PlayItem argItem, final long playFromPositionMillis) {
 		if (argItem == null) throw new IllegalArgumentException("PlayItem can not be null.");
 		if (!argItem.hasItem()) throw new IllegalArgumentException("Item must have a track.");
 
@@ -366,7 +366,7 @@ public abstract class AbstractPlayer implements Player {
 						maybeUpdatedItem = item.withAltFile(altFile);
 					}
 
-					loadAndPlay(maybeUpdatedItem);
+					loadAndPlay(maybeUpdatedItem, playFromPositionMillis);
 				}
 				catch (final Exception e) { // NOSONAR reporting exceptions.
 					rollbackToTopOfQueue(argItem);
@@ -390,7 +390,7 @@ public abstract class AbstractPlayer implements Player {
 		try {
 			final PlayItem nextItemToPlay = findNextItemToPlay();
 			if (nextItemToPlay != null) {
-				loadAndStartPlaying(nextItemToPlay);
+				loadAndStartPlaying(nextItemToPlay, 0L);
 			}
 			else {
 				stopPlaying();
@@ -422,7 +422,7 @@ public abstract class AbstractPlayer implements Player {
 	 * Already synchronised.
 	 * PlayItem has been validated.
 	 */
-	protected abstract void loadAndPlay (PlayItem item) throws Exception;
+	protected abstract void loadAndPlay (final PlayItem item, final long playFromPositionMillis) throws Exception;
 
 	protected PlayItem findNextItemToPlay () throws MorriganException {
 		final PlayItem queueItem = this.queue.takeFromQueue();

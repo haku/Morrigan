@@ -110,7 +110,10 @@ public interface IPlaybackEngine {
 	 * @param d a double where 0 <= d <= 1.
 	 * @throws PlaybackException
 	 */
+	@Deprecated
 	void seekTo (double d) throws PlaybackException;
+
+	void setPositionMillis(final long millis);
 
 	/**
 	 * The methods in this class will be called when their event occures.
