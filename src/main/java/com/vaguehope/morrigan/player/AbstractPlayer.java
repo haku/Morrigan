@@ -202,7 +202,7 @@ public abstract class AbstractPlayer implements Player {
 		if (list != null) return list;
 
 		final PlayItem item = getCurrentItem();
-		list = item == null ? null : item.getList();
+		list = item == null || !item.isReady() ? null : item.getList();
 		if (list != null) this.currentList.compareAndExchange(null, list);
 
 		return this.currentList.get();
