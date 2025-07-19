@@ -34,6 +34,7 @@ public class PlaybackRecorder {
 		this.schEx.schedule(() -> {
 			try {
 				playItem.getList().incTrackEndCnt(playItem.getItem(), completed, startTime);
+				LOG.info("recordCompleted: {} completed={} startTime={}", playItem, completed, startTime);
 			}
 			catch (MorriganException e) {
 				LOG.info("Failed to record track completed: " + ErrorHelper.getCauseTrace(e));

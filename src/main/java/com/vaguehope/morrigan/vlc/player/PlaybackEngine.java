@@ -8,17 +8,27 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.media.InfoApi;
+import uk.co.caprica.vlcj.media.Media;
+import uk.co.caprica.vlcj.media.MediaEventAdapter;
+import uk.co.caprica.vlcj.media.MediaEventListener;
+import uk.co.caprica.vlcj.media.Meta;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.component.AudioPlayerComponent;
 
 class PlaybackEngine implements IPlaybackEngine {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PlaybackEngine.class);
 
 	private final AtomicBoolean atEos = new AtomicBoolean();
 	private final AtomicBoolean stopPlaying = new AtomicBoolean();
@@ -188,7 +198,8 @@ class PlaybackEngine implements IPlaybackEngine {
 				player = new AudioPlayerComponent(this.vlcFactory);
 				if (this.prepPlayer != null) this.prepPlayer.accept(player.mediaPlayer());
 				this.playerRef.set(player);
-				player.mediaPlayer().events().addMediaPlayerEventListener(this.mediaEventListener);
+				player.mediaPlayer().events().addMediaPlayerEventListener(this.mediaPlayerEventListener);
+				player.mediaPlayer().events().addMediaEventListener(this.mediaEventListener);
 			}
 			else {
 				player.mediaPlayer().controls().stop();
@@ -210,10 +221,13 @@ class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Event handlers.
 
-	private final MediaPlayerEventListener mediaEventListener = new MediaPlayerEventAdapter () {
+	private final MediaPlayerEventListener mediaPlayerEventListener = new MediaPlayerEventAdapter () {
 
 		@Override
 		public void finished(MediaPlayer mediaPlayer) {
+			final InfoApi info = mediaPlayer.media().info();
+			LOG.info("VLC finished: {}", info != null ? info.mrl() : null);
+
 			if (mediaPlayer == PlaybackEngine.this.playerRef.get().mediaPlayer()) {
 				PlaybackEngine.this.executor.execute(() -> handleEosEvent());
 			}
@@ -249,6 +263,14 @@ class PlaybackEngine implements IPlaybackEngine {
 
 	};
 
+	private final MediaEventListener mediaEventListener = new MediaEventAdapter() {
+		@Override
+		public void mediaMetaChanged(final Media media, final Meta metaType) {
+			final String newVal = media.meta().get(metaType);
+			if (newVal != null) LOG.info("metaChanged {}:", metaType , newVal);
+		}
+	};
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Control methods.
 
@@ -275,7 +297,6 @@ class PlaybackEngine implements IPlaybackEngine {
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player != null) {
 				player.mediaPlayer().controls().setPause(true);
-				setStateAndCallListener(PlayState.PAUSED, false);
 			}
 		}
 		finally {
@@ -292,7 +313,6 @@ class PlaybackEngine implements IPlaybackEngine {
 				 * May change it if it causes issues.
 				 */
 				player.mediaPlayer().controls().play();
-				setStateAndCallListener(PlayState.PLAYING, false);
 			}
 		}
 		finally {
@@ -307,7 +327,6 @@ class PlaybackEngine implements IPlaybackEngine {
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player != null) {
 				player.mediaPlayer().controls().stop();
-				setStateAndCallListener(PlayState.STOPPED, false);
 			}
 		}
 		finally {
