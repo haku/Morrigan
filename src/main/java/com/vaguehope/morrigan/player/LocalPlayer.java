@@ -311,12 +311,10 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 		@Override
 		public void statusChanged(final PlayState state, final boolean isEndOfTrack) {
-			if (state == PlayState.STOPPED) {
-				recordPlaybackOver(getCurrentItem(), isEndOfTrack);
-			}
-
 			if (isEndOfTrack) {
 				LOG.debug("Player received endOfTrack event.");
+				recordPlaybackOver(getCurrentItem(), isEndOfTrack);
+
 				// Play next track?
 				try {
 					final PlayItem nextItemToPlay = findNextItemToPlay();
