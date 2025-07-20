@@ -299,6 +299,7 @@ class PlaybackEngine implements IPlaybackEngine {
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player != null) {
 				player.mediaPlayer().controls().setPause(true);
+				this.m_playbackState = PlayState.PAUSED;
 			}
 		}
 		finally {
@@ -315,6 +316,7 @@ class PlaybackEngine implements IPlaybackEngine {
 				 * May change it if it causes issues.
 				 */
 				player.mediaPlayer().controls().play();
+				this.m_playbackState = PlayState.PLAYING;
 			}
 		}
 		finally {
