@@ -282,8 +282,10 @@ class PlaybackEngine implements IPlaybackEngine {
 
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player != null) {
-				player.mediaPlayer().controls().play(); // This is an async call.
-//				setStateAndCallListener(PlayState.Playing); // Do think this is needed as there will be a call back.
+				// start() will block until playback actually starts.
+				if (!player.mediaPlayer().controls().start()) {
+					if (this.m_listener != null) this.m_listener.onError(new PlaybackException("VLC failed to start playback."));
+				}
 			}
 		}
 		finally {
