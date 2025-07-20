@@ -330,9 +330,9 @@ public abstract class AbstractPlayer implements Player {
 
 	public abstract PlayState getEnginePlayState ();
 
-	private void markLoadingState (final boolean isLoading) {
+	private void markLoadingState (final boolean isLoading, final PlayItem newItem) {
 		this.loadingTrack = isLoading;
-		getListeners().playStateChanged(getPlayState());
+		if (newItem != null) getListeners().playStateChanged(getPlayState(), newItem);
 	}
 
 	private final Future<?> loadAndStartPlayingTrack (final PlayItem argItem, final long playFromPositionMillis, final boolean startPaused) {
@@ -342,7 +342,7 @@ public abstract class AbstractPlayer implements Player {
 		return this.schEx.submit(new Runnable() {
 			@Override
 			public void run () {
-				markLoadingState(true);
+				markLoadingState(true, argItem);
 				try {
 					final PlayItem item = argItem.makeReady(AbstractPlayer.this.mediaFactory);
 					if (item == null) throw new MorriganException("Failed to resolve item: " + argItem);
@@ -373,7 +373,7 @@ public abstract class AbstractPlayer implements Player {
 					AbstractPlayer.this.listeners.onException(e);
 				}
 				finally {
-					markLoadingState(false);
+					markLoadingState(false, null);
 				}
 			}
 		});
