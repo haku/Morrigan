@@ -58,7 +58,7 @@ public class PlayerControlBridgeAVTransportService extends AbstractAVTransportSe
 			updateCurrentItemDetails(newItem);
 		}
 		@Override
-		public void playStateChanged(final PlayState newPlayState) {
+		public void playStateChanged(final PlayState newPlayState, final PlayItem newItem) {
 			notifySubscribers();
 		}
 		@Override

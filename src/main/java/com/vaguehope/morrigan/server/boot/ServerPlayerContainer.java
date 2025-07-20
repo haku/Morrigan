@@ -39,10 +39,6 @@ public class ServerPlayerContainer implements PlayerContainer {
 		this.player.addEventListener(this.serverPlayerEventHandler);
 	}
 
-	public Player getLocalPlayer () {
-		return this.player;
-	}
-
 	@Override
 	public Player getPlayer () {
 		return this.player;

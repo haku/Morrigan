@@ -126,7 +126,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		checkAlive();
 		try {
 			this.avTransport.stop();
-			getListeners().playStateChanged(PlayState.STOPPED);
+			getListeners().playStateChanged(PlayState.STOPPED, null);
 		}
 		catch (final DlnaException e) {
 			getListeners().onException(e);

@@ -121,7 +121,7 @@ public interface Player {
 		 * May be called with null to indicate no item or an unknown item.
 		 */
 		void currentItemChanged (PlayItem newItem);
-		void playStateChanged(PlayState newPlayState);
+		void playStateChanged(PlayState newPlayState, PlayItem newItem);
 		/**
 		 * Called when either position or duration change.
 		 * Both in seconds.

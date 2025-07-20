@@ -29,56 +29,56 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 	}
 
 	public Player getPlayer () {
-		return this.playerContainer.getLocalPlayer();
+		return this.playerContainer.getPlayer();
 	}
 
-	private void outputStatus (final PlayItem newItem) {
+	private void outputStatus (final PlayState playState, final PlayItem item) {
 		final Player player = this.playerContainer.getPlayer();
-		final PlayState currentState = (player == null ? null : player.getPlayState());
-		if (currentState != this.prevPlayState.get()) {
-			this.prevPlayState.set(currentState);
-			logger.log(Level.INFO, getPlayerStateDescription(player, newItem));
-		}
-	}
 
-	private static String getPlayerStateDescription (final Player p, final PlayItem newItem) {
-		if (p != null) {
-			final PlayState currentState = p.getPlayState();
-			if (currentState != null) {
-				final PlayItem playItem = newItem != null ? newItem : p.getCurrentItem();
-				if (playItem != null) return currentState + " " + playItem.getTitle() + ".";
-				return currentState + ".";
+		PlayState ps = playState;
+		if (ps == null && player != null) ps = player.getPlayState();
+
+		PlayItem i = item;
+		if (i == null && player != null) i = player.getCurrentItem();
+
+		if (ps != this.prevPlayState.get()) {
+			this.prevPlayState.set(ps);
+
+			String msg = "";
+			if (ps != null) msg += ps;
+			if (i != null) {
+				msg += " " + i.getTitle();
 			}
-			return "Unknown.";
+
+			logger.log(Level.INFO, msg);
 		}
-		return "Player unset.";
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
-		outputStatus(null);
+		// unused.
 	}
 
 	@Override
 	public void transcodeChanged (final Transcode newTranscode) {
-		outputStatus(null);
+		// unused.
 	}
 
 	@Override
 	public void currentItemChanged (final PlayItem newItem) {
-		outputStatus(newItem);
+		outputStatus(null, newItem);
 	}
 
 	@Override
-	public void playStateChanged (final PlayState newPlayState) {
-		outputStatus(null);
+	public void playStateChanged (final PlayState newPlayState, final PlayItem newItem) {
+		outputStatus(newPlayState, newItem);
 	}
 
 	@Override
 	public void positionChanged (final long newPosition, final int duration) {
-		outputStatus(null);
+		// unused.
 	}
 
 	@Override

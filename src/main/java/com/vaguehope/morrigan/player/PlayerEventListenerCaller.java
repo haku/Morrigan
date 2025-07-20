@@ -42,10 +42,10 @@ public class PlayerEventListenerCaller implements PlayerEventListener {
 	}
 
 	@Override
-	public void playStateChanged(final PlayState newPlayState) {
+	public void playStateChanged(final PlayState newPlayState, final PlayItem newItem) {
 		for (final PlayerEventListener l : this.watchers) {
 			try {
-				l.playStateChanged(newPlayState);
+				l.playStateChanged(newPlayState, newItem);
 			}
 			catch (final Exception e) {
 				logException(e);

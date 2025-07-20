@@ -134,12 +134,12 @@ final class WatcherTask implements Runnable {
 			this.listener.currentItemChanged(null); // TODO parse currentURIMetadata and create mock item with track title?
 			cancel();
 			LOG.info("Watcher cancelled; renderer's currentUri changed to: {}.", remoteUri);
-			this.listener.playStateChanged(PlayState.STOPPED);
+			this.listener.playStateChanged(PlayState.STOPPED, null);
 			return;
 		}
 
 		final TransportInfo ti = this.avTransport.getTransportInfo();
-		this.listener.playStateChanged(AbstractDlnaPlayer.transportIntoToPlayState(ti));
+		this.listener.playStateChanged(AbstractDlnaPlayer.transportIntoToPlayState(ti), null);
 		if (ti == null) {
 			cancel();
 			LOG.info("Watcher cancelled; renderer returned null transport info.");

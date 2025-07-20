@@ -475,7 +475,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 	private void setStateToReportExternally (final PlayState state) {
 		this.stateToReportExternally = state;
-		getListeners().playStateChanged(this.stateToReportExternally);
+		getListeners().playStateChanged(this.stateToReportExternally, null);
 	}
 
 	@Override

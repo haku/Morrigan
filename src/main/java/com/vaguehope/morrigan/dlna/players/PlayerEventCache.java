@@ -27,7 +27,7 @@ public class PlayerEventCache implements PlayerEventListener {
 	public void currentItemChanged(final PlayItem newItem) {}
 
 	@Override
-	public void playStateChanged(final PlayState newPlayState) {
+	public void playStateChanged(final PlayState newPlayState, final PlayItem newItem) {
 		this.playState = newPlayState;
 	}
 

@@ -217,7 +217,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				getListeners().onException(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
 			}
 		} // END synchronized.
-		this.getListeners().playStateChanged(getPlayState());
+		this.getListeners().playStateChanged(getPlayState(), null);
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				eng.stopPlaying();
 				eng.unloadFile();
 			}
-			getListeners().playStateChanged(PlayState.STOPPED);
+			getListeners().playStateChanged(PlayState.STOPPED, null);
 		}
 	}
 
