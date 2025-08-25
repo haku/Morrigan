@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class QuerySplitter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(QuerySplitter.class);
 
 	public static List<String> split(final String input, final int maxParts) {
 		if (input == null) return Collections.emptyList();
@@ -75,7 +80,10 @@ public class QuerySplitter {
 				part.setLength(0);
 			}
 
-			if (ret.size() >= maxParts) return ret;
+			if (ret.size() >= maxParts) {
+				LOG.info("Query exceeded {} part limit: {}", maxParts, input);
+				return ret;
+			}
 
 			if (appendC) part.append(c);
 
