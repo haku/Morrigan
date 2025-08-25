@@ -3,9 +3,12 @@ package com.vaguehope.morrigan.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 public class QuerySplitter {
 
@@ -80,7 +83,7 @@ public class QuerySplitter {
 				part.setLength(0);
 			}
 
-			if (ret.size() >= maxParts) {
+			if (countPartsIgnoringOperators(ret) >= maxParts) {
 				LOG.info("Query exceeded {} part limit: {}", maxParts, input);
 				return ret;
 			}
@@ -101,6 +104,13 @@ public class QuerySplitter {
 	private static int safeCharAt(final String input, final int i, final char def) {
 		if (i >= input.length()) return def;
 		return input.charAt(i);
+	}
+
+	private static final Set<String> OPERATORS = ImmutableSet.of("AND", "OR", "(", ")");
+
+	private static int countPartsIgnoringOperators(final List<String> parts) {
+		final long operators = parts.stream().filter((p) -> OPERATORS.contains(p)).count();
+		return parts.size() - (int) operators;
 	}
 
 }
