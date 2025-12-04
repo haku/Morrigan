@@ -30,6 +30,13 @@ public enum PlaybackOrder {
 		}
 	},
 
+	BYSTARTCOUNT_EXP() {
+		@Override
+		public String toString () {
+			return "by start-count²";
+		}
+	},
+
 	BYLASTPLAYED() {
 		@Override
 		public String toString () {

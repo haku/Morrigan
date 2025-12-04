@@ -42,7 +42,10 @@ public class OrderResolver {
 				return getNextTrackRandom(list, track);
 
 			case BYSTARTCOUNT:
-				return getNextTrackByStartCount(list, track);
+				return getNextTrackByStartCount(list, track, 1.0d);
+
+			case BYSTARTCOUNT_EXP:
+				return getNextTrackByStartCount(list, track, 1.2d);
 
 			case BYLASTPLAYED:
 				return getNextTrackByLastPlayedDate(list, track);
@@ -122,7 +125,7 @@ public class OrderResolver {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 
-	private static MediaItem getNextTrackByStartCount (final MediaList list, final MediaItem current) {
+	private static MediaItem getNextTrackByStartCount (final MediaList list, final MediaItem current, double weightPower) {
 		MediaItem ret = null;
 		final List<MediaItem> tracks = list.getMediaItems();
 
@@ -138,11 +141,11 @@ public class OrderResolver {
 		}
 		maxPlayCount = maxPlayCount + 1;
 
-		// Find sum of all selection indicies.
+		// Find sum of all selection indices.
 		long selIndexSum = 0;
 		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
-				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
+				selIndexSum += trackCountWeight(i.getStartCount(), maxPlayCount, weightPower);
 			}
 		}
 
@@ -153,7 +156,7 @@ public class OrderResolver {
 		// Find the target item.
 		for (final MediaItem i : tracks) {
 			if (validChoice(i, current)) {
-				targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
+				targetIndex = targetIndex - trackCountWeight(i.getStartCount(), maxPlayCount, weightPower);
 				if (targetIndex <= 0) {
 					ret = i;
 					break;
@@ -166,6 +169,10 @@ public class OrderResolver {
 		}
 
 		return ret;
+	}
+
+	private static long trackCountWeight(long count, long maxCount, double power) {
+		return (long) Math.pow(maxCount - count, power);
 	}
 
 	private static MediaItem getNextTrackByLastPlayedDate (final MediaList list, final MediaItem current) {

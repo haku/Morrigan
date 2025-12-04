@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.player;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.Random;
@@ -10,6 +11,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaItem;
 import com.vaguehope.morrigan.model.media.test.TestMediaDb;
@@ -35,6 +38,25 @@ public class OrderResolverTest {
 
 		assertEquals(t3, this.undertest.getNextTrack(this.testDb, t2, PlaybackOrder.SEQUENTIAL));
 		assertEquals(t1, this.undertest.getNextTrack(this.testDb, t3, PlaybackOrder.SEQUENTIAL));
+	}
+
+	// its possible this test will be unreliable, if so @Ignore.
+	@Test
+	public void itDoesStartCountExp() throws Exception {
+		MediaItem a = addWithStartCount(1);
+		MediaItem b = addWithStartCount(50);
+		addWithStartCount(100);
+
+		Multiset<MediaItem> counts = HashMultiset.create(3);
+		for (int i = 0; i < 1000; i++) {
+			final MediaItem actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.BYSTARTCOUNT_EXP);
+			counts.add(actual);
+		}
+
+		int aCount = counts.count(a);
+		int bCount = counts.count(b);
+
+		assertTrue(aCount > bCount);
 	}
 
 	@Test
@@ -155,6 +177,12 @@ public class OrderResolverTest {
 			track = or.getNextTrack(this.testDb, track, PlaybackOrder.FOLLOWTAGS);
 			setTimeAgoLastPlayed(track, 5, TimeUnit.SECONDS);
 		}
+	}
+
+	private MediaItem addWithStartCount(final int startCount) throws MorriganException {
+		final MediaItem item = this.testDb.addTestTrack();
+		this.testDb.incTrackStartCnt(item, startCount);
+		return item;
 	}
 
 	private void setTimeAgoLastPlayed (final MediaItem toRecentlyPlayed, final int time, final TimeUnit unit) throws MorriganException {

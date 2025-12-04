@@ -454,8 +454,11 @@ public abstract class AbstractPlayer implements Player {
 		final PlaybackOrder orderToUse = list.getSupportedChooseMethods().contains(order) ? order : list.getDefaultChooseMethod();
 		this.playbackOrderOverride = orderToUse != order ? orderToUse : null;
 
+		final long start = System.nanoTime();
 		final MediaItem ret = list.chooseItem(orderToUse, item);
-		LOG.info("list {} choose using {}: {}", list, orderToUse, ret);
+		final long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+		LOG.info("list {} choose using {} ({}ms): {}", list, orderToUse, duration, ret);
+
 		return ret;
 	}
 
