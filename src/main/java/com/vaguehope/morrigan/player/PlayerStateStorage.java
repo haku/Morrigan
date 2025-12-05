@@ -125,7 +125,7 @@ public class PlayerStateStorage {
 				player.loadAndStartPlaying(player.getCurrentItem(), state.positionMillis, !state.isPlaying);
 			}
 
-			LOG.info("Restorted state for player {}.", player.getId());
+			LOG.info("Restorted state for player {}: {}", player.getId(), state);
 		}
 		catch (final Exception e) {
 			LOG.warn("Failed to read state for player: {}", player.getId(), e);

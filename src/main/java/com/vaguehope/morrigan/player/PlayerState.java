@@ -33,6 +33,12 @@ public class PlayerState {
 	}
 
 	@Override
+	public String toString() {
+		return String.format("PlayerState{isPlaying=%s, position=%sms, %s, %s, %s, %s, %s}",
+				this.isPlaying, this.positionMillis, this.playbackOrder, this.transcode, this.listRef, this.item, this.queue);
+	}
+
+	@Override
 	public int hashCode() {
 		return Objects.hash(this.playbackOrder, this.transcode, this.positionMillis, this.isPlaying, this.listRef, this.item, this.queue);
 	}
@@ -68,6 +74,11 @@ public class PlayerState {
 			this.remoteLocation = remoteLocation;
 			this.md5 = md5;
 			this.title = title;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("QueueItem{%s, %s, %s, %s, %s, %s}", this.title, this.filepath, this.listRef, this.remoteId, this.remoteLocation, this.md5);
 		}
 
 		@Override
