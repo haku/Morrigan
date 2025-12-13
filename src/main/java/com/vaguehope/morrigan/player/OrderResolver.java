@@ -45,7 +45,7 @@ public class OrderResolver {
 				return getNextTrackByStartCount(list, track, 1.0d);
 
 			case BYSTARTCOUNT_EXP:
-				return getNextTrackByStartCount(list, track, 1.2d);
+				return getNextTrackByStartCount(list, track, 1.3d);
 
 			case BYLASTPLAYED:
 				return getNextTrackByLastPlayedDate(list, track);
