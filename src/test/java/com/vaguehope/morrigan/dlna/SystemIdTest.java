@@ -31,7 +31,7 @@ public class SystemIdTest {
 		final SystemId undertest0 = new SystemId(f, () -> highSeed);
 		final String actual0 = undertest0.getUsi("Service").getIdentifierString();
 
-		highSeed[0] += 1;
+		highSeed[0] += (byte) 1;
 		final SystemId undertest1 = new SystemId(f, () -> highSeed);
 		final String actual1 = undertest1.getUsi("Service").getIdentifierString();
 		assertEquals(actual0, actual1);
