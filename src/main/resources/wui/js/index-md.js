@@ -381,6 +381,7 @@
       if (val.indexOf(' ') >= 0) {
         if (val.indexOf('"') >= 0) {
           if (val.indexOf("'") >= 0) {
+            val = val.replace(/\\/g, "\\\\");
             val = val.replace(/'/g, "\\'");
           }
           quote = "'";
