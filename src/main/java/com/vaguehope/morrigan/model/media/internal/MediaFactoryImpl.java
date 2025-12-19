@@ -71,7 +71,7 @@ public class MediaFactoryImpl implements MediaFactory {
 			final MediaDb local = this.addedLocals.get(listRef);
 			if (local != null) return local;
 
-			final String localFile = LocalMediaDbHelper.getFullPathToLocalDb(this.config, listRef.getListId());
+			final String localFile = LocalMediaDbHelper.getFullPathToLocalDb(this.config, listRef.getListId(), true);
 			if (StringUtils.isBlank(listRef.getSearch())) return getLocalMixedMediaDb(localFile);
 			return LocalMediaDbFactory.getView(localFile, listRef.getSearch());
 

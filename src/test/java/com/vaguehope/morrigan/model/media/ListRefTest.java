@@ -45,6 +45,14 @@ public class ListRefTest {
 	}
 
 	@Test
+	public void itThrowsOnMalicious() throws Exception {
+		testInvalid("LOCAL:l=.");
+		testInvalid("LOCAL:l=..");
+		testInvalid("LOCAL:l=../foo");
+		testInvalid("LOCAL:l=../../some/other/path");
+	}
+
+	@Test
 	public void itSorts() throws Exception {
 		assertEquals(0, ListRef.forRpcNode("id", "0").compareTo(ListRef.forRpcNode("id", "0")));
 

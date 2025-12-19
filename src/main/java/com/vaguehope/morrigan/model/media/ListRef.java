@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,6 +13,12 @@ public class ListRef implements Comparable<ListRef> {
 
 	public static final String DLNA_ROOT_NODE_ID = "0"; // Root id of '0' is in the DLNA spec.
 	public static final String RPC_ROOT_NODE_ID = "0";
+
+	private static Pattern ID_PATTERN = Pattern.compile("^[a-zA-Z0-9-_]+$");
+
+	public static boolean isValidListId(final String listId) {
+		return ID_PATTERN.matcher(listId).matches();
+	}
 
 	public static ListRef fromUrlForm(final String urlFrom) {
 		if (urlFrom == null) return null;
@@ -41,6 +48,10 @@ public class ListRef implements Comparable<ListRef> {
 			default:
 				throw new IllegalArgumentException("Invalid:" + urlFrom);
 			}
+		}
+
+		if (type == ListType.LOCAL && !isValidListId(listId)) {
+			throw new IllegalArgumentException("Invalid listId for LOCAL list:" + urlFrom);
 		}
 
 		return new ListRef(type, listId, nodeId, search);

@@ -22,16 +22,25 @@ public final class LocalMediaDbHelper {
 		return StringUtils.removeEnd(FilenameUtils.getName(filepath), Config.MMDB_LOCAL_FILE_EXT);
 	}
 
-	public static String getFullPathToLocalDb (final Config config, final String fileName) {
-		String file = new File(config.getMmdbDir(), fileName).getAbsolutePath();
-		if (!file.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT)) {
-			file = file.concat(Config.MMDB_LOCAL_FILE_EXT);
+	public static String getFullPathToLocalDb (final Config config, final String fileName, boolean shouldAlreadyExist) throws MorriganException {
+		final String nameAndExt = fileName.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT)
+				? fileName
+				: fileName.concat(Config.MMDB_LOCAL_FILE_EXT);
+
+		final File file = new File(config.getMmdbDir(), nameAndExt);
+		if (shouldAlreadyExist && !file.exists()) {
+			throw new MorriganException("DB file not found: " + file.getAbsolutePath());
 		}
-		return file;
+
+		return file.getAbsolutePath();
 	}
 
 	public static MediaDb createLocalDb (final Config config, final String name) throws MorriganException {
-		final String file = getFullPathToLocalDb(config, name);
+		if (!ListRef.isValidListId(name)) {
+			// TODO more helpful error message.
+			throw new MorriganException("Not a valid DB name: " + name);
+		}
+		final String file = getFullPathToLocalDb(config, name, false);
 		return LocalMediaDbFactory.getMain(file);
 	}
 
