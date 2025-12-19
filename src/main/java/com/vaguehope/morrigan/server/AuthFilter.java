@@ -23,6 +23,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.http.HttpCookie;
+import org.eclipse.jetty.http.HttpCookie.SameSite;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.NetHelper;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -129,6 +132,8 @@ public class AuthFilter implements Filter {
 		final Cookie cookie = new Cookie(Auth.TOKEN_COOKIE_NAME, token);
 		cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(Auth.MAX_TOKEN_AGE_MILLIS));
 		cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		cookie.setComment(HttpCookie.getCommentWithAttributes("", false, SameSite.STRICT));
 		resp.addCookie(cookie);
 	}
 
