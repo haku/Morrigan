@@ -98,6 +98,11 @@ public class LibraryServlet extends HttpServlet {
 			return;
 		}
 
+		if (!this.libraries.contains(uri.toString())) {
+			ServletHelper.error(resp, 404, "Not found: " + uri);
+			return;
+		}
+
 		// TODO cache in RAM instead of always serving from disc.
 
 		final String contentType;
@@ -105,11 +110,6 @@ public class LibraryServlet extends HttpServlet {
 		final File cacheFile = cacheFile(schemelessUri);
 		final PropertiesFile props = new PropertiesFile(propFile);
 		if (!propFile.exists() || !cacheFile.exists()) {
-			if (!this.libraries.contains(uri.toString())) {
-				ServletHelper.error(resp, 404, "Not found: " + uri);
-				return;
-			}
-
 			try {
 				final File ftmp = File.createTempFile(cacheFile.getName(), ".tmpdl", cacheFile.getParentFile());
 				try {
