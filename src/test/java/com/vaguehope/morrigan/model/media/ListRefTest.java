@@ -46,9 +46,11 @@ public class ListRefTest {
 
 	@Test
 	public void itThrowsOnMalicious() throws Exception {
+		testInvalid("LOCAL:l=/foo");
 		testInvalid("LOCAL:l=.");
 		testInvalid("LOCAL:l=..");
 		testInvalid("LOCAL:l=../foo");
+		testInvalid("LOCAL:l=./../foo");
 		testInvalid("LOCAL:l=../../some/other/path");
 	}
 
