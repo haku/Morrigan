@@ -1,0 +1,45 @@
+package morrigan.player;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import morrigan.model.exceptions.MorriganException;
+import morrigan.util.ErrorHelper;
+
+public class PlaybackRecorder {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PlaybackRecorder.class);
+
+	private final ScheduledExecutorService schEx;
+
+	public PlaybackRecorder(final ScheduledExecutorService schEx) {
+		this.schEx = schEx;
+	}
+
+	public void recordStarted(final PlayItem playItem) {
+		this.schEx.schedule(() -> {
+			try {
+				playItem.getList().incTrackStartCnt(playItem.getItem());
+			}
+			catch (MorriganException e) {
+				LOG.info("Failed to record track started: " + ErrorHelper.getCauseTrace(e));
+			}
+		}, 5, TimeUnit.SECONDS);
+	}
+
+	public void recordCompleted(final PlayItem playItem, final boolean completed, final long startTime) {
+		this.schEx.schedule(() -> {
+			try {
+				playItem.getList().incTrackEndCnt(playItem.getItem(), completed, startTime);
+				LOG.info("recordCompleted: {} completed={} startTime={}", playItem, completed, startTime);
+			}
+			catch (MorriganException e) {
+				LOG.info("Failed to record track completed: " + ErrorHelper.getCauseTrace(e));
+			}
+		}, 5, TimeUnit.SECONDS);
+	}
+
+}

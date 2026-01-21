@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.vaguehope.morrigan</groupId>
+	<groupId>morrigan</groupId>
 	<artifactId>morrigan</artifactId>
 	<version>1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -55,7 +55,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.vaguehope.morrigan.Main</mainClass>
+							<mainClass>morrigan.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptors>
