@@ -62,7 +62,7 @@ public class AuthTest {
 				return true;
 			}
 		};
-		final AuthFilter authFilter = new AuthFilter(authChecker, Collections.emptySet(), this.config, this.schEs);
+		final AuthFilter authFilter = new AuthFilter(authChecker, Collections.emptySet(), false, this.config, this.schEs);
 		final FilterHolder authFilterHolder = new FilterHolder(authFilter);
 		this.server.getContextHandler().addFilter(authFilterHolder, "/*", null);
 	}

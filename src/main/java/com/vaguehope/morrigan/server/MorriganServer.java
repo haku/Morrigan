@@ -7,7 +7,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -30,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.common.rpc.RpcStatusServlet;
+import com.vaguehope.morrigan.Args;
+import com.vaguehope.morrigan.Args.ArgsException;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -53,22 +54,19 @@ public class MorriganServer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public MorriganServer (
-			final int httpPort,
-			final Collection<String> additionalCorsOrigins,
-			final File overrideWebRoot,
-			final Config config, final ServerConfig serverConfig,
+			final Args args, final Config config, final ServerConfig serverConfig,
 			final PlayerReader playerListener, final MediaFactory mediaFactory,
 			final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions,
 			final Transcoder transcoder,
 			final ScheduledExecutorService schEs) throws MorriganException {
 		try {
-			this.serverPort = httpPort;
+			this.serverPort = args.getHttpPort();
 
 			final QueuedThreadPool threadPool = new QueuedThreadPool();
 			threadPool.setName("jty");
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
-			this.context = makeContentHandler(additionalCorsOrigins, overrideWebRoot, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs);
+			this.context = makeContentHandler(args, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs);
 			this.server.setHandler(wrapWithRewrites(new HandlerList(this.context)));
 
 			final InetAddress bindAddress = serverConfig.getBindAddress("HTTP");
@@ -102,10 +100,19 @@ public class MorriganServer {
 		return rewrites;
 	}
 
-	private static ServletContextHandler makeContentHandler (final Collection<String> additionalCorsOrigins, final File overrideWebRoot, final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
-		final ServletContextHandler context = getWuiContext(overrideWebRoot);
+	private static ServletContextHandler makeContentHandler(
+			final Args args,
+			final Config config,
+			final ServerConfig serverConfig,
+			final PlayerReader playerListener,
+			final MediaFactory mediaFactory,
+			final AsyncTasksRegister asyncTasksRegister,
+			final AsyncActions asyncActions,
+			final Transcoder transcoder,
+			final ScheduledExecutorService schEs) throws IOException, ArgsException {
+		final ServletContextHandler context = getWuiContext(args.getWebRoot());
 
-		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, additionalCorsOrigins, config, schEs));
+		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, args.getOrigins(), args.isInsecureCookies(), config, schEs));
 		context.addFilter(authFilterHolder, "/*", null);
 
 		context.addServlet(new ServletHolder(new LibraryServlet(config)), LibraryServlet.CONTEXTPATH + "/*");

@@ -38,10 +38,12 @@ public class AuthFilter implements Filter {
 	private final AuthChecker authChecker;
 	private final AuthMgr authMgr;
 	private final Collection<String> ipAddresses;
+	private final boolean insecureCookies;
 
 	public AuthFilter (
 			final AuthChecker authChecker,
 			final Collection<String> additionalCorsOrigins,
+			final boolean insecureCookies,
 			final Config config,
 			final ScheduledExecutorService schEs) throws SocketException {
 		this.authChecker = authChecker;
@@ -49,6 +51,8 @@ public class AuthFilter implements Filter {
 
 		this.ipAddresses = makeOrigins(additionalCorsOrigins);
 		logger.info("CORS Origins: " + this.ipAddresses);
+
+		this.insecureCookies = insecureCookies;
 	}
 
 	private static Collection<String> makeOrigins(final Collection<String> additionalCorsOrigins) throws SocketException {
@@ -133,6 +137,7 @@ public class AuthFilter implements Filter {
 		cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(Auth.MAX_TOKEN_AGE_MILLIS));
 		cookie.setPath("/");
 		cookie.setHttpOnly(true);
+		cookie.setSecure(!this.insecureCookies);
 		cookie.setComment(HttpCookie.getCommentWithAttributes("", false, SameSite.STRICT));
 		resp.addCookie(cookie);
 	}

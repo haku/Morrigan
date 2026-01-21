@@ -14,15 +14,21 @@ public class Args {
 	private List<ServerPlayerArgs> serverPlayers = new ArrayList<>();
 
 	@Option(name = "--configpath", usage = "Path to config directory, defaults to $HOME/.morrigan") private String configPath;
+
 	@Option(name = "--dlna", usage = "Enable DLNA.") private boolean dlna;
 	@Option(name = "--dlna-player-control", usage = "Allow players to be controlled remotely via DLNA.") private boolean dlnaPlayerControl;
+
 	@Option(name = "--http", usage = "Local port to bind HTTP UI to.") private int httpPort = -1;
 	@Option(name = "--interface", usage = "Hostname or IP address of interface to bind to.") private String iface;
 	@Option(name = "--origin", usage = "Hostname or IP address for CORS origin.") private List<String> origins;
+	@Option(name = "--insecure-cookies", usage = "Do not mark auth cookie as secure.") private boolean insecureCookies = false;
+
 	@Option(name = "--ssh", usage = "Local port to bind SSH UI to.") private int sshPort = -1;
 	@Option(name = "--sshinterface", usage = "Hostname or IP address of interface to bind to, supersedes --interface for ssh.") private List<String> sshIfaces;
+
 	@Option(name = "--remote", usage = "Local identifier and HTTP(S) address of remote instance.", metaVar = "https://example.com/|my-rpc-remote-name") private List<String> remotes;
 	@Option(name = "--vlcdiscovery", usage = "Use VLC discovery to find renderers.") private boolean vlcDiscovery;
+
 	@Option(name = "--webroot", usage = "Override static file location, useful for UI dev.") private String webRoot;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
 	@Option(name = "--accesslog", usage = "Print access log line at end of each request.") private boolean printAccessLog;
@@ -62,6 +68,10 @@ public class Args {
 	public List<String> getOrigins() {
 		if (this.origins == null) return Collections.emptyList();
 		return this.origins;
+	}
+
+	public boolean isInsecureCookies() {
+		return this.insecureCookies;
 	}
 
 	public int getHttpPort() {
