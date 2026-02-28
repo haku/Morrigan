@@ -5,6 +5,7 @@ https://fonts.googleapis.com/icon?family=Material+Icons
 https://fonts.gstatic.com/s/materialicons/v126/flUhRq6tzZclQEJ-Vdg-IuiaDsNZ.ttf
 https://fonts.gstatic.com/s/materialicons/v134/flUhRq6tzZclQEJ-Vdg-IuiaDsNZ.ttf
 https://fonts.gstatic.com/s/materialicons/v143/flUhRq6tzZclQEJ-Vdg-IuiaDsNZ.ttf
+https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDsNZ.ttf
 https://storage.googleapis.com/code.getmdl.io/1.3.0/material.brown-light_green.min.css
 https://storage.googleapis.com/code.getmdl.io/1.3.0/material.deep_purple-pink.min.css
 https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js
