@@ -141,7 +141,7 @@ public class DlnaService {
 				final LocalDevice device = PlayerControlBridgeFactory.makeMediaRendererDevice(systemId, p, dlnaPlayingParamsFactory, this.scheduledExecutor);
 				this.upnpService.getRegistry().addDevice(device);
 				p.addOnDisposeListener(() -> this.upnpService.getRegistry().removeDevice(device));
-				LOG.info("Made DLNA contol proxy for player: " + p);
+				LOG.info("Made DLNA contol proxy for player: {} --> {}", p, device.getIdentity());
 			}
 		}
 
