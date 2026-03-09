@@ -35,6 +35,9 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 	private void outputStatus (final PlayState playState, final PlayItem item) {
 		final Player player = this.playerContainer.getPlayer();
 
+		String playerName = "";
+		if (player != null) playerName = player.getId();
+
 		PlayState ps = playState;
 		if (ps == null && player != null) ps = player.getPlayState();
 
@@ -44,7 +47,7 @@ class ServerPlayerEventHandler implements PlayerEventListener {
 		if (ps != this.prevPlayState.get()) {
 			this.prevPlayState.set(ps);
 
-			String msg = "";
+			String msg = playerName + ": ";
 			if (ps != null) msg += ps;
 			if (i != null) {
 				msg += " " + i.getTitle();

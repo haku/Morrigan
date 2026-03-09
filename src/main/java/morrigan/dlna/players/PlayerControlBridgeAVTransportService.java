@@ -245,7 +245,7 @@ public class PlayerControlBridgeAVTransportService extends AbstractAVTransportSe
 
 	@Override
 	public void next(final UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-		if (this.vlog) LOG.info("TODO next({})", instanceId);
+		if (this.vlog) LOG.info("next({})", instanceId);
 		this.player.nextTrack();
 	}
 
