@@ -75,7 +75,9 @@ public class PlayerControlBridgeAVTransportService extends AbstractAVTransportSe
 		@Override
 		public void positionChanged(final long newPosition, final int duration) {}
 		@Override
-		public void onException(final Exception e) {}
+		public void onException(final Exception e) {
+			notifySubscribers();
+		}
 	};
 
 	private void updateCurrentItemDetails(final PlayItem newItem) {
