@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.rewrite.handler.RewritePatternRule;
 import org.eclipse.jetty.server.Connector;
@@ -94,6 +95,11 @@ public class MorriganServer {
 		// - ServletHelper.getReqPath() knows how to remove the prefix.
 		rewrites.setRewriteRequestURI(false);
 		rewrites.setRewritePathInfo(false);
+
+		//  /mn --> /mn/  so that relative paths work.
+		final RedirectPatternRule addSlash = new RedirectPatternRule(REVERSE_PROXY_PREFIX, REVERSE_PROXY_PREFIX + "/");
+		addSlash.setStatusCode(301);
+		rewrites.addRule(addSlash);
 
 		rewrites.addRule(new RewritePatternRule(REVERSE_PROXY_PREFIX + "/*", "/"));
 
