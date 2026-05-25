@@ -9,6 +9,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.ScheduledExecutorService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.rewrite.handler.RewritePatternRule;
@@ -96,15 +99,24 @@ public class MorriganServer {
 		rewrites.setRewriteRequestURI(false);
 		rewrites.setRewritePathInfo(false);
 
-		//  /mn --> /mn/  so that relative paths work.
-		final RedirectPatternRule addSlash = new RedirectPatternRule(REVERSE_PROXY_PREFIX, REVERSE_PROXY_PREFIX + "/");
-		addSlash.setStatusCode(301);
-		rewrites.addRule(addSlash);
+		rewrites.addRule(new NotOptionsRedirectPatternRule(REVERSE_PROXY_PREFIX, REVERSE_PROXY_PREFIX + "/"));
 
 		rewrites.addRule(new RewritePatternRule(REVERSE_PROXY_PREFIX + "/*", "/"));
 
 		rewrites.setHandler(wrapped);
 		return rewrites;
+	}
+
+	private static class NotOptionsRedirectPatternRule extends RedirectPatternRule {
+		public NotOptionsRedirectPatternRule(final String pattern, final String location) {
+			super(pattern, location);
+			setStatusCode(301);
+		}
+		@Override
+		public String matchAndApply(String target, HttpServletRequest request, HttpServletResponse response) throws IOException {
+			if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return null;
+			return super.matchAndApply(target, request, response);
+		}
 	}
 
 	private static ServletContextHandler makeContentHandler(

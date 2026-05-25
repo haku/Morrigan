@@ -1,6 +1,7 @@
 package morrigan.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -21,7 +22,8 @@ public class MorriganServerTest {
 
 	@Test
 	public void itRedirectsToAddSlash() throws Exception {
-		testRedirect("/mn", "/mn/");
+		testRedirect("/mn", "/mn/", "GET");
+		testRedirect("/mn", "/mn", "OPTIONS");
 	}
 
 	@Test
@@ -38,16 +40,17 @@ public class MorriganServerTest {
 				"/mlists/LOCALMMDB/a.local.db3/query/t%3D\"Foo%2FBar Bat\"?&column=date_added&order=desc&_=1657822549184");
 	}
 
-	private static void testRedirect(final String input, final String expected) throws Exception {
-		testRedirectOrRewrite(input, expected, false);
+	private static void testRedirect(final String input, final String expected, final String method) throws Exception {
+		testRedirectOrRewrite(input, expected, false, method);
 	}
 
 	private static void testRewrite(final String input, final String expected) throws Exception {
-		testRedirectOrRewrite(input, expected, true);
+		testRedirectOrRewrite(input, expected, true, "GET");
 	}
 
-	private static void testRedirectOrRewrite(final String input, final String expected, final boolean isRewrite) throws Exception {
+	private static void testRedirectOrRewrite(final String input, final String expected, final boolean isRewrite, final String method) throws Exception {
 		final Request baseRequest = mock(Request.class);
+		when(baseRequest.getMethod()).thenReturn(method);
 		when(baseRequest.getScheme()).thenReturn("https");
 		when(baseRequest.getServerName()).thenReturn("mn.example.com");
 		when(baseRequest.getDispatcherType()).thenReturn(DispatcherType.REQUEST);
@@ -62,6 +65,10 @@ public class MorriganServerTest {
 
 		if (isRewrite) {
 			verify(wrapped).handle(expected, baseRequest, baseRequest, resp);
+		}
+		else if (input.equals(expected)) {
+			assertEquals(200, resp.getStatus());
+			assertNull(resp.getHeader("Location"));
 		}
 		else {
 			assertEquals(301, resp.getStatus());
