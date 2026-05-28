@@ -1,6 +1,5 @@
 package morrigan.dlna.players;
 
-import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,8 +46,9 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 	}
 
 	@Override
-	protected void dlnaPlay (final PlayItem item, final DlnaPlayingParams playingParams) throws DlnaException {
-		LOG.info("loading: {}", playingParams.id);
+	protected void dlnaPlay (final PlayItem item, final DlnaPlayingParams playingParams, final long playFromPositionMillis, final boolean startPaused) throws DlnaException {
+		LOG.info("loading: {}, playFromPositionMillis={}, startPaused={}", playingParams.id, playFromPositionMillis, startPaused);
+		if (startPaused) LOG.warn("TODO: startPaused NOT IMPLEMENTED.");
 		stopPlaying();
 
 		// Set these fist so if something goes wrong user can try again.
@@ -62,22 +62,10 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		startWatcher(playingParams.uri, item);
 		saveState();
 
-		// Only restore position if for same item.
-		final PlayerState rps = getRestorePositionState();
-		if (rps != null && rps.getCurrentItem() != null && rps.getCurrentItem().hasItem()) {
-			if (Objects.equals(item.getItem(), rps.getCurrentItem().getItem())) {
-				final WatcherTask w = this.watcher.get();
-				if (w != null) {
-					w.requestSeekAfterPlaybackStarts(rps.getPosition());
-					LOG.info("Scheduled restore of position: {}s", rps.getPosition());
-				}
-			}
-			else {
-				LOG.info("Not restoring position for {} as track is {}.",
-						rps.getCurrentItem().getItem(), item.getItem());
-			}
+		if (playFromPositionMillis > 0L) {
+			final WatcherTask w = this.watcher.get();
+			if (w != null) w.requestSeekAfterPlaybackStarts(TimeUnit.MILLISECONDS.toSeconds(playFromPositionMillis));
 		}
-		clearRestorePositionState();
 	}
 
 	private void startWatcher (final String uri, final PlayItem item) {

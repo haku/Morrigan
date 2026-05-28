@@ -39,10 +39,6 @@ import org.mockito.InOrder;
 import morrigan.config.Config;
 import morrigan.dlna.DlnaException;
 import morrigan.dlna.MediaFormat;
-import morrigan.dlna.players.AvTransportActions;
-import morrigan.dlna.players.DlnaPlayingParamsFactory;
-import morrigan.dlna.players.GoalSeekingDlnaPlayer;
-import morrigan.dlna.players.RenderingControlActions;
 import morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import morrigan.engines.playback.IPlaybackEngine.PlayState;
 import morrigan.model.exceptions.MorriganException;
@@ -136,7 +132,7 @@ public class GoalSeekingDlnaPlayerTest {
 		// start playback.
 		final PlayItem item1 = makeItem();
 		final DlnaPlayingParams item1Params = new DlnaPlayingParams(TEST_FILE_1_ID, TEST_FILE_1_URI, item1.getItem().getTitle(), MediaFormat.MP3.toMimeType(), TEST_FILE_1_SIZE, TEST_COVER_1_URI, TEST_FILE_1_DURATION);
-		this.undertest.dlnaPlay(item1, item1Params);
+		this.undertest.dlnaPlay(item1, item1Params, 0L, false);
 
 		// verify starts loading.
 		assertEquals(PlayState.LOADING, runEventLoop());
@@ -191,7 +187,7 @@ public class GoalSeekingDlnaPlayerTest {
 		// Skip to a new item.
 		final PlayItem item2 = makeItem();
 		final DlnaPlayingParams item2Params = new DlnaPlayingParams(TEST_FILE_2_ID, TEST_FILE_2_URI, item2.getItem().getTitle(), MediaFormat.OGG.toMimeType(), TEST_FILE_2_SIZE, TEST_COVER_2_URI, TEST_FILE_2_DURATION);
-		this.undertest.dlnaPlay(item2, item2Params);
+		this.undertest.dlnaPlay(item2, item2Params, 0L, false);
 
 		// verify starts loading.
 		assertEquals(PlayState.LOADING, runEventLoop());

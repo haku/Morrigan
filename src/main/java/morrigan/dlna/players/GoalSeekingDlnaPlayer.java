@@ -549,31 +549,17 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 	// Visible for testing.
 	@Override
-	public void dlnaPlay (final PlayItem item, final DlnaPlayingParams playingParams) throws DlnaException {
+	public void dlnaPlay (final PlayItem item, final DlnaPlayingParams playingParams, final long playFromPositionMillis, final boolean startPaused) throws DlnaException {
 		setCurrentItem(item);
 		setCurrentPlayingParams(playingParams);
 		saveState();
 
 		this.eventQueue.add(new DlnaToPlay(item, playingParams, this.playbackRecorder));
-		this.eventQueue.add(PlayState.PLAYING);
+		this.eventQueue.add(startPaused ? PlayState.PAUSED : PlayState.PLAYING);
 		setStateToReportExternally(PlayState.LOADING);
 
-		// Only restore position if for same item.
-		final PlayerState rps = getRestorePositionState();
-		final PlayItem cItem = rps != null ? rps.getCurrentItem() : null;
-		if (cItem != null && cItem.isReady() && cItem.hasItem()) {
-			if (Objects.equals(item.getItem(), cItem.getItem())) {
-				this.eventQueue.add(Long.valueOf(rps.getPosition()));
-				LOG.info("{}: Play scheduled restore position: {}s", getId(), rps.getPosition());
-			}
-			else {
-				LOG.info("{}: Not restoring position for {} as track is {}.",
-						getId(), cItem.getItem(), item.getItem());
-			}
-		}
-		clearRestorePositionState();
-
-		LOG.info("{}: Playback scheduled: {}", getId(), playingParams.id);
+		if (playFromPositionMillis > 0L) setPositionMillis(playFromPositionMillis);
+		LOG.info("{}: Playback scheduled: startPaused={} from={}ms {}", getId(), startPaused, playFromPositionMillis, playingParams.id);
 	}
 
 }

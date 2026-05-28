@@ -1,7 +1,9 @@
 package morrigan.dlna.players;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jupnp.controlpoint.ControlPoint;
@@ -120,13 +122,32 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	@Override
 	protected void loadAndPlay (final PlayItem item, final long playFromPositionMillis, final boolean startPaused) throws DlnaException, IOException {
 		final DlnaPlayingParams playingParams = this.dlnaPlayingParamsFactory.make(item);
-		dlnaPlay(item, playingParams);
+
+		long actualPlayFromMillis = playFromPositionMillis;
+		if (actualPlayFromMillis <= 0L) {
+			// Only restore position if for same item.
+			final PlayerState rps = getRestorePositionState();
+			final PlayItem cItem = rps != null ? rps.getCurrentItem() : null;
+			if (cItem != null && cItem.isReady() && cItem.hasItem()) {
+				if (Objects.equals(item.getItem(), cItem.getItem())) {
+					actualPlayFromMillis = TimeUnit.SECONDS.toMillis(rps.getPosition());
+					LOG.info("{}: Scheduled restore position: {}s", getId(), rps.getPosition());
+				}
+				else {
+					LOG.info("{}: Not restoring position for {} as track is {}.",
+							getId(), cItem.getItem(), item.getItem());
+				}
+			}
+			clearRestorePositionState();
+		}
+
+		dlnaPlay(item, playingParams, actualPlayFromMillis, startPaused);
 
 		// After dlnaPlay() because it will (likely) call setCurrentItem().
 		setCurrentTrackDurationAsMeasured(playingParams.durationSeconds);
 	}
 
-	protected abstract void dlnaPlay (PlayItem item, DlnaPlayingParams playingParams) throws DlnaException;
+	protected abstract void dlnaPlay (PlayItem item, DlnaPlayingParams playingParams, final long playFromPositionMillis, boolean startPaused) throws DlnaException;
 
 	protected abstract boolean shouldBePlaying ();
 
