@@ -61,6 +61,7 @@ public abstract class AbstractPlayer implements Player {
 
 	private final ScheduledFuture<?> saveStatePeriodicFuture;
 	private volatile long saveStatePeriodicQueueVersion;
+	private volatile PlayState saveStatePeriodicPlayState;
 
 	private volatile boolean stateRestoreAttempted = false;
 	private volatile boolean loadingTrack = false;
@@ -151,9 +152,11 @@ public abstract class AbstractPlayer implements Player {
 
 	private void saveStatePeriodic() {
 		if (!this.alive.get()) return;
+		final PlayState playState = getPlayState();
 		final long queueVersion = this.queue.getVersion();
-		if (this.saveStatePeriodicQueueVersion != queueVersion) {
+		if (this.saveStatePeriodicPlayState != playState || this.saveStatePeriodicQueueVersion != queueVersion) {
 			saveState();
+			this.saveStatePeriodicPlayState = playState;
 			this.saveStatePeriodicQueueVersion = queueVersion;
 		}
 	}
