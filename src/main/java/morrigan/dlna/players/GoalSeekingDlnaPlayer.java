@@ -121,7 +121,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		final int n = this.sequentialEmptyDlnaResponses.incrementAndGet();
 		if (n >= MAX_SEQUENTIAL_EMPTY_DLNA_RESPONSES) {
 			if (this.selfDestructTriggered.compareAndSet(false, true)) {
-				LOG.warn("Self destructing, {} sequential empty DLNA responses.", n);
+				LOG.warn("{}: Self destructing, {} sequential empty DLNA responses.", getId(), n);
 				this.controlPoint.getRegistry().removeDevice(this.avTransportSvc.getDevice());
 				this.controlPoint.search();
 			}
@@ -139,14 +139,14 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			markLastSuccess();
 		}
 		catch (final DlnaResponseException e) {
-			LOG.warn("DLNA call failed: {}", ErrorHelper.oneLineCauseTrace(e));
+			LOG.warn("{}: DLNA call failed: {}", getId(), ErrorHelper.oneLineCauseTrace(e));
 			if (e.emptyResponse()) markEmptyDlnaResponse();
 		}
 		catch (final DlnaException e) {
-			LOG.warn("DLNA call failed: {}", ErrorHelper.oneLineCauseTrace(e));
+			LOG.warn("{}: DLNA call failed: {}", getId(), ErrorHelper.oneLineCauseTrace(e));
 		}
 		catch (final Exception e) {
-			LOG.warn("Unhandled error in event thread.", e);
+			LOG.warn("{}: Unhandled error in event thread.", getId(), e);
 		}
 
 		if (secondsSinceLastSuccess() > SLOW_RETRIES_AFTER_SECONDS) {
@@ -211,12 +211,12 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 				}
 			}
 			else {
-				LOG.warn("Unexpected {} type on event queue: {}", obj.getClass(), obj);
+				LOG.warn("{}: Unexpected {} type on event queue: {}", getId(), obj.getClass(), obj);
 			}
 		}
 
 		if (this.goalToPlay != null && this.goalToPlay == prevToPlay && stopEvent) {
-			LOG.info("Track finished playing event for: {}", this.goalToPlay.getId());
+			LOG.info("{}: Track finished playing event for: {}", getId(), this.goalToPlay.getId());
 			this.unprocessedPlaybackOfGoalStoppedEvent = true;
 		}
 	}
@@ -241,7 +241,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 	public PlayState readStateAndSeekGoal () throws DlnaException {
 		// If a clean up is needed, everything else might be invalid.
 		if (this.rendererNeedsCleaning) {
-			LOG.debug("Sending cleanup Stop()...");
+			LOG.debug("{}: Sending cleanup Stop()...", getId());
 			this.avTransport.stop();
 			this.rendererNeedsCleaning = false;
 		}
@@ -258,7 +258,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		final MediaInfo renMi = this.avTransport.getMediaInfo();
 		final TransportInfo renTi = this.avTransport.getTransportInfo();
 		final PositionInfo renPi = this.avTransport.getPositionInfo();
-		LOG.debug("PositionInfo: {}", renPi);
+		LOG.debug("{}: PositionInfo: {}", getId(), renPi);
 
 		// Check playback progress.  This needs to happen before checking state to ensure LOP is as up to date as possible.
 		final long renElapsedSeconds;
@@ -277,7 +277,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		final String renUri = renMi != null ? renMi.getCurrentURI() : null;
 
 		if (renState != this.prevRenState || !Objects.equals(renUri, this.prevRenUri)) {
-			LOG.info("Renderer: {} {}", renState, renUri);
+			LOG.info("{}: Renderer: {} {}", getId(), renState, renUri);
 			this.prevRenState = renState;
 			this.prevRenUri = renUri;
 		}
@@ -297,11 +297,11 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 		// Did the render stop on its own?
 		if (rendererStoppedPlaying) {
-			LOG.info("Assuming playback stopped: {}", goToPlay.getId());
+			LOG.info("{}: Assuming playback stopped: {}", getId(), goToPlay.getId());
 
 			// Track ended event.
 			if (lopAtEnd) {
-				LOG.info("Assuming track was played to end: {} ({}s of {}s)", goToPlay.getId(), maxSecondsThatHaveBeenPlayed, goToPlay.getDurationSeconds());
+				LOG.info("{}: Assuming track was played to end: {} ({}s of {}s)", getId(), goToPlay.getId(), maxSecondsThatHaveBeenPlayed, goToPlay.getDurationSeconds());
 				goToPlay.recordEndOfTrack(true);
 
 				// Make the UI show that the end of the track was reached exactly.
@@ -317,7 +317,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 				return PlayState.STOPPED; // Made a change, so return.
 			}
 
-			LOG.info("But track did not play to end, going to try again from {}s...", this.lastObservedPositionSeconds);
+			LOG.info("{}: But track did not play to end, going to try again from {}s...", getId(), this.lastObservedPositionSeconds);
 		}
 
 		// If renderer is between states or a strange state, wait.
@@ -325,7 +325,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			switch (renState) {
 				case CUSTOM:
 				case TRANSITIONING:
-					LOG.info("Waiting for renderer to leave state: {}", renState);
+					LOG.info("{}: Waiting for renderer to leave state: {}", getId(), renState);
 					return PlayState.LOADING;
 				default:
 			}
@@ -340,7 +340,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 					case PLAYING:
 					case RECORDING:
 						this.avTransport.stop();
-						LOG.info("Stopped.");
+						LOG.info("{}: Stopped.", getId());
 						return PlayState.STOPPED; // Made a change, so return.
 					default:
 				}
@@ -348,7 +348,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			goToPlay.recordEndOfTrack(false);
 			this.goalToPlay = null;
 			this.goalSeekToSeconds = null;
-			LOG.info("Cleared goal state.");
+			LOG.info("{}: Cleared goal state.", getId());
 			return PlayState.STOPPED; // Target state reached.  Stop.
 		}
 
@@ -358,21 +358,21 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 			// If age of last observed position is too young, wait a bit in case end event turns up.
 			if (this.lastObservedPositionSeconds.age(TimeUnit.SECONDS) < WAIT_FOR_STOP_EVENT_TIMEOUT_SECONDS) {
-				LOG.debug("Waiting for posible end event...");
+				LOG.debug("{}: Waiting for posible end event...", getId());
 				return PlayState.LOADING;
 			}
 
 			if (renUri != null) {
-				LOG.info("Stopping: {}", renUri);
+				LOG.info("{}: Stopping: {}", getId(), renUri);
 				try {
 					this.avTransport.stop();
 				}
 				catch (final DlnaResponseException e) { // Specifically not a timeout.
-					LOG.info("Stop before play failed: {}", ErrorHelper.oneLineCauseTrace(e));
+					LOG.info("{}: Stop before play failed: {}", getId(), ErrorHelper.oneLineCauseTrace(e));
 				}
 			}
 
-			LOG.info("Loading: {}", goToPlay);
+			LOG.info("{}: Loading: {}", getId(), goToPlay);
 			this.avTransport.setUri(
 					goToPlay.getId(),
 					goToPlay.getUri(),
@@ -381,7 +381,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 					goToPlay.getCoverArtUri(),
 					goToPlay.getDurationSeconds());
 			this.avTransport.play();
-			LOG.debug("Loaded: {}.", goToPlay.getId());
+			LOG.debug("{}: Loaded: {}.", getId(), goToPlay.getId());
 			scheduleRestorePosition(this.lastObservedPositionSeconds.get());
 			return PlayState.LOADING; // Made a change, so return.
 		}
@@ -394,12 +394,12 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 					case RECORDING:
 						try {
 							this.avTransport.pause();
-							LOG.info("Paused.");
+							LOG.info("{}: Paused.", getId());
 						}
 						catch (final DlnaResponseException e) {
 							if (e.hasStatusCodeBetween(500, 600)) {
 								this.avTransport.stop();
-								LOG.info("Paused failed, stopped instead.");
+								LOG.info("{}: Paused failed, stopped instead.", getId());
 							}
 							else {
 								throw e;
@@ -416,14 +416,14 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 					case STOPPED:
 					case NO_MEDIA_PRESENT:
 						this.avTransport.play();
-						LOG.info("Started playback.");
+						LOG.info("{}: Started playback.", getId());
 						scheduleRestorePosition(this.lastObservedPositionSeconds.get());
 						return PlayState.PLAYING; // Made a change, so return.
 
 					case PAUSED_PLAYBACK:
 					case PAUSED_RECORDING:
 						this.avTransport.play();
-						LOG.info("Resumed.");
+						LOG.info("{}: Resumed.", getId());
 						return PlayState.PLAYING; // Made a change, so return.
 
 					default:
@@ -451,7 +451,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		// Check and set should be safe as only our thread should be updating it.
 		if (renElapsedSeconds > 0 && this.goalSeekToSeconds != null && this.goalSeekToSeconds >= 0) {
 			this.avTransport.seek(this.goalSeekToSeconds);
-			LOG.info("Set position to {}s.", this.goalSeekToSeconds);
+			LOG.info("{}: Set position to {}s.", getId(), this.goalSeekToSeconds);
 			this.goalSeekToSeconds = null;
 			getListeners().afterSeek();
 			return renPlayState; // Made a change, so return.
@@ -463,7 +463,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 	private void scheduleRestorePosition (final long lopSeconds) {
 		if (lopSeconds > MIN_POSITION_TO_RESTORE_SECONDS) {
 			this.eventQueue.add(Long.valueOf(lopSeconds));
-			LOG.info("Recovery scheduled restore position: {}s", lopSeconds);
+			LOG.info("{}: Recovery scheduled restore position: {}s", getId(), lopSeconds);
 		}
 	}
 
@@ -524,7 +524,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			if (ci != null) loadAndStartPlaying(ci, 0L, false);
 		}
 		else {
-			LOG.warn("Asked to pause when state is {}, do not know what to do.", playState);
+			LOG.warn("{}: Asked to pause when state is {}, do not know what to do.", getId(), playState);
 		}
 	}
 
@@ -564,16 +564,16 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		if (cItem != null && cItem.isReady() && cItem.hasItem()) {
 			if (Objects.equals(item.getItem(), cItem.getItem())) {
 				this.eventQueue.add(Long.valueOf(rps.getPosition()));
-				LOG.info("Play scheduled restore position: {}s", rps.getPosition());
+				LOG.info("{}: Play scheduled restore position: {}s", getId(), rps.getPosition());
 			}
 			else {
-				LOG.info("Not restoring position for {} as track is {}.",
-						cItem.getItem(), item.getItem());
+				LOG.info("{}: Not restoring position for {} as track is {}.",
+						getId(), cItem.getItem(), item.getItem());
 			}
 		}
 		clearRestorePositionState();
 
-		LOG.info("Playback scheduled: {}", playingParams.id);
+		LOG.info("{}: Playback scheduled: {}", getId(), playingParams.id);
 	}
 
 }

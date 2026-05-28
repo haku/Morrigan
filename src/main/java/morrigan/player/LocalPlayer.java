@@ -78,7 +78,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				eng.stopPlaying();
 			}
 			catch (final PlaybackException e) {
-				LOG.error("Failed top stop playback.", e);
+				LOG.error("{}: Failed top stop playback.", getId(), e);
 			}
 			eng.unloadFile();
 			eng.finalise();
@@ -117,7 +117,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 
 		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
-			LOG.debug("Loading: {}", item.getItem().getTitle());
+			LOG.debug("{}: Loading: {}", getId(), item.getItem().getTitle());
 			final PlayItem prevItem = setCurrentItem(item);
 			if (prevItem != null) recordPlaybackOver(prevItem, false);
 
@@ -127,7 +127,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 			if (!startPaused) engine.startPlaying();
 
 			this._currentTrackDuration = engine.getDuration();
-			LOG.debug("Started to play: {}", item.getItem().getTitle());
+			LOG.debug("{}: Started to play: {}", getId(), item.getItem().getTitle());
 
 			this.playbackStartTime.set(System.currentTimeMillis());
 			this.schEx.submit(() -> getListeners().currentItemChanged(item));
@@ -296,11 +296,11 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 				if (c != null && c.hasListAndItem()) {
 					if (c.getItem().getDuration() != duration) {
 						try {
-							LOG.debug("setting item duration={}.", duration);
+							LOG.debug("{}: setting item duration={}.", getId(), duration);
 							c.getList().setTrackDuration(c.getItem(), duration);
 						}
 						catch (final MorriganException e) {
-							LOG.error("Failed to update track duration.", e);
+							LOG.error("{}: Failed to update track duration.", getId(), e);
 						}
 					}
 				}
@@ -312,7 +312,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 		@Override
 		public void statusChanged(final PlayState state, final boolean isEndOfTrack) {
 			if (isEndOfTrack) {
-				LOG.debug("Player received endOfTrack event.");
+				LOG.debug("{}: Player received endOfTrack event.", getId());
 				recordPlaybackOver(getCurrentItem(), isEndOfTrack);
 
 				// Play next track?
@@ -322,7 +322,7 @@ public class LocalPlayer extends AbstractPlayer implements Player {
 						loadAndStartPlaying(nextItemToPlay, 0L, false);
 					}
 					else {
-						LOG.info("No more tracks to play.");
+						LOG.info("{}: No more tracks to play.", getId());
 						getListeners().currentItemChanged(null);
 					}
 				}

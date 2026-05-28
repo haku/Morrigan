@@ -141,7 +141,7 @@ public abstract class AbstractPlayer implements Player {
 				this.playerStateStorage.writeState(this);
 			}
 			else {
-				LOG.info("Not saving player state as a restore has not yet been attempted.");
+				LOG.info("{}: Not saving player state as a restore has not yet been attempted.", this.id);
 			}
 		}
 		catch (final Exception e) {
@@ -457,7 +457,7 @@ public abstract class AbstractPlayer implements Player {
 		final long start = System.nanoTime();
 		final MediaItem ret = list.chooseItem(orderToUse, item);
 		final long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-		LOG.info("list {} choose using {} ({}ms): {}", list, orderToUse, duration, ret);
+		LOG.info("{}: list {} choose using {} ({}ms): {}", this.id, list, orderToUse, duration, ret);
 
 		return ret;
 	}
