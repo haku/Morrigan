@@ -311,18 +311,7 @@ public abstract class AbstractPlayer implements Player {
 			}
 		}
 
-		PlayItem pi = item;
-		if (!pi.hasItem()) {
-			if (!pi.hasList()) return;  // can not pick a track without a list.
-
-			this.currentList.set(pi.getList());  // list only items update the current list.
-
-			final MediaItem track = findTrackForListOnlyPlayItem(pi);
-			if (track == null) return;
-			pi = pi.withItem(track);
-		}
-
-		loadAndStartPlayingTrack(pi, playFromPositionMillis, startPaused);
+		loadAndStartPlayingTrack(item, playFromPositionMillis, startPaused);
 	}
 
 	@Override
@@ -340,15 +329,23 @@ public abstract class AbstractPlayer implements Player {
 
 	private final Future<?> loadAndStartPlayingTrack (final PlayItem argItem, final long playFromPositionMillis, final boolean startPaused) {
 		if (argItem == null) throw new IllegalArgumentException("PlayItem can not be null.");
-		if (!argItem.hasItem()) throw new IllegalArgumentException("Item must have a track.");
 
 		return this.schEx.submit(new Runnable() {
 			@Override
 			public void run () {
 				markLoadingState(true, argItem);
 				try {
-					final PlayItem item = argItem.makeReady(AbstractPlayer.this.mediaFactory);
+					PlayItem item = argItem.makeReady(AbstractPlayer.this.mediaFactory);
 					if (item == null) throw new MorriganException("Failed to resolve item: " + argItem);
+
+					if (!item.hasItem()) {
+						if (!item.hasList()) return;  // can not pick a track without a list.
+						AbstractPlayer.this.currentList.set(item.getList());  // list only items update the current list.
+
+						final MediaItem track = findTrackForListOnlyPlayItem(item);
+						if (track == null) return;
+						item = item.withItem(track);
+					}
 
 					if (StringHelper.notBlank(item.getItem().getFilepath())) {
 						final File file = new File(item.getItem().getFilepath());
@@ -360,16 +357,14 @@ public abstract class AbstractPlayer implements Player {
 
 					AbstractPlayer.this.listeners.currentItemChanged(item);
 
-					PlayItem maybeUpdatedItem = item;
-
 					final TranscodeProfile tProfile = getTranscode().profileForItem(new TranscodeContext(AbstractPlayer.this.config), item.getList(), item.getItem());
 					if (tProfile != null) {
 						AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
 						final File altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.
-						maybeUpdatedItem = item.withAltFile(altFile);
+						item = item.withAltFile(altFile);
 					}
 
-					loadAndPlay(maybeUpdatedItem, playFromPositionMillis, startPaused);
+					loadAndPlay(item, playFromPositionMillis, startPaused);
 				}
 				catch (final Exception e) { // NOSONAR reporting exceptions.
 					rollbackToTopOfQueue(argItem);
