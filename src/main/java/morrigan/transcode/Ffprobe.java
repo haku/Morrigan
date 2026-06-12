@@ -36,6 +36,7 @@ public class Ffprobe {
 				"ffprobe",
 				"-hide_banner",
 				"-show_streams",
+				"-show_format",
 				"-print_format", "flat",
 				inFile.getAbsolutePath()
 		}, parser);
