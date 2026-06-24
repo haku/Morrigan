@@ -6,6 +6,7 @@
 # https://docs.python.org/3/library/xml.ElementTree.elementtree.html
 
 import argparse
+import os
 import sys
 import time
 import urllib.request
@@ -32,7 +33,6 @@ def parseArgs() -> argparse.Namespace:
       help='Prefix path to Morrigan HTTP endpoint.')
   parser.add_argument(
       '--authfile',
-      required=True,
       help='Path to file containing username:password.')
   parser.add_argument(
       '--library',
@@ -107,8 +107,13 @@ def waitForTask(args: argparse.Namespace, taskid: str):
 
 
 def mkAuthOpener(args: argparse.Namespace):
-  with open(args.authfile) as f:
-    auth = f.readline().strip()
+  auth = os.environ.get('MORRIGAN_AUTH')
+  if not auth and args.authfile:
+    with open(args.authfile) as f:
+      auth = f.readline().strip()
+  if not auth:
+    fail(f"Either setting MORRIGAN_AUTH or --authfile is required.")
+
   (user, passwd) = auth.split(':')
   passwd_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
   passwd_mgr.add_password(None, args.url, user, passwd)
