@@ -227,6 +227,8 @@ public abstract class PlayItem {
 			final MediaList list = listSupplier.apply(this.listRef);
 			if (list == null) return null;
 
+			if (this.filepath == null && this.remoteId == null && this.md5 == null) return new ReadyPlayItem(PlayItemType.PLAYABLE, list, null, null);
+
 			MediaItem item = null;
 			if (StringUtils.isNotBlank(this.filepath)) item = list.getByFile(this.filepath);
 			if (item == null && StringUtils.isNotBlank(this.remoteId)) item = list.getByFile(this.remoteId);
