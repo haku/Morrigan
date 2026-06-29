@@ -30,11 +30,11 @@ import morrigan.model.media.ListRef;
 import morrigan.model.media.ListRefWithTitle;
 import morrigan.model.media.MediaFactory;
 import morrigan.model.media.MediaItem;
+import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.MediaList;
 import morrigan.model.media.MediaNode;
 import morrigan.model.media.MediaTag;
 import morrigan.model.media.SortColumn;
-import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.SortColumn.SortDirection;
 import morrigan.util.StringHelper;
 

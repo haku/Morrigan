@@ -28,9 +28,9 @@ import morrigan.tasks.TaskEventListener;
 import morrigan.tasks.TaskOutcome;
 import morrigan.tasks.TaskResult;
 import morrigan.util.ChecksumHelper;
+import morrigan.util.ChecksumHelper.Md5AndSha1;
 import morrigan.util.FileSystem;
 import morrigan.util.MimeType;
-import morrigan.util.ChecksumHelper.Md5AndSha1;
 
 public abstract class LocalDbUpdateTask<Q extends MediaDb> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

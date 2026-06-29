@@ -16,7 +16,6 @@ import morrigan.config.Config;
 import morrigan.model.media.ListRef;
 import morrigan.model.media.MediaDb;
 import morrigan.model.media.MediaList;
-import morrigan.model.media.internal.MediaFactoryImpl;
 
 public class MediaFactoryImplTest {
 

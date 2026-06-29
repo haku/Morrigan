@@ -5,8 +5,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import morrigan.model.exceptions.MorriganException;
 import morrigan.model.media.MediaItem;
-import morrigan.model.media.MediaStorageLayer;
 import morrigan.model.media.MediaItem.MediaType;
+import morrigan.model.media.MediaStorageLayer;
 import morrigan.sqlitewrapper.DbException;
 
 public class MetadataStorage {

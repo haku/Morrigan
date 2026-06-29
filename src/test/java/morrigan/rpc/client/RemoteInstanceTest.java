@@ -12,7 +12,6 @@ import org.junit.Test;
 import com.vaguehope.common.rpc.RpcTarget;
 
 import morrigan.Args;
-import morrigan.rpc.client.RemoteInstance;
 
 public class RemoteInstanceTest {
 

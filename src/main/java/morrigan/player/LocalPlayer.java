@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import morrigan.config.Config;
 import morrigan.engines.playback.IPlaybackEngine;
+import morrigan.engines.playback.IPlaybackEngine.PlayState;
 import morrigan.engines.playback.IPlaybackStatusListener;
 import morrigan.engines.playback.PlaybackEngineFactory;
 import morrigan.engines.playback.PlaybackException;
-import morrigan.engines.playback.IPlaybackEngine.PlayState;
 import morrigan.model.exceptions.MorriganException;
 import morrigan.model.media.MediaFactory;
 import morrigan.player.contentproxy.ContentProxy;

@@ -23,13 +23,6 @@ import morrigan.model.media.MediaFactory;
 import morrigan.model.media.MediaItem;
 import morrigan.model.media.MediaList;
 import morrigan.model.media.UrlItem;
-import morrigan.player.DefaultPlayerQueue;
-import morrigan.player.PlayItem;
-import morrigan.player.PlayItemType;
-import morrigan.player.PlaybackOrder;
-import morrigan.player.Player;
-import morrigan.player.PlayerQueue;
-import morrigan.player.PlayerStateStorage;
 import morrigan.transcode.Transcode;
 
 public class PlayerStateStorageTest {

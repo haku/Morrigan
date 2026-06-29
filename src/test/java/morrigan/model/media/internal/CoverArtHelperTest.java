@@ -13,8 +13,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import morrigan.model.media.MediaItem;
-import morrigan.model.media.internal.CoverArtHelper;
-import morrigan.model.media.internal.DefaultMediaItem;
 
 public class CoverArtHelperTest {
 

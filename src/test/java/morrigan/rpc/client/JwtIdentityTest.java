@@ -33,7 +33,6 @@ import io.jsonwebtoken.security.Jwk;
 import io.jsonwebtoken.security.Jwks;
 import io.jsonwebtoken.security.PrivateJwk;
 import io.jsonwebtoken.security.PublicJwk;
-import morrigan.rpc.client.JwtIdentity;
 
 public class JwtIdentityTest {
 

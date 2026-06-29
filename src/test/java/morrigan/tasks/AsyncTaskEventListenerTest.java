@@ -14,10 +14,6 @@ import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
 
-import morrigan.tasks.AsyncTaskEventListener;
-import morrigan.tasks.TaskOutcome;
-import morrigan.tasks.TaskState;
-
 public class AsyncTaskEventListenerTest {
 
 	private Clock clock;

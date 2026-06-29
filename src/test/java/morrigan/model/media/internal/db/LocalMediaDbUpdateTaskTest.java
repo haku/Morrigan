@@ -32,14 +32,13 @@ import morrigan.model.media.MediaFactory;
 import morrigan.model.media.MediaItem;
 import morrigan.model.media.MediaTag;
 import morrigan.model.media.MediaTagType;
-import morrigan.model.media.internal.db.LocalMediaDbUpdateTask;
 import morrigan.model.media.test.TestMediaDb;
 import morrigan.sqlitewrapper.DbException;
 import morrigan.tasks.TaskEventListener;
 import morrigan.tasks.TaskOutcome;
 import morrigan.tasks.TaskResult;
-import morrigan.util.FileSystem;
 import morrigan.util.ChecksumHelper.Md5AndSha1;
+import morrigan.util.FileSystem;
 
 public class LocalMediaDbUpdateTaskTest {
 

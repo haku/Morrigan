@@ -23,7 +23,6 @@ import com.vaguehope.common.servlet.MockHttpServletRequest;
 import com.vaguehope.common.servlet.MockHttpServletResponse;
 
 import morrigan.config.Config;
-import morrigan.server.LibraryServlet;
 
 public class LibraryServletTest {
 

@@ -17,8 +17,6 @@ import com.google.common.collect.Multiset;
 import morrigan.model.exceptions.MorriganException;
 import morrigan.model.media.MediaItem;
 import morrigan.model.media.test.TestMediaDb;
-import morrigan.player.OrderResolver;
-import morrigan.player.PlaybackOrder;
 import morrigan.sqlitewrapper.DbException;
 
 public class OrderResolverTest {

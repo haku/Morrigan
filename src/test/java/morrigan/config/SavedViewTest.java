@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import morrigan.config.SavedView;
-
 public class SavedViewTest {
 
 	@Test

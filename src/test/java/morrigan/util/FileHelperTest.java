@@ -14,8 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import morrigan.util.FileHelper;
-
 public class FileHelperTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();

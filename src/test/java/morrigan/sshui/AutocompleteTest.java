@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import morrigan.sshui.Autocomplete;
 import morrigan.sshui.Autocomplete.MergedResult;
 import morrigan.sshui.Autocomplete.PartialQuery;
 

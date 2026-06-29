@@ -8,9 +8,9 @@ import java.util.List;
 
 import morrigan.model.db.IDbColumn;
 import morrigan.model.media.MediaItem;
+import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.MediaStorageLayer;
 import morrigan.model.media.SortColumn;
-import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.SortColumn.SortDirection;
 import morrigan.util.QuerySplitter;
 import morrigan.util.QuoteRemover;

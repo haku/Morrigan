@@ -7,8 +7,6 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import morrigan.model.media.internal.MediaTagImpl;
-
 public class MediaTagImplTest {
 
 	@Test

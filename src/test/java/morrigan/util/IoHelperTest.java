@@ -10,8 +10,6 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import morrigan.util.IoHelper;
-
 public class IoHelperTest {
 
 	@Test

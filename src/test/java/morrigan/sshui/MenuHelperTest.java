@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import morrigan.sshui.MenuHelper;
-
 public class MenuHelperTest {
 
 	@Test

@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import morrigan.util.ChecksumHelper;
 import morrigan.util.ChecksumHelper.Md5AndSha1;
 
 public class ChecksumHelperTest {

@@ -20,9 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import morrigan.player.contentproxy.ContentServer;
-import morrigan.player.contentproxy.LocalHostContentServer;
-
 public class LocalHostContentServerTest {
 
 	private LocalHostContentServer undertest;

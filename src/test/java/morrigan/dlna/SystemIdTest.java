@@ -11,8 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import morrigan.dlna.SystemId;
-
 public class SystemIdTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();

@@ -14,8 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import morrigan.util.Touch;
-
 public class TouchTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();

@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
-import morrigan.dlna.players.AbstractDlnaPlayer;
-import morrigan.dlna.players.AvSubscriber;
 
 public class AvSubscriberTest {
 

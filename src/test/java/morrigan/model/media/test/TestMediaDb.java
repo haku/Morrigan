@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import morrigan.model.exceptions.MorriganException;
 import morrigan.model.media.MediaItem;
+import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.MediaList;
 import morrigan.model.media.MediaNode;
-import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.internal.db.DefaultMediaItemFactory;
 import morrigan.model.media.internal.db.LocalMediaDb;
 import morrigan.model.media.internal.db.MediaDbConfig;

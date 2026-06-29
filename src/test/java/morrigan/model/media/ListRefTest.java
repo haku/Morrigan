@@ -8,8 +8,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.junit.Assert;
 import org.junit.Test;
 
-import morrigan.model.media.ListRef;
-
 public class ListRefTest {
 
 	@Test

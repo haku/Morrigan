@@ -16,8 +16,8 @@ import morrigan.model.exceptions.MorriganException;
 import morrigan.model.media.AbstractItem;
 import morrigan.model.media.ListRef;
 import morrigan.model.media.MediaItem;
-import morrigan.model.media.SortColumn;
 import morrigan.model.media.MediaItem.MediaType;
+import morrigan.model.media.SortColumn;
 import morrigan.model.media.SortColumn.SortDirection;
 import morrigan.player.PlaybackOrder;
 

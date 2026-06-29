@@ -21,10 +21,10 @@ import morrigan.model.media.EphemeralMediaList;
 import morrigan.model.media.FileExistance;
 import morrigan.model.media.ListRef;
 import morrigan.model.media.MediaItem;
+import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.MediaList;
 import morrigan.model.media.MediaNode;
 import morrigan.model.media.SortColumn;
-import morrigan.model.media.MediaItem.MediaType;
 import morrigan.model.media.SortColumn.SortDirection;
 import morrigan.sqlitewrapper.DbException;
 

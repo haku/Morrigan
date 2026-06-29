@@ -14,11 +14,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import morrigan.model.media.MediaItem;
-import morrigan.model.media.SortColumn;
 import morrigan.model.media.MediaItem.MediaType;
+import morrigan.model.media.SortColumn;
 import morrigan.model.media.SortColumn.SortDirection;
-import morrigan.model.media.internal.db.DefaultMediaItemFactory;
-import morrigan.model.media.internal.db.MediaSqliteLayer;
 import morrigan.sqlitewrapper.DbException;
 
 public class MediaSqliteLayerTest {

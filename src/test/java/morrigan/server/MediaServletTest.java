@@ -29,7 +29,6 @@ import morrigan.model.media.MediaNode;
 import morrigan.model.media.MediaTagType;
 import morrigan.model.media.internal.MediaFactoryImpl;
 import morrigan.model.media.test.TestMediaDb;
-import morrigan.server.MediaServlet;
 
 public class MediaServletTest {
 

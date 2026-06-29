@@ -12,8 +12,8 @@ import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
 
 import morrigan.model.exceptions.MorriganException;
-import morrigan.model.media.MediaDb;
 import morrigan.model.media.ListRef.ListType;
+import morrigan.model.media.MediaDb;
 import morrigan.sqlitewrapper.DbException;
 import morrigan.sshui.util.LastActionMessage;
 import morrigan.sshui.util.MenuItems;

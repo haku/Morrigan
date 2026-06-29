@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import morrigan.Args;
 import morrigan.config.Config;
 import morrigan.util.NetHelper;
-import morrigan.util.PropertiesFile;
 import morrigan.util.NetHelper.IfaceAndAddr;
+import morrigan.util.PropertiesFile;
 
 public class ServerConfig implements AuthChecker {
 

@@ -12,8 +12,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import morrigan.engines.playback.IPlaybackEngine.PlayState;
-import morrigan.player.Player;
-import morrigan.player.PlayerSorter;
 
 public class PlayerSorterTest {
 

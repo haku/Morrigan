@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import morrigan.model.media.ListRef;
 import morrigan.model.media.MediaItem;
-import morrigan.model.media.MediaNode;
 import morrigan.model.media.MediaItem.MediaType;
+import morrigan.model.media.MediaNode;
 import morrigan.sqlitewrapper.DbException;
 import morrigan.util.Cache;
 import morrigan.util.Quietly;

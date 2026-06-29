@@ -16,8 +16,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import morrigan.config.Config;
-import morrigan.server.AuthChecker;
-import morrigan.server.AuthFilter;
 
 // Jetty source: https://github.com/eclipse/jetty.project/tree/jetty-7.5.4.v20111024/
 

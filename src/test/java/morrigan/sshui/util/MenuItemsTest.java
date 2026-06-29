@@ -11,8 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import morrigan.sshui.MenuHelper.VDirection;
-import morrigan.sshui.util.MenuItems;
-import morrigan.sshui.util.SelectionAndScroll;
 
 public class MenuItemsTest {
 

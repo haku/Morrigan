@@ -26,8 +26,6 @@ import mediatoad.rpc.MediaToadProto.HasMediaRequest;
 import mediatoad.rpc.MediaToadProto.MediaItem;
 import mediatoad.rpc.MediaToadProto.ReadMediaReply;
 import mediatoad.rpc.MediaToadProto.ReadMediaRequest;
-import morrigan.rpc.client.RpcClient;
-import morrigan.rpc.client.RpcContentServlet;
 
 public class RpcContentServletTest {
 

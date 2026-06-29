@@ -23,11 +23,6 @@ import mediatoad.rpc.MediaToadProto.SortField;
 import morrigan.dlna.extcd.MetadataStorage;
 import morrigan.model.media.ListRef;
 import morrigan.model.media.SortColumn;
-import morrigan.rpc.client.RemoteInstance;
-import morrigan.rpc.client.RpcClient;
-import morrigan.rpc.client.RpcContentServlet;
-import morrigan.rpc.client.RpcItemCache;
-import morrigan.rpc.client.RpcMediaSearchList;
 
 public class RpcMediaSearchListTest {
 

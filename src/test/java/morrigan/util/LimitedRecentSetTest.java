@@ -7,8 +7,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import morrigan.util.LimitedRecentSet;
-
 public class LimitedRecentSetTest {
 
 	private LimitedRecentSet<String> undertest;

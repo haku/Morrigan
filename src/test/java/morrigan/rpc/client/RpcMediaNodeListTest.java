@@ -20,10 +20,6 @@ import morrigan.dlna.extcd.MetadataStorage;
 import morrigan.model.media.ListRef;
 import morrigan.model.media.MediaItem;
 import morrigan.player.PlaybackOrder;
-import morrigan.rpc.client.RemoteInstance;
-import morrigan.rpc.client.RpcClient;
-import morrigan.rpc.client.RpcItemCache;
-import morrigan.rpc.client.RpcMediaNodeList;
 
 public class RpcMediaNodeListTest {
 

@@ -1,8 +1,8 @@
 package morrigan.server;
 
+import morrigan.model.media.ListRef.ListType;
 import morrigan.model.media.MediaDb;
 import morrigan.model.media.MediaFactory;
-import morrigan.model.media.ListRef.ListType;
 import morrigan.tasks.AsyncTask;
 import morrigan.tasks.AsyncTasksRegister;
 import morrigan.tasks.MorriganTask;

@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.common.servlet.MockHttpServletRequest;
 import com.vaguehope.common.servlet.MockHttpServletResponse;
 
-import morrigan.server.LogServlet;
-
 public class LogServletTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LogServletTest.class);

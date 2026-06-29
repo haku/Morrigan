@@ -12,9 +12,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import morrigan.vlc.player.Metadata;
-import morrigan.vlc.player.VlcEngineFactory;
-
 public class MetadataTest {
 
 	private VlcEngineFactory factory;

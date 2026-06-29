@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 import morrigan.model.exceptions.MorriganException;
 import morrigan.model.media.ListRef;
+import morrigan.model.media.ListRef.ListType;
 import morrigan.model.media.MediaFactory;
 import morrigan.model.media.MediaList;
-import morrigan.model.media.ListRef.ListType;
 import morrigan.sqlitewrapper.DbException;
 import morrigan.util.Cache;
 
