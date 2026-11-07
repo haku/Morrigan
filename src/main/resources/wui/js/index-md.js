@@ -376,25 +376,28 @@
 
   function fillInTagSearches(data) {
     $.each(data, function(index, item) {
-      var val = item['value'];
-      var quote;
-      if (val.indexOf(' ') >= 0) {
-        if (val.indexOf('"') >= 0) {
-          if (val.indexOf("'") >= 0) {
-            val = val.replace(/\\/g, "\\\\");
-            val = val.replace(/'/g, "\\'");
-          }
-          quote = "'";
+      item['value'] = makeTagSearch(item['value']);
+    });
+  }
+
+  function makeTagSearch(tag) {
+    var quote;
+    if (tag.indexOf(' ') >= 0) {
+      if (tag.indexOf('"') >= 0) {
+        if (tag.indexOf("'") >= 0) {
+          tag = tag.replace(/\\/g, "\\\\");
+          tag = tag.replace(/'/g, "\\'");
         }
-        else {
-          quote = '"';
-        }
+        quote = "'";
       }
       else {
-        quote = '';
+        quote = '"';
       }
-      item['value'] = 't=' + quote + val + quote;
-    });
+    }
+    else {
+      quote = '';
+    }
+    return 't=' + quote + tag + quote;
   }
 
   function onAutocompleteKeyup(event) {
@@ -957,7 +960,7 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
-      setDbTabToSearch(tag.listRef, tag.view, tag.value);
+      setDbTabToSearch(tag.listRef, tag.view, makeTagSearch(tag.value));
     });
 
     return el;
@@ -1178,7 +1181,7 @@
       var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
       updateRowText(search, tag, items);
       search.unbind().click(function() {
-        setDbTabToSearch(listRef, view, 't=' + tag);
+        setDbTabToSearch(listRef, view, makeTagSearch(tag));
         hidePopup(dlg);
         $('#fixed_tab_db span').click();
       });
