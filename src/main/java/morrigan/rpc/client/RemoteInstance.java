@@ -9,9 +9,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.vaguehope.common.rpc.RpcTarget;
-import com.vaguehope.common.rpc.RpcTarget.RpcConfigException;
-
+import faecommon.rpc.RpcTarget;
+import faecommon.rpc.RpcTarget.RpcConfigException;
 import morrigan.Args;
 import morrigan.Args.ArgsException;
 

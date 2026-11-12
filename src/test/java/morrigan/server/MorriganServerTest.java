@@ -16,7 +16,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 
-import com.vaguehope.common.servlet.MockHttpServletResponse;
+import faecommon.servlet.MockHttpServletResponse;
 
 public class MorriganServerTest {
 

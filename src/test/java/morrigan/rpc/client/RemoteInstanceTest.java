@@ -9,8 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.vaguehope.common.rpc.RpcTarget;
-
+import faecommon.rpc.RpcTarget;
 import morrigan.Args;
 
 public class RemoteInstanceTest {

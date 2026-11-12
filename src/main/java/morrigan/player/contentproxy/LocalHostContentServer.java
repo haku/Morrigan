@@ -13,8 +13,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.common.servlet.RequestLoggingFilter;
-
+import faecommon.servlet.RequestLoggingFilter;
 import morrigan.model.exceptions.MorriganException;
 
 public class LocalHostContentServer implements ContentProxy {

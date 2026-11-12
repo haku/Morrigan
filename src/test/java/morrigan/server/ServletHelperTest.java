@@ -14,8 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.vaguehope.common.servlet.MockHttpServletResponse;
-
+import faecommon.servlet.MockHttpServletResponse;
 import morrigan.util.IoHelper;
 
 public class ServletHelperTest {

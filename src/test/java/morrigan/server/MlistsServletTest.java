@@ -13,9 +13,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.vaguehope.common.servlet.MockHttpServletRequest;
-import com.vaguehope.common.servlet.MockHttpServletResponse;
-
+import faecommon.servlet.MockHttpServletRequest;
+import faecommon.servlet.MockHttpServletResponse;
 import morrigan.config.Config;
 import morrigan.model.media.MediaItem;
 import morrigan.model.media.MediaItem.MediaType;

@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.common.servlet.MockHttpServletRequest;
-import com.vaguehope.common.servlet.MockHttpServletResponse;
+import faecommon.servlet.MockHttpServletRequest;
+import faecommon.servlet.MockHttpServletResponse;
 
 public class LogServletTest {
 

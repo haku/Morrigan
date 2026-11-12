@@ -32,8 +32,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.common.rpc.RpcStatusServlet;
-
+import faecommon.rpc.RpcStatusServlet;
 import morrigan.Args;
 import morrigan.Args.ArgsException;
 import morrigan.config.Config;

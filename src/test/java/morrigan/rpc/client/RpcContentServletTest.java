@@ -15,9 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.protobuf.ByteString;
-import com.vaguehope.common.servlet.MockHttpServletRequest;
-import com.vaguehope.common.servlet.MockHttpServletResponse;
 
+import faecommon.servlet.MockHttpServletRequest;
+import faecommon.servlet.MockHttpServletResponse;
 import mediatoad.rpc.MediaGrpc.MediaBlockingStub;
 import mediatoad.rpc.MediaToadProto;
 import mediatoad.rpc.MediaToadProto.FileExistance;
