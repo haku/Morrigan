@@ -1,5 +1,7 @@
 package faecommon.servlet;
 
+import static faecommon.util.StringsCommon.escapeHtml;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -50,18 +52,25 @@ public abstract class StatusPageServlet extends HttpServlet {
 		w.println("<table>");
 		w.print("<tr><th></th>");
 		for (final C c : columns) {
-			w.print("<th>" + c + "</th>");
+			w.print("<th>");
+			w.print(escapeHtml(c));
+			w.print("</th>");
 		}
 		w.println("</tr>");
 		for (final Entry<R, Map<C, V>> re : table.rowMap().entrySet()) {
-			w.print("<tr><td>" + re.getKey() + "</td>");
+			w.print("<tr><td>");
+			w.print(escapeHtml(re.getKey()));
+			w.print("</td>");
+
 			for (final C c : columns) {
 				final V val = re.getValue().get(c);
 				if (val == null) {
 					w.print("<td></td>");
 				}
 				else {
-					w.print("<td>" + val + "</td>");
+					w.print("<td>");
+					w.print(escapeHtml(val));
+					w.print("</td>");
 				}
 			}
 			w.println("</tr>");
