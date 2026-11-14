@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import faecommon.mediatoadclient.RemoteInstance;
+import faecommon.mediatoadclient.RpcClient;
 import io.grpc.StatusRuntimeException;
 import mediatoad.rpc.MediaGrpc.MediaBlockingStub;
 import mediatoad.rpc.MediaToadProto;

@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.google.protobuf.ByteString;
 
+import faecommon.mediatoadclient.RpcClient;
 import faecommon.servlet.MockHttpServletRequest;
 import faecommon.servlet.MockHttpServletResponse;
 import mediatoad.rpc.MediaGrpc.MediaBlockingStub;

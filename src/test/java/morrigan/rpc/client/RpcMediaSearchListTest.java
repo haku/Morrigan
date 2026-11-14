@@ -14,6 +14,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import faecommon.mediatoadclient.RemoteInstance;
+import faecommon.mediatoadclient.RpcClient;
 import mediatoad.rpc.MediaGrpc.MediaBlockingStub;
 import mediatoad.rpc.MediaToadProto.AboutReply;
 import mediatoad.rpc.MediaToadProto.AboutRequest;

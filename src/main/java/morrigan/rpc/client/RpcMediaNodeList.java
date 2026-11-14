@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
+import faecommon.mediatoadclient.RemoteInstance;
+import faecommon.mediatoadclient.RpcClient;
 import io.grpc.StatusRuntimeException;
 import mediatoad.rpc.MediaToadProto;
 import mediatoad.rpc.MediaToadProto.ListNodeReply;

@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import faecommon.mediatoadclient.RemoteInstance;
 import faecommon.rpc.RpcTarget;
 import morrigan.Args;
 
@@ -27,7 +28,7 @@ public class RemoteInstanceTest {
 
 		final Args args = mock(Args.class);
 		when(args.getRemotes()).thenReturn(input);
-		assertEquals(expected, RemoteInstance.fromArgs(args));
+		assertEquals(expected, MnRemoteInstances.fromArgs(args));
 	}
 
 }

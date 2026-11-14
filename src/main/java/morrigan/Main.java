@@ -26,7 +26,7 @@ import morrigan.player.PlayerRegister;
 import morrigan.player.PlayerRegisterImpl;
 import morrigan.player.PlayerStateStorage;
 import morrigan.player.contentproxy.LocalHostContentServer;
-import morrigan.rpc.client.RpcRemotesManager;
+import morrigan.rpc.client.MnRpcRemotesManager;
 import morrigan.server.AsyncActions;
 import morrigan.server.MorriganServer;
 import morrigan.server.ServerConfig;
@@ -113,7 +113,7 @@ public final class Main {
 		}
 
 		if (args.getRemotes().size() > 0) {
-			final RpcRemotesManager remotes = new RpcRemotesManager(args, mediaFactory, config);
+			final MnRpcRemotesManager remotes = new MnRpcRemotesManager(args, mediaFactory, config);
 			remotes.start();
 		}
 

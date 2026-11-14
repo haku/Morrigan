@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
+import faecommon.mediatoadclient.RemoteInstance;
+import faecommon.mediatoadclient.RpcClient;
 import mediatoad.rpc.MediaGrpc.MediaBlockingStub;
 import mediatoad.rpc.MediaToadProto;
 import mediatoad.rpc.MediaToadProto.ListNodeReply;

@@ -16,6 +16,7 @@ import org.eclipse.jetty.server.InclusiveByteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import faecommon.mediatoadclient.RpcClient;
 import io.grpc.Context;
 import io.grpc.Context.CancellableContext;
 import io.grpc.StatusRuntimeException;

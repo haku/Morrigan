@@ -1,4 +1,4 @@
-package morrigan.rpc.client;
+package faecommon.mediatoadclient;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,6 @@ import io.grpc.CallCredentials;
 import io.grpc.ManagedChannel;
 import mediatoad.rpc.MediaGrpc;
 import mediatoad.rpc.MediaGrpc.MediaBlockingStub;
-import morrigan.Args.ArgsException;
 
 public class RpcClient {
 
@@ -19,7 +18,7 @@ public class RpcClient {
 	private final Map<String, MediaBlockingStub> mediaBlockingStubs = new ConcurrentHashMap<>();
 	private final CallCredentials callCredentials;
 
-	public RpcClient(final List<RemoteInstance> remoteInstances, CallCredentials callCredentials) throws ArgsException {
+	public RpcClient(final List<RemoteInstance> remoteInstances, CallCredentials callCredentials) {
 		this.remoteInstances = remoteInstances;
 		this.callCredentials = callCredentials;
 	}

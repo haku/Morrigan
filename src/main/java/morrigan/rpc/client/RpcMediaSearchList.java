@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import faecommon.mediatoadclient.RemoteInstance;
+import faecommon.mediatoadclient.RpcClient;
 import io.grpc.StatusRuntimeException;
 import mediatoad.rpc.MediaToadProto.AboutReply;
 import mediatoad.rpc.MediaToadProto.AboutRequest;
