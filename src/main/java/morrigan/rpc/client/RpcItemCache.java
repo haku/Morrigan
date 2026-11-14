@@ -1,9 +1,9 @@
 package morrigan.rpc.client;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class RpcItemCache {
 	private static final Logger LOG = LoggerFactory.getLogger(RpcItemCache.class);
 
 	private final Cache<String, MediaItem> freshCache = CacheBuilder.newBuilder()
-			.expireAfterWrite(1, TimeUnit.MINUTES)
+			.expireAfterWrite(Duration.ofMinutes(1))
 			.build();
 	// TODO maybe provide a way to GC this?  atm its unbounded growth.
 	private final Cache<String, MediaItem> allCache = CacheBuilder.newBuilder()
