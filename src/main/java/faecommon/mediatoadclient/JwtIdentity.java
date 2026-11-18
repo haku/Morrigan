@@ -34,9 +34,9 @@ public class JwtIdentity extends CallCredentials {
 
 	private final RateLimiter sendPublicKeyRate = RateLimiter.create(1d / 300d);
 
-	public JwtIdentity(final File keyFile, final String hostName) throws IOException {
+	public JwtIdentity(final File keyFile, final String appName, final String hostName) throws IOException {
 		if (StringUtils.isBlank(hostName)) throw new IllegalArgumentException("hostName can not be blank.");
-		this.username = "morrigan@" + hostName;
+		this.username = appName + "@" + hostName;
 
 		if (!keyFile.exists() || keyFile.length() < 1) {
 			generateKey(keyFile, this.username);

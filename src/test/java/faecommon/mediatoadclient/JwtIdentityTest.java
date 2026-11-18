@@ -43,16 +43,16 @@ public class JwtIdentityTest {
 	@Test
 	public void itReloadsKey() throws Exception {
 		final File f = this.tmp.newFile();
-		new JwtIdentity(f, "my-host-name");
+		new JwtIdentity(f, "my-app-name", "my-host-name");
 		final String generatedKey = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
 		assertThat(generatedKey.length(), greaterThan(1));
 
-		final JwtIdentity undertest = new JwtIdentity(f, "my-host-name");
+		final JwtIdentity undertest = new JwtIdentity(f, "my-app-name", "my-host-name");
 		final String loadedKey = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
 		assertEquals(generatedKey, loadedKey);
 
 		try {
-			new JwtIdentity(f, "different-host-name");
+			new JwtIdentity(f, "my-app-name", "different-host-name");
 			fail("Expected exception.");
 		}
 		catch (final IllegalStateException e) {
@@ -66,7 +66,7 @@ public class JwtIdentityTest {
 		final MetadataApplier applier = mock(MetadataApplier.class);
 
 		final File file = this.tmp.newFile();
-		final JwtIdentity undertest = new JwtIdentity(file, "my-host-name");
+		final JwtIdentity undertest = new JwtIdentity(file, "my-app-name", "my-host-name");
 		undertest.applyRequestMetadata(requestInfo, MoreExecutors.directExecutor(), applier);
 		undertest.applyRequestMetadata(requestInfo, MoreExecutors.directExecutor(), applier);
 

@@ -48,6 +48,10 @@ public class RpcClient {
 		return this.remoteInstances;
 	}
 
+	public MediaBlockingStub getMediaBlockingStub(final RemoteInstance ri) {
+		return this.getMediaBlockingStub(ri.getLocalIdentifier());
+	}
+
 	public MediaBlockingStub getMediaBlockingStub(final String rid) {
 		final MediaBlockingStub stub = this.mediaBlockingStubs.get(rid);
 		if (stub == null) throw new IllegalArgumentException("No stub found for: " + rid);

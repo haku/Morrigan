@@ -18,6 +18,7 @@ import morrigan.sqlitewrapper.DbException;
 public class MnRpcRemotesManager extends RpcRemotesManager {
 
 	private static final String METADATA_DB_DIR = "rpcmetadata";  // TODO move to Config class.
+	private static final String APP_NAME = "morrigan";
 
 	private final MediaFactory mediaFactory;
 	private final Config config;
@@ -29,7 +30,7 @@ public class MnRpcRemotesManager extends RpcRemotesManager {
 	}
 
 	public MnRpcRemotesManager(final List<RemoteInstance> instances, final MediaFactory mediaFactory, final Config config, final boolean printAccessLog) throws ArgsException, IOException {
-		super(instances, config.getConfigDir(), printAccessLog);
+		super(instances, config.getConfigDir(), APP_NAME, printAccessLog);
 		this.mediaFactory = mediaFactory;
 		this.config = config;
 		this.rpcContentServer = new RpcContentServlet(this.rpcClient);

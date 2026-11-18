@@ -12,15 +12,15 @@ public class RpcRemotesManager {
 
 	protected final RpcClient rpcClient;
 
-	public RpcRemotesManager(final List<RemoteInstance> instances, final File configDir, final boolean printAccessLog) throws IOException {
-		final JwtIdentity credentials = makeCredentials(configDir);
+	public RpcRemotesManager(final List<RemoteInstance> instances, final File configDir, final String appName, final boolean printAccessLog) throws IOException {
+		final JwtIdentity credentials = makeCredentials(configDir, appName);
 		this.rpcClient = new RpcClient(instances, credentials);
 	}
 
-	private static JwtIdentity makeCredentials(final File configDir) throws IOException {
+	private static JwtIdentity makeCredentials(final File configDir, final String appName) throws IOException {
 		final File file = new File(configDir, PRIVATE_KEY_FILE_NAME);
 		setPrivateKeyFilePermissions(file);
-		final JwtIdentity credentials = new JwtIdentity(file, findHostName());
+		final JwtIdentity credentials = new JwtIdentity(file, appName, findHostName());
 		setPrivateKeyFilePermissions(file);
 		return credentials;
 	}
@@ -45,6 +45,10 @@ public class RpcRemotesManager {
 			}
 		});
 		this.rpcClient.start();
+	}
+
+	public RpcClient getClient() {
+		return this.rpcClient;
 	}
 
 	private static String findHostName() {
