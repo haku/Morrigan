@@ -169,7 +169,8 @@ public class PlayerStateStorage {
 		if (StringHelper.blank(i.filepath) && StringHelper.blank(i.md5)) return null;
 
 		final ListRef listRef = ListRef.fromUrlForm(i.listRef);
-		final PlayItem unresolved = PlayItem.makeUnresolved(listRef, i.filepath, i.remoteId, new BigInteger(i.md5, 16), i.title);
+		final BigInteger md5 = "0".equals(i.md5) ? null : new BigInteger(i.md5, 16);
+		final PlayItem unresolved = PlayItem.makeUnresolved(listRef, i.filepath, i.remoteId, md5, i.title);
 		try {
 			final PlayItem ready = unresolved.makeReady((r) -> getList(r, listCache));
 			if (ready != null) return ready;

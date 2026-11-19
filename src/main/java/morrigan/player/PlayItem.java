@@ -29,6 +29,7 @@ public abstract class PlayItem {
 	}
 
 	public static PlayItem makeUnresolved(final ListRef listRef, final String filepath, final String remoteId, final BigInteger md5, final String title) {
+		if (BigInteger.ZERO.equals(md5)) throw new IllegalArgumentException("md5 can not be 0.");
 		return new UnresolvedPlayItem(listRef, filepath, remoteId, md5, title);
 	}
 

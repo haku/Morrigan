@@ -38,7 +38,6 @@ public class PlayerStateStorageTest {
 	private ListRef listRef1;
 	private MediaList mediaList1;
 	private PlayItem playItem0;
-	private PlayItem playItem1;
 
 	private Player player;
 	private PlayerQueue queue;
@@ -73,7 +72,6 @@ public class PlayerStateStorageTest {
 		when(mediaItem1.getMd5()).thenReturn(BigInteger.valueOf(0xabcdef123456789L));
 		when(mediaItem1.getTitle()).thenReturn("item1");
 		when(mediaItem1.isPlayable()).thenReturn(true);
-		this.playItem1 = PlayItem.makeReady(this.mediaList1, mediaItem1);
 
 		this.player = mock(Player.class);
 		this.queue = new DefaultPlayerQueue();
@@ -85,8 +83,9 @@ public class PlayerStateStorageTest {
 		when(this.player.getCurrentItem()).thenReturn(this.playItem0);
 
 		this.queue.addToQueue(PlayItem.makeAction(PlayItemType.STOP));
-		this.queue.addToQueue(this.playItem1);
-		this.queue.addToQueue(PlayItem.makeUnresolved(this.listRef1, "un path", "un id", BigInteger.ZERO, "un title"));
+		this.queue.addToQueue(PlayItem.makeReady(this.mediaList0, null));
+		this.queue.addToQueue(PlayItem.makeReady(this.mediaList1, mediaItem1));
+		this.queue.addToQueue(PlayItem.makeUnresolved(this.listRef1, "un path", "un id", null, "un title"));
 		this.queue.addToQueue(PlayItem.makeReady(null, new UrlItem("https://example.com/path")));
 	}
 
@@ -102,6 +101,7 @@ public class PlayerStateStorageTest {
 				+ "},"
 				+ "\"queue\":["
 				+ "{\"listRef\":\"STOP\"},"
+				+ "{\"listRef\":\"LOCAL:l\\u003dsome-db\\u0026s\\u003dt%3Dfoo+OR+t%3Dbar\",\"md5\":\"0\",\"title\":\"list0\"},"
 				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"remoteId\":\"some-remote-id\",\"md5\":\"abcdef123456789\",\"title\":\"item1\"},"
 				+ "{\"listRef\":\"RPC:l\\u003dsome-rpc-list\\u0026n\\u003dsome-rpc-node\",\"filepath\":\"un path\",\"remoteId\":\"un id\",\"md5\":\"0\",\"title\":\"Unresolved: un title\"},"
 				+ "{\"remoteLocation\":\"https://example.com/path\",\"md5\":\"0\",\"title\":\"https://example.com/path\"}"
@@ -120,13 +120,15 @@ public class PlayerStateStorageTest {
 
 		final PlayItem q0 = PlayItem.makeAction(PlayItemType.STOP);
 		q0.setId(0);
-		final PlayItem q1 = PlayItem.makeUnresolved(this.listRef1, null, "some-remote-id", BigInteger.valueOf(0xabcdef123456789L), "item1");
+		final PlayItem q1 = PlayItem.makeReady(this.mediaList0, null);
 		q1.setId(1);
-		final PlayItem q2 = PlayItem.makeUnresolved(this.listRef1, "un path", "un id", BigInteger.ZERO, "Unresolved: un title");
+		final PlayItem q2 = PlayItem.makeUnresolved(this.listRef1, null, "some-remote-id", BigInteger.valueOf(0xabcdef123456789L), "item1");
 		q2.setId(2);
-		final PlayItem q3 = PlayItem.makeReady(null, new UrlItem("https://example.com/path"));
+		final PlayItem q3 = PlayItem.makeUnresolved(this.listRef1, "un path", "un id", null, "Unresolved: un title");
 		q3.setId(3);
-		assertThat(newPlayer.getQueue().getQueueList(), contains(q0, q1, q2, q3));
+		final PlayItem q4 = PlayItem.makeReady(null, new UrlItem("https://example.com/path"));
+		q4.setId(4);
+		assertThat(newPlayer.getQueue().getQueueList(), contains(q0, q1, q2, q3, q4));
 	}
 
 }
